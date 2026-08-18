@@ -15,10 +15,8 @@ import { LevelUpModal } from './components/LevelUpModal';
 export const App: Component = () => {
   const store = createGameStore();
 
-  // Khởi động ván cờ đầu tiên khi mở trang và bắt sự kiện chuyển tab
+  // Khởi động khi mở trang và bắt sự kiện chuyển tab
   onMount(() => {
-    store.startNewGame(true);
-
     const handleVisibilityChange = () => {
       if (document.hidden) {
         if (store.gameStatus() === 'playing' && store.moveHistory().length > 0) {

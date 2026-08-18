@@ -114,6 +114,7 @@ export function createGameStore() {
     } catch (err) {
       console.error('Không thể khởi tạo Web Worker:', err);
     }
+    resetIdleTimer();
   });
 
   onCleanup(() => {

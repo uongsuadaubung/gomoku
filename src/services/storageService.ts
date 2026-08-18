@@ -73,7 +73,7 @@ export class StorageService {
   public static getTheme(): ThemeType {
     const theme = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeType;
     const validThemes: ThemeType[] = ['wood', 'paper', 'jade', 'slate', 'cyber'];
-    return validThemes.includes(theme) ? theme : 'wood';
+    return validThemes.includes(theme) ? theme : 'paper';
   }
 
   public static setTheme(theme: ThemeType): void {
@@ -90,7 +90,7 @@ export class StorageService {
 
   public static getBoardStyle(): BoardStyle {
     const style = localStorage.getItem('gomoku_board_style_v1') as BoardStyle;
-    return style === 'cells' ? 'cells' : 'intersections';
+    return style === 'intersections' ? 'intersections' : 'cells';
   }
 
   public static setBoardStyle(style: BoardStyle): void {
