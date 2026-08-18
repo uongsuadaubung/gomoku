@@ -65,8 +65,17 @@ export function createGameStore() {
 
   let tauntDismissTimer: number | null = null;
   let idleThinkingTimer: number | null = null;
+  let recentUndoTimestamps: number[] = [];
   let lastActionTauntTime: number = 0;
   const IDLE_EVENTS: TauntEvent[] = ['IDLE_IN_GAME', 'IDLE_THINKING', 'IDLE_PRE_GAME', 'IDLE_AFTER_LOSS'];
+
+  // Trạng thái chuỗi trận (Match Series Flow)
+  const [isSeriesActive, setIsSeriesActive] = createSignal<boolean>(false);
+  const [seriesGameNumber, setSeriesGameNumber] = createSignal<number>(0);
+  const [lastResigned, setLastResigned] = createSignal<boolean>(false);
+
+  // Bên đi trước ở ván kế tiếp trong chuỗi (tự động đảo bên)
+  const nextSeriesPlayerSide = createMemo<boolean>(() => playerColor() !== BLACK);
 
   // Modals
   const [showStatsModal, setShowStatsModal] = createSignal<boolean>(false);
@@ -202,7 +211,7 @@ export function createGameStore() {
         if (status === 'playing') {
           // Khi đến lượt người chơi mà đang ngâm cờ / AFK suy nghĩ
           if (currentTurn() === playerColor() && !isAiThinking()) {
-            const inGameEvents: TauntEvent[] = ['IDLE_IN_GAME', 'IDLE_THINKING'];
+            const inGameEvents: TauntEvent[] = ['IDLE_IN_GAME', 'IDLE_THINKING', 'SUPER_SLOW_MOVE'];
             const chosenEvent = inGameEvents[Math.floor(Math.random() * inGameEvents.length)];
             triggerTaunt(chosenEvent);
             scheduleNextIdleTaunt(getRandomInterval());
@@ -230,13 +239,16 @@ export function createGameStore() {
   }
 
   /**
-   * Chọn bên đi trước / đi sau (chờ người chơi bấm Ván Mới để bắt đầu)
+   * Chọn bên đi trước / đi sau khi bắt đầu chuỗi mới
    */
   function setPlayerSide(playAsBlack: boolean) {
-    const chosenPlayer: ActivePlayer = playAsBlack ? BLACK : WHITE;
-    if (playerColor() === chosenPlayer && gameStatus() === 'idle') return;
+    if (gameStatus() === 'playing') return;
 
+    const chosenPlayer: ActivePlayer = playAsBlack ? BLACK : WHITE;
     setPlayerColor(chosenPlayer);
+    setIsSeriesActive(false);
+    setSeriesGameNumber(0);
+    setLastResigned(false);
     setBoard(createEmptyBoard());
     setCurrentTurn(BLACK);
     setGameStatus('idle');
@@ -257,9 +269,9 @@ export function createGameStore() {
   }
 
   /**
-   * Bắt đầu một ván cờ mới ngay lập tức khi người chơi bấm nút Ván Mới
+   * Khởi động một ván cờ nội bộ
    */
-  function startNewGame(playAsBlack: boolean = playerColor() === BLACK) {
+  function launchBoardGame(playAsBlack: boolean) {
     const chosenPlayer: ActivePlayer = playAsBlack ? BLACK : WHITE;
     setPlayerColor(chosenPlayer);
     const emptyBoard = createEmptyBoard();
@@ -270,7 +282,7 @@ export function createGameStore() {
     soundService.playClickSound();
 
     if (!playAsBlack) {
-      // Bot cầm quân Đen đi trước -> Hạ cờ ngay tại trung tâm Thiên Nguyên (7, 7) tức thì
+      // Bot cầm quân Đen đi trước -> Hạ cờ ngay tại trung tâm Thiên Nguyên (7, 7)
       const botRow = 7;
       const botCol = 7;
       emptyBoard[botRow][botCol] = BLACK;
@@ -300,6 +312,61 @@ export function createGameStore() {
       triggerTaunt('GAME_START', 200);
       resetIdleTimer();
     }
+  }
+
+  /**
+   * Bắt đầu một chuỗi ván đấu mới từ đầu
+   */
+  function startNewSeries(playAsBlack: boolean) {
+    setIsSeriesActive(true);
+    setSeriesGameNumber(1);
+    setLastResigned(false);
+    launchBoardGame(playAsBlack);
+  }
+
+  /**
+   * Bắt đầu ván kế tiếp: Tự động đảo lượt đi trước nếu đang trong chuỗi
+   */
+  function startNextGame() {
+    if (isSeriesActive()) {
+      // Đang trong chuỗi: Tự động đảo lượt đi trước qua lại
+      const nextPlayAsBlack = playerColor() !== BLACK;
+      setSeriesGameNumber(prev => prev + 1);
+      setLastResigned(false);
+      launchBoardGame(nextPlayAsBlack);
+    } else {
+      // Chưa trong chuỗi hoặc vừa đầu hàng: Bắt đầu chuỗi mới
+      startNewSeries(playerColor() === BLACK);
+    }
+  }
+
+  /**
+   * Bắt đầu ván cờ (Tương thích chung với các nút bấm)
+   */
+  function startNewGame(playAsBlack?: boolean) {
+    if (playAsBlack !== undefined && !isSeriesActive()) {
+      startNewSeries(playAsBlack);
+    } else {
+      startNextGame();
+    }
+  }
+
+  /**
+   * Đặt lại chuỗi đấu về trạng thái ban đầu để người chơi tự do chọn lại bên
+   */
+  function resetSeries() {
+    setIsSeriesActive(false);
+    setSeriesGameNumber(0);
+    setLastResigned(false);
+    setGameStatus('idle');
+    setBoard(createEmptyBoard());
+    setCurrentTurn(BLACK);
+    setMoveHistory([]);
+    setLastMove(null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    soundService.playClickSound();
   }
 
   /**
@@ -390,9 +457,7 @@ export function createGameStore() {
    * Người chơi thực hiện nước đi
    */
   function makePlayerMove(row: number, col: number) {
-    if (gameStatus() === 'idle' && currentTurn() === playerColor()) {
-      setGameStatus('playing');
-    } else if (gameStatus() !== 'playing' || isAiThinking()) {
+    if (gameStatus() !== 'playing' || isAiThinking()) {
       return;
     }
     if (currentTurn() !== playerColor()) return;
@@ -409,10 +474,13 @@ export function createGameStore() {
       triggerTaunt('CENTER_MOVE', 150);
     }
 
-    // Kiểm tra nếu đánh quá nhanh không cần suy nghĩ (< 800ms)
+    // Kiểm tra nếu đánh quá nhanh không cần suy nghĩ (< 450ms -> RUSH_MOVE, < 800ms -> FAST_MOVE_TAUNT)
     if (history.length >= 2) {
-      const lastPlayerStep = history[history.length - 1];
-      if (now - lastPlayerStep.timestamp < 800 && Math.random() < 0.35) {
+      const lastStep = history[history.length - 1];
+      const diff = now - lastStep.timestamp;
+      if (diff < 450 && Math.random() < 0.6) {
+        triggerTaunt('RUSH_MOVE', 150);
+      } else if (diff < 800 && Math.random() < 0.35) {
         triggerTaunt('FAST_MOVE_TAUNT', 150);
       }
     }
@@ -461,6 +529,11 @@ export function createGameStore() {
     const isBlunder = TauntService.isPlayerBlunder(currentBoard, aiColor(), row, col);
     if (isBlunder) {
       triggerTaunt('BLUNDER_MOVE', 150);
+    } else {
+      const isThreat = TauntService.isPlayerThreatMove(currentBoard, player);
+      if (isThreat && Math.random() < 0.45) {
+        triggerTaunt('PLAYER_GOOD_MOVE', 150);
+      }
     }
 
     // Chuyển lượt sang AI
@@ -486,6 +559,14 @@ export function createGameStore() {
       setWinInfo(winResult);
     }
 
+    if (!lastResigned()) {
+      // Kết thúc tự nhiên -> Duy trì chuỗi ván đấu để tự động đảo bên ở ván tiếp theo
+      setIsSeriesActive(true);
+      if (seriesGameNumber() === 0) {
+        setSeriesGameNumber(1);
+      }
+    }
+
     const player = playerColor();
     const oldLevel = currentLevelConfig().id;
     const prevStats = stats();
@@ -500,8 +581,10 @@ export function createGameStore() {
       // Nếu trước đó đang thua nhiều ván liên tiếp mà giờ thắng được 1 ván
       if (prevStats.losses >= 3 && prevStats.currentStreak === 0) {
         triggerTaunt('BREAK_LOSS_STREAK', 500);
+      } else if (newStats.currentStreak >= 2) {
+        triggerTaunt('PLAYER_STREAK_WIN', 500);
       } else {
-        triggerTaunt('PLAYER_GOOD_MOVE', 500);
+        triggerTaunt('PLAYER_WIN', 500);
       }
 
       // Kiểm tra thăng cấp AI
@@ -537,7 +620,7 @@ export function createGameStore() {
   }
 
   /**
-   * Người chơi chủ động nhận thua ván đấu đang diễn ra
+   * Người chơi chủ động nhận thua ván đấu đang diễn ra -> Chấm dứt chuỗi đấu
    */
   function resignGame() {
     if (gameStatus() !== 'playing') return;
@@ -547,6 +630,11 @@ export function createGameStore() {
       worker.postMessage({ type: 'CANCEL' });
       setIsAiThinking(false);
     }
+
+    // Chấm dứt chuỗi ván đấu hiện tại khi người chơi đầu hàng
+    setIsSeriesActive(false);
+    setLastResigned(true);
+
     triggerTaunt('PLAYER_RESIGN', 200);
     handleGameOver(aiColor(), null);
   }
@@ -620,7 +708,15 @@ export function createGameStore() {
     setCurrentTurn(playerColor());
 
     soundService.playClickSound();
-    triggerTaunt('PLAYER_UNDO', 300);
+    const now = Date.now();
+    recentUndoTimestamps = recentUndoTimestamps.filter(t => now - t < 10000);
+    recentUndoTimestamps.push(now);
+
+    if (recentUndoTimestamps.length >= 3) {
+      triggerTaunt('MULTI_UNDO', 300);
+    } else {
+      triggerTaunt('PLAYER_UNDO', 300);
+    }
     resetIdleTimer();
   }
 
@@ -689,6 +785,11 @@ export function createGameStore() {
   function toggleSound() {
     const next = soundService.toggleMute();
     setIsMutedState(next);
+    if (next) {
+      triggerTaunt('SOUND_MUTE', 150);
+    } else {
+      triggerTaunt('SOUND_UNMUTE', 150);
+    }
   }
 
   /**
@@ -722,6 +823,10 @@ export function createGameStore() {
     isMuted,
     enableTaunts,
     tauntState,
+    isSeriesActive,
+    seriesGameNumber,
+    lastResigned,
+    nextSeriesPlayerSide,
     showStatsModal,
     showBotModal,
     showSettingsModal,
@@ -737,6 +842,9 @@ export function createGameStore() {
 
     // Actions
     startNewGame,
+    startNewSeries,
+    startNextGame,
+    resetSeries,
     setPlayerSide,
     resignGame,
     makePlayerMove,

@@ -83,15 +83,27 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     }
   };
 
-  return (
-    <div class="relative flex items-center justify-center my-1 sm:my-2 w-full">
-      {/* 🗨️ BONG BÓNG THOẠI CÀ KHỊA (Comic Speech Bubble) - Định vị Absolute để triệt tiêu hoàn toàn xê dịch layout */}
-      <Show when={taunt().visible}>
-        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-30 animate-scale-in w-max max-w-[min(90vw,360px)] sm:max-w-md pointer-events-none">
-          <div class="relative bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 font-black text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-2xl shadow-amber-950/60 border-2 border-amber-300 flex items-center gap-2 text-center pointer-events-auto">
-            <MessageSquareQuote size={16} class="shrink-0 text-slate-900 sm:w-[18px] sm:h-[18px]" />
-            <span class="leading-snug text-left sm:text-center">{taunt().text}</span>
+  let pokeTimestamps: number[] = [];
+  const handlePoke = () => {
+    const now = Date.now();
+    pokeTimestamps = pokeTimestamps.filter(t => now - t < 4000);
+    pokeTimestamps.push(now);
 
+    if (pokeTimestamps.length >= 4) {
+      store.triggerTaunt('SPAM_POKE_BOT');
+    } else {
+      store.triggerTaunt('POKE_BOT');
+    }
+  };
+
+  return (
+    <div class="relative flex flex-col items-center">
+      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Nổi bật phía trên Icon Bot) */}
+      <Show when={taunt().visible && !!taunt().text}>
+        <div class="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-40 w-max max-w-[280px] sm:max-w-[340px] pointer-events-none animate-bounce-subtle">
+          <div class="relative px-3.5 py-2.5 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl border-2 border-amber-200">
+            {/* Nội dung câu khịa */}
+            <p class="drop-shadow-sm break-words select-none">{taunt().text}</p>
             {/* Mũi nhọn đuôi bong bóng thoại trỏ xuống chính giữa Icon Bot */}
             <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-amber-400 rotate-45 border-r-2 border-b-2 border-amber-300 pointer-events-none" />
           </div>
@@ -100,7 +112,7 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
       {/* 🤖 ICON BOT TƯƠNG TÁC (Chỉ hiển thị Icon, bấm vào để bị cà khịa) */}
       <button
-        onClick={() => store.triggerTaunt('POKE_BOT')}
+        onClick={handlePoke}
         class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-lg transition-all duration-300 active:scale-90 cursor-pointer select-none ${
           taunt().visible ? 'ring-2 ring-amber-400 shadow-amber-500/30' : ''
         }`}

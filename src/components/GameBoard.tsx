@@ -35,18 +35,20 @@ export const GameBoard: Component<GameBoardProps> = props => {
   };
 
   const canPlay = () => {
-    const isPlaying =
-      store.gameStatus() === 'playing' ||
-      (store.gameStatus() === 'idle' && store.playerColor() === BLACK);
     return (
-      isPlaying &&
+      store.gameStatus() === 'playing' &&
       !store.isAiThinking() &&
       store.currentTurn() === store.playerColor()
     );
   };
 
   const handleCellClick = (r: number, c: number) => {
-    if (!canPlay()) return;
+    if (!canPlay()) {
+      if (store.gameStatus() === 'idle' || !store.isSeriesActive()) {
+        store.triggerTaunt('CLICK_BEFORE_START', 50);
+      }
+      return;
+    }
     if (store.board()[r][c] !== EMPTY) {
       store.triggerTaunt('CLICK_OCCUPIED_CELL', 100);
       return;
@@ -151,9 +153,13 @@ export const GameBoard: Component<GameBoardProps> = props => {
                         onClick={() => handleCellClick(rIdx, cIdx)}
                         onMouseEnter={() => setHoverPos({ row: rIdx, col: cIdx })}
                         onMouseLeave={() => setHoverPos(null)}
-                        class={`relative w-full h-full cursor-pointer transition-all touch-manipulation ${
+                        class={`relative w-full h-full transition-all touch-manipulation ${
+                          canPlay() && cell === EMPTY
+                            ? 'cursor-pointer hover:scale-[1.02] active:scale-95'
+                            : 'cursor-default'
+                        } ${
                           !isIntersections() ? `border ${cellBorderColor()}` : ''
-                        } ${canPlay() && cell === EMPTY ? 'hover:scale-[1.02] active:scale-95' : ''}`}
+                        }`}
                       >
                         {/* 1. Phong cách A: Đường kẻ giao điểm (Intersections) */}
                         <Show when={isIntersections()}>

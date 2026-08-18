@@ -34,7 +34,15 @@ export type TauntEvent =
   | 'GAME_DRAW'
   | 'RESET_STATS'
   | 'BOARD_STYLE_CHANGE'
-  | 'LEVEL_UP_ALERT';
+  | 'CLICK_BEFORE_START'
+  | 'LEVEL_UP_ALERT'
+  | 'PLAYER_WIN'
+  | 'MULTI_UNDO'
+  | 'SUPER_SLOW_MOVE'
+  | 'RUSH_MOVE'
+  | 'PLAYER_STREAK_WIN'
+  | 'OPEN_BOT_MODAL'
+  | 'SPAM_POKE_BOT';
 
 export type BotMood =
   | 'smug'        // 😏 Cười khẩy đắc thắng

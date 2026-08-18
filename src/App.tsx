@@ -68,15 +68,6 @@ export const App: Component = () => {
             <div class="w-full hidden lg:block">
               <GameControls store={store} />
             </div>
-
-            {/* Quick Strategic Tips */}
-            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 sm:p-4 text-xs text-slate-400">
-              <span class="font-bold text-slate-300 block mb-1">Mẹo Chiến Thuật:</span>
-              <p class="leading-relaxed">
-                - Chiếm các điểm trung tâm sớm để kiểm soát nhiều đường chéo.<br />
-                - Luôn cảnh giác với các nước tạo <strong class="text-sky-300">3 mở</strong> và <strong class="text-amber-300">bẫy 4-3</strong> của đối thủ khi cấp độ tăng cao.
-              </p>
-            </div>
           </div>
         </div>
       </main>

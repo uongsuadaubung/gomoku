@@ -1,5 +1,5 @@
 import { Component, Show } from 'solid-js';
-import { X, BookOpen, CheckCircle, Zap } from 'lucide-solid';
+import { X, BookOpen, CheckCircle, Zap, Lightbulb } from 'lucide-solid';
 import { GameStore } from '../store/gameStore';
 import { ModalBotTaunt } from './ModalBotTaunt';
 
@@ -72,6 +72,23 @@ export const RulesModal: Component<RulesModalProps> = props => {
                 - Ở những cấp độ đầu, đối thủ sẽ chơi cởi mở và để lộ một số khoảng trống bẫy 3-3.<br/>
                 - Khi bạn thắng nhiều hơn, đối thủ sẽ mở rộng tầm nhìn chiến thuật và liên tục tạo các chuỗi tấn công cưỡng bức. Hãy luôn duy trì quyền Tiên Thủ (chủ động tấn công) để không bị rơi vào thế thủ!
               </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+              <h3 class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-1.5">
+                <Lightbulb size={16} /> 4. Mẹo Chiến Thuật Bỏ Túi
+              </h3>
+              <ul class="space-y-1.5 list-disc list-inside text-slate-300">
+                <li>
+                  <strong class="text-white">Chiếm trung tâm sớm:</strong> Hạ quân gần ô Thiên Nguyên (7, 7) ở khai cuộc để kiểm soát tối đa các đường ngang, dọc và chéo.
+                </li>
+                <li>
+                  <strong class="text-white">Cảnh giác đòn hiểm:</strong> Luôn chú ý các nước tạo <strong class="text-sky-300">3 mở</strong> và <strong class="text-amber-300">bẫy đôi 4-3, 3-3</strong> của đối thủ khi cấp độ nâng cao.
+                </li>
+                <li>
+                  <strong class="text-white">Phòng ngự chủ động:</strong> Đừng chỉ chặn khi đối phương đã có 3 quân; hãy chặn các hướng phát triển tiềm năng ngay từ khi họ có 2 quân mở.
+                </li>
+              </ul>
             </div>
           </div>
         </div>

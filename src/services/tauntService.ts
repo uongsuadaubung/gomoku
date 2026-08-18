@@ -35,6 +35,7 @@ export class TauntService {
         mood = 'salute';
         break;
       case 'PLAYER_UNDO':
+      case 'MULTI_UNDO':
       case 'CORNER_MOVE':
       case 'CHANGE_BOT_LEVEL_DOWN':
       case 'RESET_STATS':
@@ -42,7 +43,9 @@ export class TauntService {
         break;
       case 'BLUNDER_MOVE':
       case 'FAST_MOVE_TAUNT':
+      case 'RUSH_MOVE':
       case 'CLICK_OCCUPIED_CELL':
+      case 'CLICK_BEFORE_START':
         mood = 'clown';
         break;
       case 'BOT_TRAP':
@@ -54,6 +57,7 @@ export class TauntService {
         mood = 'cool';
         break;
       case 'POKE_BOT':
+      case 'SPAM_POKE_BOT':
         mood = 'rage';
         break;
       case 'TAB_BLUR':
@@ -64,12 +68,15 @@ export class TauntService {
         mood = 'bored';
         break;
       case 'IDLE_IN_GAME':
+      case 'SUPER_SLOW_MOVE':
         mood = 'sleepy';
         break;
       case 'PLAYER_GOOD_MOVE':
+      case 'PLAYER_WIN':
         mood = 'shocked';
         break;
       case 'BREAK_LOSS_STREAK':
+      case 'PLAYER_STREAK_WIN':
         mood = 'mindblown';
         break;
       case 'GAME_DRAW':
@@ -85,6 +92,7 @@ export class TauntService {
       case 'TOGGLE_STEP_NUMBERS':
       case 'OPEN_STATS':
       case 'OPEN_RULES':
+      case 'OPEN_BOT_MODAL':
       case 'BOARD_STYLE_CHANGE':
         mood = 'detective';
         break;
@@ -148,5 +156,28 @@ export class TauntService {
     const win = checkWin(board);
     board[botRow][botCol] = EMPTY;
     return !!(win && win.winner === playerColor);
+  }
+
+  /**
+   * Kiểm tra xem người chơi vừa tạo được một thế đe dọa thắng (nước 4 chuẩn bị thắng)
+   */
+  static isPlayerThreatMove(
+    board: BoardMatrix,
+    playerColor: ActivePlayer
+  ): boolean {
+    const size = board.length;
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (board[r][c] === EMPTY) {
+          board[r][c] = playerColor;
+          const win = checkWin(board);
+          board[r][c] = EMPTY;
+          if (win && win.winner === playerColor) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }

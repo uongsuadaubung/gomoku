@@ -49,7 +49,7 @@ export const LevelUpModal: Component<LevelUpModalProps> = props => {
           <button
             onClick={() => {
               store.setShowLevelUpAlert(null);
-              store.startNewGame(store.playerColor() === BLACK);
+              store.startNextGame();
             }}
             class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
           >

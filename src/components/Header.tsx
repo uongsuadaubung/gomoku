@@ -73,7 +73,10 @@ export const Header: Component<HeaderProps> = props => {
 
           {/* Bot Level Modal */}
           <button
-            onClick={() => store.setShowBotModal(true)}
+            onClick={() => {
+              store.setShowBotModal(true);
+              store.triggerTaunt('OPEN_BOT_MODAL', 200);
+            }}
             title="Cấp độ đối thủ"
             class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
           >
