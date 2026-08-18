@@ -65,6 +65,8 @@ export function createGameStore() {
 
   let tauntDismissTimer: number | null = null;
   let idleThinkingTimer: number | null = null;
+  let lastActionTauntTime: number = 0;
+  const IDLE_EVENTS: TauntEvent[] = ['IDLE_IN_GAME', 'IDLE_THINKING', 'IDLE_PRE_GAME', 'IDLE_AFTER_LOSS'];
 
   // Modals
   const [showStatsModal, setShowStatsModal] = createSignal<boolean>(false);
@@ -124,7 +126,7 @@ export function createGameStore() {
   });
 
   /**
-   * Kích hoạt một câu cà khịa từ Bot
+   * Kích hoạt một câu cà khịa từ đối thủ với cơ chế chống ghi đè ưu tiên
    */
   function triggerTaunt(event: TauntEvent, delayMs: number = 0) {
     if (!enableTaunts()) return;
@@ -132,6 +134,21 @@ export function createGameStore() {
     if (delayMs > 0) {
       setTimeout(() => triggerTaunt(event, 0), delayMs);
       return;
+    }
+
+    const now = Date.now();
+    const isIdle = IDLE_EVENTS.includes(event);
+
+    // Nếu là sự kiện IDLE mà vừa có một Action Taunt trong vòng 7.5s -> Không ghi đè lên Action Taunt
+    if (isIdle && now - lastActionTauntTime < 7500) {
+      return;
+    }
+
+    // Nếu là Action Taunt (tương tác trực tiếp, gài bẫy, đổi theme, xin đi lại, v.v.)
+    if (!isIdle) {
+      lastActionTauntTime = now;
+      // Tự động hủy và dời lịch hẹn Idle Taunt sang 15s - 25s sau
+      resetIdleTimer();
     }
 
     if (tauntDismissTimer) {
@@ -170,6 +187,14 @@ export function createGameStore() {
 
     const scheduleNextIdleTaunt = (delay: number) => {
       idleThinkingTimer = window.setTimeout(() => {
+        const now = Date.now();
+        // Nếu vừa có Action Taunt cách đây ít hơn 7.5 giây thì hoãn lại lượt Idle này
+        if (now - lastActionTauntTime < 7500) {
+          const remainingTime = 7500 - (now - lastActionTauntTime) + getRandomInterval();
+          scheduleNextIdleTaunt(remainingTime);
+          return;
+        }
+
         const status = gameStatus();
 
         // 1. ĐANG TRONG TRẬN ĐẤU (status === 'playing')
