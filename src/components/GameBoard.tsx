@@ -58,15 +58,15 @@ export const GameBoard: Component<GameBoardProps> = props => {
     const t = store.theme();
     if (t === 'paper') return 'board-paper border-stone-400/90 shadow-stone-900/40';
     if (t === 'jade') return 'board-jade border-emerald-600/70 shadow-emerald-950/60';
-    if (t === 'cyber') return 'board-cyber border-cyan-500/50 shadow-cyan-900/30';
-    if (t === 'slate') return 'board-slate border-slate-700 shadow-slate-950/60';
-    return 'board-wood border-amber-900/90 shadow-amber-950/60';
+    if (t === 'cyber') return 'board-cyber border-cyan-500/60 shadow-cyan-950/80';
+    if (t === 'slate') return 'board-slate border-slate-700/80 shadow-slate-950/70';
+    return 'board-wood border-amber-950/60 shadow-amber-950/70';
   };
 
   const lineBg = () => {
     const t = store.theme();
-    if (t === 'paper') return 'bg-slate-700/80';
-    if (t === 'jade') return 'bg-emerald-400/40';
+    if (t === 'paper') return 'bg-slate-400/80';
+    if (t === 'jade') return 'bg-emerald-300/60';
     if (t === 'cyber') return 'bg-cyan-400/40';
     if (t === 'slate') return 'bg-slate-400/40';
     return 'bg-amber-950/60';
@@ -74,11 +74,11 @@ export const GameBoard: Component<GameBoardProps> = props => {
 
   const cellBorderColor = () => {
     const t = store.theme();
-    if (t === 'paper') return 'border-slate-300 hover:bg-sky-500/10';
-    if (t === 'jade') return 'border-emerald-500/25 hover:bg-emerald-500/10';
-    if (t === 'cyber') return 'border-cyan-500/25 hover:bg-cyan-500/10';
-    if (t === 'slate') return 'border-slate-500/25 hover:bg-slate-500/10';
-    return 'border-amber-950/30 hover:bg-amber-950/10';
+    if (t === 'paper') return 'border-slate-300 hover:bg-sky-500/10 active:bg-sky-500/20';
+    if (t === 'jade') return 'border-emerald-500/25 hover:bg-emerald-500/10 active:bg-emerald-500/20';
+    if (t === 'cyber') return 'border-cyan-500/25 hover:bg-cyan-500/10 active:bg-cyan-500/20';
+    if (t === 'slate') return 'border-slate-500/25 hover:bg-slate-500/10 active:bg-slate-500/20';
+    return 'border-amber-950/30 hover:bg-amber-950/10 active:bg-amber-950/20';
   };
 
   const starPointBg = () => {
@@ -100,13 +100,13 @@ export const GameBoard: Component<GameBoardProps> = props => {
   };
 
   return (
-    <div class="w-full flex flex-col items-center justify-center select-none">
+    <div class="w-full flex flex-col items-center justify-center select-none touch-manipulation">
       {/* Khung viền Bàn cờ chính */}
       <div
-        class={`w-full max-w-[min(94vw,560px)] md:max-w-[600px] aspect-square p-3 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-300 flex flex-col shadow-2xl relative ${themeClass()}`}
+        class={`w-full max-w-[min(96vw,560px)] md:max-w-[600px] aspect-square p-1.5 sm:p-3.5 md:p-5 rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-300 flex flex-col shadow-2xl relative ${themeClass()}`}
       >
         {/* Tọa độ cột trên (A - O) */}
-        <div class={`w-full flex justify-between px-1 mb-1 text-[10px] sm:text-xs font-mono select-none ${coordTextColor()}`}>
+        <div class={`w-full flex justify-between px-0.5 sm:px-1 mb-0.5 sm:mb-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
           <For each={COL_LETTERS}>
             {letter => <span class="w-[6.66%] text-center">{letter}</span>}
           </For>
@@ -115,7 +115,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
         {/* Thân bàn cờ ở giữa: Tọa độ trái + Lưới 15x15 + Tọa độ phải */}
         <div class="flex-1 w-full flex items-center justify-between relative">
           {/* Tọa độ hàng trái (15 - 1) */}
-          <div class={`h-full flex flex-col justify-between py-1 mr-1 text-[10px] sm:text-xs font-mono select-none ${coordTextColor()}`}>
+          <div class={`h-full flex flex-col justify-between py-0.5 sm:py-1 mr-0.5 sm:mr-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
             <For each={ROW_NUMBERS}>
               {num => <span class="h-[6.66%] flex items-center justify-center">{num}</span>}
             </For>
@@ -124,12 +124,13 @@ export const GameBoard: Component<GameBoardProps> = props => {
           {/* Lưới 15x15 pixel-perfect */}
           <div
             class={`flex-1 h-full aspect-square relative ${
-              store.boardStyle() === 'cells' ? 'border border-amber-950/40 rounded-lg overflow-hidden' : ''
+              store.boardStyle() === 'cells' ? 'border border-amber-950/40 rounded-md sm:rounded-lg overflow-hidden' : ''
             }`}
             style={{
               display: 'grid',
               'grid-template-columns': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
               'grid-template-rows': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+              'touch-action': 'manipulation',
             }}
           >
             <For each={store.board()}>
@@ -150,9 +151,9 @@ export const GameBoard: Component<GameBoardProps> = props => {
                         onClick={() => handleCellClick(rIdx, cIdx)}
                         onMouseEnter={() => setHoverPos({ row: rIdx, col: cIdx })}
                         onMouseLeave={() => setHoverPos(null)}
-                        class={`relative w-full h-full cursor-pointer transition-all ${
+                        class={`relative w-full h-full cursor-pointer transition-all touch-manipulation ${
                           !isIntersections() ? `border ${cellBorderColor()}` : ''
-                        } ${canPlay() && cell === EMPTY ? 'hover:scale-[1.03]' : ''}`}
+                        } ${canPlay() && cell === EMPTY ? 'hover:scale-[1.02] active:scale-95' : ''}`}
                       >
                         {/* 1. Phong cách A: Đường kẻ giao điểm (Intersections) */}
                         <Show when={isIntersections()}>
@@ -182,7 +183,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
                         {/* 2. Điểm sao (Star Points) - Dùng absolute luôn cố định ở tâm */}
                         <Show when={isStarPoint(rIdx, cIdx) && cell === EMPTY}>
                           <div
-                            class={`absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 ${
+                            class={`absolute w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 ${
                               isIntersections() ? starPointBg() : `opacity-40 ${starPointBg()}`
                             }`}
                           />
@@ -191,20 +192,20 @@ export const GameBoard: Component<GameBoardProps> = props => {
                         {/* 3. Quân cờ thực tế đã đánh - Căn tâm tuyệt đối */}
                         <Show when={cell !== EMPTY}>
                           <div
-                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[84%] h-[84%] rounded-full transition-all duration-200 flex items-center justify-center z-10 ${
+                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88%] h-[88%] rounded-full transition-all duration-200 flex items-center justify-center z-10 ${
                               cell === BLACK ? 'stone-black text-slate-200' : 'stone-white text-slate-800'
                             } ${winCell() ? 'animate-win-glow scale-110' : ''}`}
                           >
                             {/* Hiển thị số thứ tự nước đi nếu bật */}
                             <Show when={store.showStepNumbers() && stepNum() !== null}>
-                              <span class="text-[9px] sm:text-xs font-bold font-mono select-none">
+                              <span class="text-[8px] sm:text-[10px] md:text-xs font-bold font-mono select-none">
                                 {stepNum()}
                               </span>
                             </Show>
 
                             {/* Đánh dấu nước đi cuối (Last move dot) */}
                             <Show when={last() && !winCell() && !store.showStepNumbers()}>
-                              <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 shadow-sm animate-pulse" />
+                              <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500 shadow-sm animate-pulse" />
                             </Show>
 
                             {/* Vòng phát sáng cho 5 quân chiến thắng */}
@@ -217,7 +218,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
                         {/* 4. Ghost Stone khi Hover - Căn tâm tuyệt đối đè lên điểm sao */}
                         <Show when={isHovered()}>
                           <div
-                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[84%] h-[84%] rounded-full opacity-40 transition-opacity pointer-events-none z-10 ${
+                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88%] h-[88%] rounded-full opacity-40 transition-opacity pointer-events-none z-10 ${
                               store.playerColor() === BLACK ? 'stone-black' : 'stone-white'
                             }`}
                           />
@@ -231,7 +232,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
           </div>
 
           {/* Tọa độ hàng phải (15 - 1) */}
-          <div class={`h-full flex flex-col justify-between py-1 ml-1 text-[10px] sm:text-xs font-mono select-none ${coordTextColor()}`}>
+          <div class={`h-full flex flex-col justify-between py-0.5 sm:py-1 ml-0.5 sm:ml-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
             <For each={ROW_NUMBERS}>
               {num => <span class="h-[6.66%] flex items-center justify-center">{num}</span>}
             </For>
@@ -239,7 +240,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
         </div>
 
         {/* Tọa độ cột dưới (A - O) */}
-        <div class={`w-full flex justify-between px-1 mt-1 text-[10px] sm:text-xs font-mono select-none ${coordTextColor()}`}>
+        <div class={`w-full flex justify-between px-0.5 sm:px-1 mt-0.5 sm:mt-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
           <For each={COL_LETTERS}>
             {letter => <span class="w-[6.66%] text-center">{letter}</span>}
           </For>

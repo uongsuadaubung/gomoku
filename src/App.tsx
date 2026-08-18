@@ -38,10 +38,10 @@ export const App: Component = () => {
       <Header store={store} />
 
       {/* Main Content Area */}
-      <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-4 md:py-6 flex flex-col items-center justify-center">
-        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <main class="flex-1 max-w-6xl w-full mx-auto px-2 sm:px-4 py-2 sm:py-4 md:py-6 flex flex-col items-center justify-center">
+        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
           {/* Left Column: Board & Opponent Character & Game Over banner (7 cols on large screens) */}
-          <div class="lg:col-span-7 flex flex-col items-center gap-3 w-full">
+          <div class="lg:col-span-7 flex flex-col items-center gap-2 sm:gap-3 w-full">
             {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa */}
             <BotCharacter store={store} />
 
@@ -49,23 +49,30 @@ export const App: Component = () => {
             <GameOverBanner store={store} />
 
             {/* 15x15 Interactive Game Board */}
-            <div class="w-full flex justify-center py-1">
+            <div class="w-full flex justify-center py-0.5 sm:py-1">
               <GameBoard store={store} />
+            </div>
+
+            {/* Trên Mobile: Đặt GameControls ngay dưới bàn cờ để ngón tay thao tác thuận tiện */}
+            <div class="w-full block lg:hidden">
+              <GameControls store={store} />
             </div>
           </div>
 
           {/* Right Column: AI Live Radar & Game Controls (5 cols on large screens) */}
-          <div class="lg:col-span-5 flex flex-col gap-4 w-full">
+          <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
             {/* AI Status & Radar Panel */}
             <AIStatusPanel store={store} />
 
-            {/* Action Buttons & Game Controls */}
-            <GameControls store={store} />
+            {/* Trên Desktop: Hiển thị Game Controls ở cột bên phải */}
+            <div class="w-full hidden lg:block">
+              <GameControls store={store} />
+            </div>
 
             {/* Quick Strategic Tips */}
-            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-xs text-slate-400">
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 sm:p-4 text-xs text-slate-400">
               <span class="font-bold text-slate-300 block mb-1">Mẹo Chiến Thuật:</span>
-              <p>
+              <p class="leading-relaxed">
                 - Chiếm các điểm trung tâm sớm để kiểm soát nhiều đường chéo.<br />
                 - Luôn cảnh giác với các nước tạo <strong class="text-sky-300">3 mở</strong> và <strong class="text-amber-300">bẫy 4-3</strong> của đối thủ khi cấp độ tăng cao.
               </p>

@@ -17,32 +17,29 @@ export const Header: Component<HeaderProps> = props => {
   const { store } = props;
 
   return (
-    <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 sticky top-0 z-30">
-      <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-2.5 sm:px-4 py-2 sm:py-2.5 sticky top-0 z-30 select-none">
+      <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
         {/* Logo & Title */}
-        <div class="flex items-center space-x-3">
-          <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-md shadow-amber-500/20">
-            <span class="text-xl font-black text-slate-950">G</span>
+        <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          <div class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-md shadow-amber-500/20">
+            <span class="text-base sm:text-lg font-black text-slate-950">G</span>
           </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                Gomoku <span class="text-amber-400">Master</span>
-              </h1>
-            </div>
-          </div>
+          <h1 class="hidden sm:flex text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-white items-center gap-1">
+            <span>Gomoku</span>
+            <span class="text-amber-400">Master</span>
+          </h1>
         </div>
 
         {/* Action Buttons */}
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
           {/* Sound Toggle */}
           <button
             onClick={() => store.toggleSound()}
             title={store.isMuted() ? 'Bật âm thanh' : 'Tắt âm thanh'}
-            class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700/60"
+            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60"
           >
-            <Show when={!store.isMuted()} fallback={<VolumeX size={18} class="text-rose-400" />}>
-              <Volume2 size={18} class="text-emerald-400" />
+            <Show when={!store.isMuted()} fallback={<VolumeX size={16} class="text-rose-400 sm:w-[18px] sm:h-[18px]" />}>
+              <Volume2 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
             </Show>
           </button>
 
@@ -53,10 +50,10 @@ export const Header: Component<HeaderProps> = props => {
               store.triggerTaunt('OPEN_RULES', 200);
             }}
             title="Hướng dẫn luật chơi"
-            class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700/60 flex items-center gap-1 text-xs font-medium"
+            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 text-xs font-medium"
           >
-            <HelpCircle size={18} class="text-sky-400" />
-            <span class="hidden md:inline">Luật chơi</span>
+            <HelpCircle size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />
+            <span class="hidden md:inline">Luật</span>
           </button>
 
           {/* Stats Modal */}
@@ -66,24 +63,22 @@ export const Header: Component<HeaderProps> = props => {
               store.triggerTaunt('OPEN_STATS', 200);
             }}
             title="Thống kê kết quả ván đấu"
-            class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700/60 flex items-center gap-1.5 text-xs font-medium"
+            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
           >
-            <BarChart3 size={18} class="text-emerald-400" />
-            <span class="hidden md:inline">Thống kê</span>
-            <span class="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded text-[11px] font-bold border border-emerald-500/30">
-              {store.stats().wins}W - {store.stats().losses}L
+            <BarChart3 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
+            <span class="bg-emerald-500/20 text-emerald-300 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border border-emerald-500/30">
+              {store.stats().wins}W
             </span>
           </button>
 
           {/* Bot Level Modal */}
           <button
             onClick={() => store.setShowBotModal(true)}
-            title="Cấp độ và thông tin Bot"
-            class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700/60 flex items-center gap-1.5 text-xs font-medium"
+            title="Cấp độ đối thủ"
+            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
           >
-            <Bot size={18} class="text-amber-400" />
-            <span class="hidden md:inline">Cấp độ Bot</span>
-            <span class="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded text-[11px] font-bold border border-amber-500/30">
+            <Bot size={16} class="text-amber-400 sm:w-[18px] sm:h-[18px]" />
+            <span class="bg-amber-500/20 text-amber-300 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border border-amber-500/30">
               Lv.{store.currentLevelConfig().id}
             </span>
           </button>
@@ -92,9 +87,9 @@ export const Header: Component<HeaderProps> = props => {
           <button
             onClick={() => store.setShowSettingsModal(true)}
             title="Cài đặt trò chơi"
-            class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700/60"
+            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60"
           >
-            <Settings size={18} class="text-slate-300 hover:rotate-45 transition-transform" />
+            <Settings size={16} class="text-slate-300 sm:w-[18px] sm:h-[18px] hover:rotate-45 transition-transform" />
           </button>
         </div>
       </div>
