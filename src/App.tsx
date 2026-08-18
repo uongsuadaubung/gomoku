@@ -57,21 +57,22 @@ export const App: Component = () => {
             </div>
           </div>
 
-          {/* Right Column: AI Live Radar, Game Controls & Move History (5 cols on large screens) */}
+          {/* Right Column: Game Controls, AI Live Radar & Move History (5 cols on large screens) */}
           <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
-            {/* 1. AI Status & Radar Panel */}
-            <AIStatusPanel store={store} />
-
-            {/* 2. Game Controls */}
+            {/* 1. Trên Desktop: Game Controls (Chọn lượt đi / Nhận thua / Ván mới) ở trên đầu */}
             <div class="w-full hidden lg:block">
               <GameControls store={store} />
             </div>
+
+            {/* 2. AI Status & Radar Panel */}
+            <AIStatusPanel store={store} />
 
             {/* 3. Danh Sách Nước Đi Nằm Ở Dưới Cuối Cùng */}
             <div class="w-full">
               <MoveHistory store={store} />
             </div>
           </div>
+
         </div>
       </main>
 
