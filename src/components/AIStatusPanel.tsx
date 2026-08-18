@@ -32,7 +32,6 @@ export const AIStatusPanel: Component<AIStatusPanelProps> = props => {
     const stats = store.aiStats();
     if (!stats) return 50;
 
-    // stats.winProbability luôn là xác suất của Bot (tính toán từ góc nhìn của Bot)
     return Math.min(100, Math.max(0, stats.winProbability));
   };
 

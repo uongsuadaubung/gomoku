@@ -659,7 +659,7 @@ export function createGameStore() {
    * Đi lại nước cờ (Undo)
    */
   function undoMove() {
-    if (gameStatus() !== 'playing' && gameStatus() !== 'black_win' && gameStatus() !== 'white_win') {
+    if (gameStatus() !== 'playing') {
       return;
     }
     if (isAiThinking()) return;
@@ -671,22 +671,14 @@ export function createGameStore() {
     const currentBoard = createEmptyBoard();
     let stepsToUndo = 1;
 
-    if (gameStatus() === 'playing') {
-      if (currentTurn() === playerColor() && history.length >= 2) {
-        stepsToUndo = 2;
-      } else {
-        stepsToUndo = 1;
-      }
-    } else if (gameStatus() === 'black_win' || gameStatus() === 'white_win') {
-      const lastPlayer = history[history.length - 1].player;
-      if (lastPlayer === aiColor() && history.length >= 2) {
-        stepsToUndo = 2;
-      } else {
-        stepsToUndo = 1;
-      }
+    if (currentTurn() === playerColor() && history.length >= 2) {
+      stepsToUndo = 2;
+    } else {
+      stepsToUndo = 1;
     }
 
     const remainingHistory = history.slice(0, history.length - stepsToUndo);
+
 
     // Tái dựng lại bàn cờ từ lịch sử còn lại
     remainingHistory.forEach(item => {

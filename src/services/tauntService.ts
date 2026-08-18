@@ -46,8 +46,10 @@ export class TauntService {
       case 'RUSH_MOVE':
       case 'CLICK_OCCUPIED_CELL':
       case 'CLICK_BEFORE_START':
+      case 'CLICK_AFTER_GAME_OVER':
         mood = 'clown';
         break;
+
       case 'BOT_TRAP':
         mood = 'evil';
         break;

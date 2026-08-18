@@ -1,5 +1,4 @@
 import { Component, Show } from 'solid-js';
-import { MessageSquareQuote } from 'lucide-solid';
 import type { GameStore } from '../store/gameStore';
 import type { BotMood } from '../services/tauntService';
 
@@ -97,23 +96,11 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
   };
 
   return (
-    <div class="relative flex flex-col items-center">
-      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Nổi bật phía trên Icon Bot) */}
-      <Show when={taunt().visible && !!taunt().text}>
-        <div class="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-40 w-max max-w-[280px] sm:max-w-[340px] pointer-events-none animate-bounce-subtle">
-          <div class="relative px-3.5 py-2.5 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl border-2 border-amber-200">
-            {/* Nội dung câu khịa */}
-            <p class="drop-shadow-sm break-words select-none">{taunt().text}</p>
-            {/* Mũi nhọn đuôi bong bóng thoại trỏ xuống chính giữa Icon Bot */}
-            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-amber-400 rotate-45 border-r-2 border-b-2 border-amber-300 pointer-events-none" />
-          </div>
-        </div>
-      </Show>
-
-      {/* 🤖 ICON BOT TƯƠNG TÁC (Chỉ hiển thị Icon, bấm vào để bị cà khịa) */}
+    <div class="w-full max-w-[min(96vw,560px)] md:max-w-[600px] flex items-center justify-start gap-2.5 sm:gap-3.5 relative select-none min-h-[52px]">
+      {/* 🤖 ICON BOT TƯƠNG TÁC (Lệch trái, giữ trọn 18 biểu cảm) */}
       <button
         onClick={handlePoke}
-        class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-lg transition-all duration-300 active:scale-90 cursor-pointer select-none ${
+        class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-lg transition-all duration-300 active:scale-90 cursor-pointer select-none shrink-0 ${
           taunt().visible ? 'ring-2 ring-amber-400 shadow-amber-500/30' : ''
         }`}
         title="Chọc đối thủ để nghe cà khịa"
@@ -129,9 +116,28 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
         {/* Chấm trạng thái nhỏ xinh */}
         <div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-slate-950 flex items-center justify-center">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 group-hover:bg-amber-400 transition-colors" />
+          <div
+            class={`w-2.5 h-2.5 rounded-full transition-colors ${
+              store.isAiThinking()
+                ? 'bg-rose-500 animate-ping'
+                : 'bg-emerald-500 group-hover:bg-amber-400'
+            }`}
+          />
         </div>
       </button>
+
+      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Nằm ngang sang bên phải, co giãn tự nhiên trong khung bàn cờ) */}
+      <Show when={taunt().visible && !!taunt().text}>
+        <div class="flex-1 min-w-0 max-w-[480px] pointer-events-none animate-bubble-pop">
+          <div class="relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl border-2 border-amber-200">
+            {/* Nội dung câu khịa */}
+            <p class="drop-shadow-sm break-words select-none">{taunt().text}</p>
+
+            {/* Mũi nhọn đuôi bong bóng thoại trỏ sang trái về phía Bot */}
+            <div class="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-400 rotate-45 border-l-2 border-b-2 border-amber-300 pointer-events-none" />
+          </div>
+        </div>
+      </Show>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { BotCharacter } from './components/BotCharacter';
 import { GameBoard } from './components/GameBoard';
 import { AIStatusPanel } from './components/AIStatusPanel';
 import { GameControls } from './components/GameControls';
+import { MoveHistory } from './components/MoveHistory';
 import { GameOverBanner } from './components/GameOverBanner';
 import { StatsModal } from './components/StatsModal';
 import { BotModal } from './components/BotModal';
@@ -40,13 +41,10 @@ export const App: Component = () => {
       {/* Main Content Area */}
       <main class="flex-1 max-w-6xl w-full mx-auto px-2 sm:px-4 py-2 sm:py-4 md:py-6 flex flex-col items-center justify-center">
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
-          {/* Left Column: Board & Opponent Character & Game Over banner (7 cols on large screens) */}
+          {/* Left Column: Board & Opponent Character (7 cols on large screens) */}
           <div class="lg:col-span-7 flex flex-col items-center gap-2 sm:gap-3 w-full">
             {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa */}
             <BotCharacter store={store} />
-
-            {/* Game Over Banner (chỉ hiện khi kết thúc ván) */}
-            <GameOverBanner store={store} />
 
             {/* 15x15 Interactive Game Board */}
             <div class="w-full flex justify-center py-0.5 sm:py-1">
@@ -59,20 +57,26 @@ export const App: Component = () => {
             </div>
           </div>
 
-          {/* Right Column: AI Live Radar & Game Controls (5 cols on large screens) */}
+          {/* Right Column: AI Live Radar, Game Controls & Move History (5 cols on large screens) */}
           <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
-            {/* AI Status & Radar Panel */}
+            {/* 1. AI Status & Radar Panel */}
             <AIStatusPanel store={store} />
 
-            {/* Trên Desktop: Hiển thị Game Controls ở cột bên phải */}
+            {/* 2. Game Controls */}
             <div class="w-full hidden lg:block">
               <GameControls store={store} />
+            </div>
+
+            {/* 3. Danh Sách Nước Đi Nằm Ở Dưới Cuối Cùng */}
+            <div class="w-full">
+              <MoveHistory store={store} />
             </div>
           </div>
         </div>
       </main>
 
       {/* Modals */}
+      <GameOverBanner store={store} />
       <StatsModal store={store} />
       <BotModal store={store} />
       <SettingsModal store={store} />

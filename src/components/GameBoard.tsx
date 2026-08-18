@@ -43,6 +43,16 @@ export const GameBoard: Component<GameBoardProps> = props => {
   };
 
   const handleCellClick = (r: number, c: number) => {
+    // Khi game đã kết thúc (không quan tâm bên nào thắng), nếu người chơi cố ấn thêm vào bàn cờ -> cà khịa
+    if (
+      store.gameStatus() === 'black_win' ||
+      store.gameStatus() === 'white_win' ||
+      store.gameStatus() === 'draw'
+    ) {
+      store.triggerTaunt('CLICK_AFTER_GAME_OVER', 0);
+      return;
+    }
+
     if (!canPlay()) {
       if (store.gameStatus() === 'idle' || !store.isSeriesActive()) {
         store.triggerTaunt('CLICK_BEFORE_START', 50);
@@ -55,6 +65,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
     }
     store.makePlayerMove(r, c);
   };
+
 
   const themeClass = () => {
     const t = store.theme();

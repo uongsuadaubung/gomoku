@@ -42,9 +42,11 @@ export type TauntEvent =
   | 'RUSH_MOVE'
   | 'PLAYER_STREAK_WIN'
   | 'OPEN_BOT_MODAL'
-  | 'SPAM_POKE_BOT';
+  | 'SPAM_POKE_BOT'
+  | 'CLICK_AFTER_GAME_OVER';
 
 export type BotMood =
+
   | 'smug'        // 😏 Cười khẩy đắc thắng
   | 'laugh'       // 🤣 Cười ngả nghiêng
   | 'clown'       // 🤡 Mặt hề (Blunder, tự hủy, bấm ẩu)

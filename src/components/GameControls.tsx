@@ -76,26 +76,17 @@ export const GameControls: Component<GameControlsProps> = props => {
 
       {/* 2. TRẠNG THÁI VÁN KẾT THÚC TỰ NHIÊN (Thắng/Thua/Hòa) */}
       <Show when={!isMatchActive() && store.isSeriesActive() && !store.lastResigned()}>
-        <div class="grid grid-cols-2 gap-2.5">
+        <div>
           {/* Nút Ván Tiếp Theo (Tự động đảo bên) */}
           <button
             onClick={() => store.startNextGame()}
-            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
           >
             <Play size={16} fill="currentColor" />
             <span>Ván Tiếp Theo</span>
           </button>
-
-          {/* Nút Xem lại / Đi lại */}
-          <button
-            onClick={() => store.undoMove()}
-            disabled={store.moveHistory().length === 0}
-            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 transition-all disabled:opacity-50"
-          >
-            <RotateCcw size={16} />
-            <span>Xem Lại</span>
-          </button>
         </div>
+
 
         {/* Báo lượt đi tiếp theo */}
         <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
