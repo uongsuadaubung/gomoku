@@ -148,7 +148,7 @@ export function createGameStore() {
     // Nếu là Action Taunt (tương tác trực tiếp, gài bẫy, đổi theme, xin đi lại, v.v.)
     if (!isIdle) {
       lastActionTauntTime = now;
-      // Tự động hủy và dời lịch hẹn Idle Taunt sang 15s - 25s sau
+      // Tự động hủy và dời lịch hẹn Idle Taunt sang 25s - 35s sau
       resetIdleTimer();
     }
 
@@ -183,8 +183,8 @@ export function createGameStore() {
     clearIdleTimer();
     if (!enableTaunts()) return;
 
-    // Vòng lặp liên tục khi người chơi AFK: ngẫu nhiên từ 15 đến 25 giây một câu
-    const getRandomInterval = () => 15000 + Math.floor(Math.random() * 10000); // 15s - 25s
+    // Vòng lặp liên tục khi người chơi AFK: ngẫu nhiên từ 25 đến 35 giây một câu
+    const getRandomInterval = () => 25000 + Math.floor(Math.random() * 10000); // 25s - 35s
 
     const scheduleNextIdleTaunt = (delay: number) => {
       idleThinkingTimer = window.setTimeout(() => {
