@@ -6,6 +6,7 @@ import {
   BoardMatrix,
   Move,
   AIStats,
+  LevelConfig,
 } from './types';
 import { checkWin, getCandidateMoves, isBoardFull } from './board';
 import { evaluateBoardScore, evaluatePositionScore } from './evaluator';
@@ -29,7 +30,7 @@ export class AIEngine {
   }
 
   /**
-   * Tính toán nước đi tốt nhất dựa trên cấp độ và trạng thái bàn cờ
+   * Tính toán nước đi tốt nhất dựa trên Decision Pipeline chuẩn hóa
    */
   public findBestMove(
     board: BoardMatrix,
@@ -44,10 +45,8 @@ export class AIEngine {
 
     const oppPlayer: ActivePlayer = aiPlayer === BLACK ? WHITE : BLACK;
     const levelConfig = getLevelConfigByWins(0, levelId);
-    const maxSearchDepth = levelConfig.depth;
-    const candidateLimit = levelConfig.candidateCount;
 
-    // Lấy danh sách ô ứng viên lân cận
+    // Lấy danh sách ô ứng viên lân cận (bán kính 2 ô quanh các quân cờ)
     const rawCandidates = getCandidateMoves(board, 2);
     if (rawCandidates.length === 0) {
       return {
@@ -75,54 +74,33 @@ export class AIEngine {
       };
     }
 
-    // 1. KIỂM TRA ĐÒN THẮNG NGAY / CHẶN NGAY (Immediate Win / Urgent Defense)
-    // Giúp bot không bao giờ bỏ sót nước 5 của mình hoặc nước 5 của đối thủ
-    for (const cand of rawCandidates) {
-      // Nếu AI đi vào đây thắng luôn
-      board[cand.row][cand.col] = aiPlayer;
-      const winAi = checkWin(board);
-      board[cand.row][cand.col] = EMPTY;
-      if (winAi && winAi.winner === aiPlayer) {
-        return {
-          move: cand,
-          stats: {
-            depth: 1,
-            nodesEvaluated: this.nodesCount,
-            timeMs: Math.round(performance.now() - this.startTime),
-            winProbability: 100,
-            bestScore: SCORES.FIVE,
-          },
-        };
-      }
+    // ─────────────────────────────────────────────────────────────
+    // STAGE 1: BỘ LỌC NHẬN THỨC ĐE DỌA TRỰC DIỆN (Threat Perception)
+    // ─────────────────────────────────────────────────────────────
+    const threatMove = this.checkImmediateThreats(board, aiPlayer, oppPlayer, rawCandidates, levelConfig);
+    if (threatMove) {
+      return {
+        move: threatMove.move,
+        stats: {
+          depth: 1,
+          nodesEvaluated: this.nodesCount,
+          timeMs: Math.round(performance.now() - this.startTime),
+          winProbability: threatMove.winProbability,
+          bestScore: threatMove.score,
+        },
+      };
     }
 
-    for (const cand of rawCandidates) {
-      // Nếu Đối thủ đi vào đây sẽ thắng -> Phải chặn ngay!
-      board[cand.row][cand.col] = oppPlayer;
-      const winOpp = checkWin(board);
-      board[cand.row][cand.col] = EMPTY;
-      if (winOpp && winOpp.winner === oppPlayer) {
-        return {
-          move: cand,
-          stats: {
-            depth: 1,
-            nodesEvaluated: this.nodesCount,
-            timeMs: Math.round(performance.now() - this.startTime),
-            winProbability: 50,
-            bestScore: SCORES.FIVE / 2,
-          },
-        };
-      }
-    }
-
-    // 2. TÌM KIẾM SÁT CỤC VCF NẾU Ở CẤP ĐỘ CAO (Level 5, 6)
-    if (levelConfig.vcfEnabled) {
-      const vcfMove = solveVCF(board, aiPlayer, 12);
+    // ─────────────────────────────────────────────────────────────
+    // STAGE 2: TÌM KIẾM SÁT CỤC CHIẾN THUẬT (Tactical VCF Solver)
+    // ─────────────────────────────────────────────────────────────
+    if (levelConfig.vcfDepth > 0) {
+      const vcfMove = solveVCF(board, aiPlayer, levelConfig.vcfDepth);
       if (vcfMove) {
         return {
           move: vcfMove,
           stats: {
-            depth: 8,
+            depth: Math.min(8, levelConfig.vcfDepth),
             nodesEvaluated: this.nodesCount,
             timeMs: Math.round(performance.now() - this.startTime),
             winProbability: 99,
@@ -133,29 +111,75 @@ export class AIEngine {
       }
     }
 
-    // 3. ĐÁNH GIÁ VÀ SẮP XẾP ỨNG VIÊN (Move Ordering)
+    // ─────────────────────────────────────────────────────────────
+    // STAGE 3 & 4: ĐÁNH GIÁ CỤC DIỆN & CHÍNH SÁCH RA QUYẾT ĐỊNH
+    // ─────────────────────────────────────────────────────────────
+    return this.searchAndSelectMove(board, aiPlayer, oppPlayer, levelConfig, rawCandidates, onProgress);
+  }
+
+  /**
+   * STAGE 1: Kiểm tra nước thắng ngay hoặc nước chặn khẩn cấp theo tầm nhìn của level
+   */
+  private checkImmediateThreats(
+    board: BoardMatrix,
+    aiPlayer: ActivePlayer,
+    oppPlayer: ActivePlayer,
+    candidates: Move[],
+    config: LevelConfig
+  ): { move: Move; score: number; winProbability: number } | null {
+    // 1. Kiểm tra nếu AI có nước 5 để thắng ngay lập tức
+    for (const cand of candidates) {
+      board[cand.row][cand.col] = aiPlayer;
+      const winAi = checkWin(board);
+      board[cand.row][cand.col] = EMPTY;
+      if (winAi && winAi.winner === aiPlayer) {
+        return { move: cand, score: SCORES.FIVE, winProbability: 100 };
+      }
+    }
+
+    // 2. Kiểm tra nếu Đối thủ có nước 5 (cần chặn khẩn cấp)
+    // Tầm nhìn đe dọa (threatVision) quyết định xác suất AI nhận biết và chặn kịp thời
+    const seesOppThreat = Math.random() < config.threatVision;
+    if (seesOppThreat) {
+      for (const cand of candidates) {
+        board[cand.row][cand.col] = oppPlayer;
+        const winOpp = checkWin(board);
+        board[cand.row][cand.col] = EMPTY;
+        if (winOpp && winOpp.winner === oppPlayer) {
+          return { move: cand, score: SCORES.FIVE / 2, winProbability: 50 };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * STAGE 3 & 4: Tìm kiếm theo độ sâu và áp dụng chính sách chọn nước đi (Boltzmann/Softmax Policy)
+   */
+  private searchAndSelectMove(
+    board: BoardMatrix,
+    aiPlayer: ActivePlayer,
+    oppPlayer: ActivePlayer,
+    config: LevelConfig,
+    rawCandidates: Move[],
+    onProgress?: (depth: number, nodes: number, currentBest?: Move, score?: number) => void
+  ): { move: Move; stats: AIStats } {
+    // Chấm điểm và sắp xếp ứng viên theo Heuristic weights của level
     const scoredCandidates = rawCandidates
       .map(c => ({
         ...c,
-        score: evaluatePositionScore(board, c.row, c.col, aiPlayer),
+        score: evaluatePositionScore(board, c.row, c.col, aiPlayer, config.attackWeight, config.defenseWeight),
       }))
       .sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    // Lọc lấy top N ứng viên sáng giá nhất theo cấu hình Level
-    const topCandidates = scoredCandidates.slice(0, candidateLimit);
+    const topCandidates = scoredCandidates.slice(0, config.candidateCount);
 
-    // 4. LEVEL 1: XỬ LÝ NHẸ NHÀNG (HEURISTIC + SOFT RANDOM)
-    if (levelConfig.depth === 1) {
+    // CẤP ĐỘ 1-PLY (Depth === 1): Chọn trực tiếp qua Heuristic kết hợp Softmax Policy
+    if (config.depth <= 1) {
       this.nodesCount = topCandidates.length;
-      let selectedMove = topCandidates[0];
-
-      // Nếu có tỷ lệ ngẫu nhiên mềm (randomness), cho phép chọn trong top 3 nước tốt
-      if (levelConfig.randomness > 0 && topCandidates.length >= 3 && Math.random() < levelConfig.randomness) {
-        const randomIndex = Math.floor(Math.random() * Math.min(3, topCandidates.length));
-        selectedMove = topCandidates[randomIndex];
-      }
-
-      const evalScore = evaluateBoardScore(board, aiPlayer);
+      const selectedMove = this.selectMoveByPolicy(topCandidates, config.temperature);
+      const evalScore = evaluateBoardScore(board, aiPlayer, config.attackWeight, config.defenseWeight);
       const winProb = this.calculateWinProbability(evalScore);
 
       return {
@@ -170,24 +194,24 @@ export class AIEngine {
       };
     }
 
-    // 5. CÁC LEVEL CAO HƠN: CHẠY MINIMAX VỚI ALPHA-BETA PRUNING & ITERATIVE DEEPENING
-    let globalBestMove = topCandidates[0];
+    // CÁC CẤP ĐỘ MINIMAX (Depth >= 2): Iterative Deepening với Alpha-Beta Pruning
+    let globalBestMove: Move = topCandidates[0];
     let globalBestScore = -Infinity;
-    let initialHash = zobrist.computeHash(board);
+    const initialHash = zobrist.computeHash(board);
 
-    for (let currentDepth = 2; currentDepth <= maxSearchDepth; currentDepth += 2) {
+    for (let currentDepth = 2; currentDepth <= config.depth; currentDepth += 2) {
       if (this.isCancelled || performance.now() - this.startTime > this.timeLimitMs) {
         break;
       }
 
       let alpha = -Infinity;
-      let beta = Infinity;
-      let depthBestMove = globalBestMove;
+      const beta = Infinity;
+      let depthBestMove: Move = globalBestMove;
       let depthBestScore = -Infinity;
 
       for (const cand of topCandidates) {
         board[cand.row][cand.col] = aiPlayer;
-        let nextHash = zobrist.togglePiece(initialHash, cand.row, cand.col, aiPlayer);
+        const nextHash = zobrist.togglePiece(initialHash, cand.row, cand.col, aiPlayer);
 
         const score = -this.minimax(
           board,
@@ -197,7 +221,7 @@ export class AIEngine {
           oppPlayer,
           aiPlayer,
           nextHash,
-          candidateLimit
+          config
         );
 
         board[cand.row][cand.col] = EMPTY;
@@ -218,35 +242,56 @@ export class AIEngine {
         onProgress(currentDepth, this.nodesCount, globalBestMove, globalBestScore);
       }
 
-      // Nếu đã tìm thấy đường thắng tuyệt đối thì không cần tìm sâu hơn
+      // Đã tìm thấy chuỗi thắng tuyệt đối thì dừng tìm kiếm
       if (globalBestScore >= SCORES.FIVE / 2) {
         break;
       }
     }
 
-    // Nếu ở Level 2-3 có randomness nhẹ, đôi khi chọn nước đi gần tốt nhất
-    if (levelConfig.randomness > 0 && topCandidates.length > 2 && Math.random() < levelConfig.randomness) {
-      const altMove = topCandidates.find(
-        m => m.row !== globalBestMove.row || m.col !== globalBestMove.col
-      );
-      if (altMove && (altMove.score || 0) >= (topCandidates[0].score || 0) * 0.8) {
-        globalBestMove = altMove;
-      }
+    // Áp dụng Softmax Temperature Policy cho nước đi nếu level có temperature > 0
+    let finalMove: Move = globalBestMove;
+    if (config.temperature > 0 && topCandidates.length >= 2) {
+      finalMove = this.selectMoveByPolicy(topCandidates, config.temperature);
     }
 
     const elapsedMs = Math.max(1, Math.round(performance.now() - this.startTime));
     const winProbability = this.calculateWinProbability(globalBestScore);
 
     return {
-      move: globalBestMove,
+      move: finalMove,
       stats: {
-        depth: maxSearchDepth,
+        depth: config.depth,
         nodesEvaluated: this.nodesCount,
         timeMs: elapsedMs,
         winProbability,
         bestScore: globalBestScore,
       },
     };
+  }
+
+  /**
+   * STAGE 4: Chính sách chọn nước đi theo phân phối xác suất Boltzmann / Softmax
+   * Giúp AI cấp thấp đánh rất mềm mại, tự nhiên, mô phỏng đúng cảm giác đối thủ người thật
+   */
+  private selectMoveByPolicy(candidates: Move[], temperature: number): Move {
+    if (temperature <= 0 || candidates.length <= 1) {
+      return candidates[0];
+    }
+
+    // Phân phối trọng số rank-based softmax: weight_i = exp(-i / (temperature * 2.5))
+    const scale = temperature * 2.5;
+    const weights = candidates.map((_, i) => Math.exp(-i / scale));
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+    let randomThreshold = Math.random() * totalWeight;
+    for (let i = 0; i < candidates.length; i++) {
+      randomThreshold -= weights[i];
+      if (randomThreshold <= 0) {
+        return candidates[i];
+      }
+    }
+
+    return candidates[0];
   }
 
   /**
@@ -260,12 +305,12 @@ export class AIEngine {
     currentPlayer: ActivePlayer,
     aiPlayer: ActivePlayer,
     currentHash: number,
-    candidateLimit: number
+    config: LevelConfig
   ): number {
     this.nodesCount++;
 
     if (this.isCancelled || (this.nodesCount % 1000 === 0 && performance.now() - this.startTime > this.timeLimitMs)) {
-      return evaluateBoardScore(board, aiPlayer);
+      return evaluateBoardScore(board, aiPlayer, config.attackWeight, config.defenseWeight);
     }
 
     // Tra cứu Transposition Table
@@ -286,7 +331,7 @@ export class AIEngine {
     }
 
     if (depth <= 0 || isBoardFull(board)) {
-      const score = evaluateBoardScore(board, aiPlayer);
+      const score = evaluateBoardScore(board, aiPlayer, config.attackWeight, config.defenseWeight);
       return currentPlayer === aiPlayer ? score : -score;
     }
 
@@ -297,17 +342,17 @@ export class AIEngine {
     const sortedCandidates = rawCandidates
       .map(c => ({
         ...c,
-        score: evaluatePositionScore(board, c.row, c.col, currentPlayer),
+        score: evaluatePositionScore(board, c.row, c.col, currentPlayer, config.attackWeight, config.defenseWeight),
       }))
       .sort((a, b) => (b.score || 0) - (a.score || 0))
-      .slice(0, Math.max(6, Math.min(candidateLimit, 12)));
+      .slice(0, Math.max(6, Math.min(config.candidateCount, 12)));
 
     let maxScore = -Infinity;
-    let originalAlpha = alpha;
+    const originalAlpha = alpha;
 
     for (const cand of sortedCandidates) {
       board[cand.row][cand.col] = currentPlayer;
-      let nextHash = zobrist.togglePiece(currentHash, cand.row, cand.col, currentPlayer);
+      const nextHash = zobrist.togglePiece(currentHash, cand.row, cand.col, currentPlayer);
 
       const score = -this.minimax(
         board,
@@ -317,7 +362,7 @@ export class AIEngine {
         oppPlayer,
         aiPlayer,
         nextHash,
-        candidateLimit
+        config
       );
 
       board[cand.row][cand.col] = EMPTY;

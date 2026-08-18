@@ -43,10 +43,13 @@ export interface LevelConfig {
   tag: string;
   minWins: number;
   maxWins: number;
-  depth: number;
-  candidateCount: number;
-  randomness: number; // Tỷ lệ chọn ngẫu nhiên có trọng số trong top nước đi (0 = tuyệt đối tối ưu)
-  vcfEnabled: boolean;
+  depth: number;               // Độ sâu tìm kiếm Minimax (1 -> 6)
+  candidateCount: number;      // Số nhánh ứng viên tối đa tại mỗi tầng
+  threatVision: number;        // Tầm nhìn đe dọa khẩn cấp [0.0 - 1.0] (xác suất nhận biết nước 4/5)
+  attackWeight: number;        // Trọng số tấn công [0.5 - 1.5]
+  defenseWeight: number;       // Trọng số phòng thủ [0.3 - 1.5]
+  temperature: number;         // Nhiệt độ Softmax chọn nước đi [0.0 - 1.0] (0 = tuyệt đối tối ưu)
+  vcfDepth: number;            // Độ sâu tìm kiếm chuỗi VCF (0 = tắt)
   color: string;
   gradient: string;
   badgeBg: string;

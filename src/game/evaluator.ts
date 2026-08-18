@@ -169,7 +169,12 @@ function getAllLines(board: BoardMatrix): number[][] {
 /**
  * Đánh giá điểm tổng thể của toàn bộ bàn cờ cho người chơi (player)
  */
-export function evaluateBoardScore(board: BoardMatrix, aiPlayer: ActivePlayer): number {
+export function evaluateBoardScore(
+  board: BoardMatrix,
+  aiPlayer: ActivePlayer,
+  attackWeight: number,
+  defenseWeight: number
+): number {
   const oppPlayer: ActivePlayer = aiPlayer === BLACK ? WHITE : BLACK;
   const lines = getAllLines(board);
 
@@ -204,8 +209,7 @@ export function evaluateBoardScore(board: BoardMatrix, aiPlayer: ActivePlayer): 
     }
   }
 
-  // Tăng tỷ trọng phòng thủ 1.1x để AI luôn cảnh giác với các hiểm họa của người chơi
-  return aiScore - Math.floor(oppScore * 1.15);
+  return Math.floor(aiScore * attackWeight) - Math.floor(oppScore * defenseWeight);
 }
 
 /**
@@ -215,7 +219,9 @@ export function evaluatePositionScore(
   board: BoardMatrix,
   row: number,
   col: number,
-  aiPlayer: ActivePlayer
+  aiPlayer: ActivePlayer,
+  attackWeight: number,
+  defenseWeight: number
 ): number {
   const oppPlayer: ActivePlayer = aiPlayer === BLACK ? WHITE : BLACK;
   const directions = [
@@ -261,7 +267,7 @@ export function evaluatePositionScore(
   const distFromCenter = Math.abs(row - center) + Math.abs(col - center);
   const centerBonus = Math.max(0, 20 - distFromCenter * 2);
 
-  return attackScore + defenseScore + centerBonus;
+  return Math.floor(attackScore * attackWeight) + Math.floor(defenseScore * defenseWeight) + centerBonus;
 }
 
 /**

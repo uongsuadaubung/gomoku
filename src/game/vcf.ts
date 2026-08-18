@@ -89,11 +89,11 @@ export function solveVCF(
   if (currentDepth >= maxDepth) return null;
 
   const candidates = getCandidateMoves(board, 2);
-  // Sắp xếp các nước đi có điểm cục bộ cao nhất
+  // Sắp xếp các nước đi có điểm cục bộ cao nhất (VCF ưu tiên tấn công dồn dập)
   const sortedCandidates = candidates
     .map(m => ({
       ...m,
-      score: evaluatePositionScore(board, m.row, m.col, attackPlayer),
+      score: evaluatePositionScore(board, m.row, m.col, attackPlayer, 1.0, 0.0),
     }))
     .sort((a, b) => (b.score || 0) - (a.score || 0));
 

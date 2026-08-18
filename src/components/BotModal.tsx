@@ -177,8 +177,8 @@ export const BotModal: Component<BotModalProps> = props => {
                             <div class="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-mono">
                               <span>Yêu cầu: {level.minWins === 0 ? 'Cấp khởi đầu' : `${level.minWins}+ ván thắng`}</span>
                               <span>•</span>
-                              <span>Độ khó: {level.id}/6</span>
-                              <Show when={level.vcfEnabled}>
+                              <span>Độ khó: {level.id}/{AI_LEVELS.length}</span>
+                              <Show when={level.vcfDepth > 0}>
                                 <span>•</span>
                                 <span class="text-rose-400 font-bold">Sát cục liên hoàn</span>
                               </Show>
