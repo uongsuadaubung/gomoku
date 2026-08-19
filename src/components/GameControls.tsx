@@ -1,4 +1,4 @@
-import { type Component, Show } from 'solid-js';
+import { type Component, Show, Switch, Match } from 'solid-js';
 import {
   RotateCcw,
   Play,
@@ -8,30 +8,36 @@ import {
   RotateCw,
   Sparkles,
 } from 'lucide-solid';
-import type { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BLACK, WHITE } from '../game/types';
 
-interface GameControlsProps {
-  store: GameStore;
-}
+export const GameControls: Component = () => {
+  const store = useGame();
 
-export const GameControls: Component<GameControlsProps> = props => {
-  const { store } = props;
+  const isMatchActive = () => store.matchStage() === 'playing';
 
-  const isMatchActive = () => store.gameStatus() === 'playing';
+  const isPlayerWinner = () => {
+    const status = store.gameStatus();
+    const player = store.playerColor();
+    return (status === 'black_win' && player === BLACK) || (status === 'white_win' && player === WHITE);
+  };
+
+  const isDraw = () => store.gameStatus() === 'draw';
 
   const canUndo = () => {
     return (
-      store.moveHistory().length > 0 &&
+      store.matchStage() === 'playing' &&
       !store.isAiThinking() &&
-      store.gameStatus() === 'playing'
+      store.currentStrategy().canUndo() &&
+      store.moveHistory().some(m => m.player === store.playerColor())
     );
   };
 
   const nextSideText = () =>
-    store.nextSeriesPlayerSide() ? 'Bạn Đi Trước (Quân Đen)' : 'Bot Đi Trước (Quân Đen)';
+    store.nextSeriesPlayerSide() ? 'Bạn cầm Đen' : 'Bot cầm Đen';
 
   let undoHoverStartTime = 0;
+  let lastUndoHesitationTime = 0;
 
   const handleUndoMouseEnter = () => {
     if (!canUndo()) return;
@@ -39,127 +45,238 @@ export const GameControls: Component<GameControlsProps> = props => {
   };
 
   const handleUndoMouseLeave = () => {
-    if (undoHoverStartTime > 0 && Date.now() - undoHoverStartTime >= 2000 && isMatchActive()) {
+    const now = Date.now();
+    if (
+      undoHoverStartTime > 0 &&
+      now - undoHoverStartTime >= 2000 &&
+      now - lastUndoHesitationTime > 45000 &&
+      isMatchActive()
+    ) {
       store.triggerTaunt('HOVER_UNDO_HESITATION', 200);
+      lastUndoHesitationTime = now;
     }
     undoHoverStartTime = 0;
   };
 
   return (
-    <div class="w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3 transition-all">
-      {/* 1. TRẠNG THÁI TRẬN ĐẤU ĐANG DIỄN RA */}
-      <Show when={isMatchActive()}>
-        <div class="grid grid-cols-2 gap-2.5">
-          {/* Nút Nhận Thua */}
-          <button
-            onClick={() => store.resignGame()}
-            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-sm shadow-md shadow-rose-950/40 active:scale-95 transition-all"
-            title="Đầu hàng và nhận thua ván đấu"
-          >
-            <Flag size={16} />
-            <span>Nhận Thua</span>
-          </button>
-
-          {/* Nút Đi Lại (Undo) */}
-          <button
-            onClick={() => {
-              undoHoverStartTime = 0;
-              store.undoMove();
-            }}
-            onMouseEnter={handleUndoMouseEnter}
-            onMouseLeave={handleUndoMouseLeave}
-            disabled={!canUndo()}
-            class={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all border ${
-              canUndo()
-                ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:scale-95'
-                : 'bg-slate-800/40 text-slate-500 border-slate-800 cursor-not-allowed'
-            }`}
-          >
-            <RotateCcw size={16} />
-            <span>Đi Lại</span>
-          </button>
-        </div>
-
-        {/* Thông tin ván đấu */}
-        <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium px-1">
-          <span class="flex items-center gap-1.5 text-amber-400/90">
-            <Sparkles size={13} />
-            <span>Ván #{store.seriesGameNumber() || 1}</span>
-          </span>
-          <span>
-            {store.playerColor() === BLACK ? 'Bạn cầm Đen (Đi trước)' : 'Bạn cầm Trắng (Đi sau)'}
-          </span>
-        </div>
-      </Show>
-
-      {/* 2. TRẠNG THÁI VÁN KẾT THÚC TỰ NHIÊN (Thắng/Thua/Hòa) */}
-      <Show when={!isMatchActive() && store.isSeriesActive() && !store.lastResigned()}>
-        <div>
-          {/* Nút Ván Tiếp Theo (Tự động đảo bên) */}
-          <button
-            onClick={() => store.startNextGame()}
-            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer animate-start-pulse"
-          >
-            <Play size={16} fill="currentColor" />
-            <span>Ván Tiếp Theo</span>
-          </button>
-        </div>
-
-
-        {/* Báo lượt đi tiếp theo */}
-        <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-          <div class="flex items-center gap-1.5 text-slate-300 text-center sm:text-left">
-            <RotateCw size={13} class="text-amber-400 shrink-0" />
-            <span>
-              Ván tiếp theo: <strong class="text-amber-400 font-semibold">{nextSideText()}</strong>
+    <div class="w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col gap-3 transition-all">
+      {/* 1. CHẾ ĐỘ THẾ CỜ GIỮA TRẬN (PUZZLE) */}
+      <Show when={store.gameMode() === 'puzzle'}>
+        <div class="flex flex-col gap-2.5">
+          {/* Header thông tin thế cờ */}
+          <div class="flex items-center justify-between p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="text-amber-400">{'⭐'.repeat(store.currentPuzzle()?.stars || 1)}</span>
+              <span class="font-extrabold text-white">{store.currentPuzzle()?.name || 'Thế Cờ'}</span>
+            </div>
+            <span class="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+              Tìm Đòn Sát Cục
             </span>
           </div>
 
-          <button
-            onClick={() => store.resetSeries()}
-            class="text-[11px] text-slate-400 hover:text-amber-400 hover:underline transition-all"
-          >
-            Chọn lại lượt đi
-          </button>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <button
+              onClick={() => store.nextPuzzleScenario()}
+              class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            >
+              <Sparkles size={14} />
+              <span>Thế Cờ Mới</span>
+            </button>
+
+            <button
+              onClick={() => store.restartCurrentPuzzle()}
+              class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            >
+              <RotateCcw size={14} />
+              <span>Chơi Lại</span>
+            </button>
+
+            <Show
+              when={isMatchActive()}
+              fallback={
+                <button
+                  onClick={() => store.goToMainMenu()}
+                  class="col-span-2 sm:col-span-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>🏠 Về Menu</span>
+                </button>
+              }
+            >
+              <button
+                onClick={() => store.resignGame()}
+                class="col-span-2 sm:col-span-1 py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <Flag size={14} />
+                <span>Nhận Thua</span>
+              </button>
+            </Show>
+          </div>
         </div>
       </Show>
 
-      {/* 3. TRẠNG THÁI BẮT ĐẦU (Lần đầu vào game hoặc sau khi đầu hàng) */}
-      <Show when={!isMatchActive() && (!store.isSeriesActive() || store.lastResigned())}>
-        <div class="flex flex-col gap-2.5 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80 shadow-lg animate-fade-in">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <Sparkles size={14} class="text-amber-400" />
-              <span>Chọn lượt đi trước để bắt đầu:</span>
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2.5">
-            <button
-              onClick={() => store.startNewSeries(true)}
-              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-emerald cursor-pointer"
-            >
-              <div class="flex items-center gap-1.5">
-                <User size={15} class="group-hover:scale-110 transition-transform text-emerald-400 group-hover:text-slate-950" />
-                <span>Bạn Đi Trước</span>
+      {/* 2. CHẾ ĐỘ CHIẾN DỊCH & ĐẤU TÙY CHỌN */}
+      <Show when={store.gameMode() !== 'puzzle'}>
+        <Switch>
+          {/* GIAI ĐOẠN 1: READY (Chỉ có ở Chiến Dịch khi chưa chọn bên mở màn) */}
+          <Match when={store.matchStage() === 'ready'}>
+            <div class="flex flex-col gap-2.5 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80 shadow-lg animate-fade-in">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Sparkles size={14} class="text-amber-400" />
+                  <span>Chọn lượt đi trước để bắt đầu:</span>
+                </span>
               </div>
-              <span class="text-[10px] opacity-75 font-normal">Bạn cầm quân Đen (●)</span>
-            </button>
 
-            <button
-              onClick={() => store.startNewSeries(false)}
-              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-indigo-500 hover:text-slate-950 text-slate-200 border border-indigo-500/50 hover:border-indigo-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-indigo cursor-pointer"
-            >
-              <div class="flex items-center gap-1.5">
-                <Bot size={15} class="group-hover:scale-110 transition-transform text-indigo-400 group-hover:text-slate-950" />
-                <span>Bot Đi Trước</span>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => store.startNewSeries(true)}
+                  class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-emerald cursor-pointer"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <User size={15} class="group-hover:scale-110 transition-transform text-emerald-400 group-hover:text-slate-950" />
+                    <span>Bạn Đi Trước</span>
+                  </div>
+                  <span class="text-[10px] opacity-75 font-normal">Bạn cầm quân Đen (●)</span>
+                </button>
+
+                <button
+                  onClick={() => store.startNewSeries(false)}
+                  class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-indigo-500 hover:text-slate-950 text-slate-200 border border-indigo-500/50 hover:border-indigo-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-indigo cursor-pointer"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <Bot size={15} class="group-hover:scale-110 transition-transform text-indigo-400 group-hover:text-slate-950" />
+                    <span>Bot Đi Trước</span>
+                  </div>
+                  <span class="text-[10px] opacity-75 font-normal">Bot cầm quân Đen (●)</span>
+                </button>
               </div>
-              <span class="text-[10px] opacity-75 font-normal">Bot cầm quân Đen (●)</span>
-            </button>
-          </div>
-        </div>
+            </div>
+          </Match>
+
+          {/* GIAI ĐOẠN 2: PLAYING (Đang trong trận đấu cho cả Chiến Dịch và Đấu Tập) */}
+          <Match when={store.matchStage() === 'playing'}>
+            <div class="flex flex-col gap-3 animate-fade-in">
+              <div class="grid grid-cols-2 gap-2.5">
+                {/* Nút Nhận Thua */}
+                <button
+                  onClick={() => store.resignGame()}
+                  class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-sm shadow-md shadow-rose-950/40 active:scale-95 transition-all cursor-pointer"
+                  title="Đầu hàng và nhận thua ván đấu"
+                >
+                  <Flag size={16} />
+                  <span>Nhận Thua</span>
+                </button>
+
+                {/* Nút Đi Lại (Undo) */}
+                <button
+                  onClick={() => {
+                    undoHoverStartTime = 0;
+                    store.undoMove();
+                  }}
+                  onMouseEnter={handleUndoMouseEnter}
+                  onMouseLeave={handleUndoMouseLeave}
+                  disabled={!canUndo()}
+                  class={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all border ${
+                    canUndo()
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:scale-95 cursor-pointer'
+                      : 'bg-slate-800/40 text-slate-500 border-slate-800 cursor-not-allowed'
+                  }`}
+                >
+                  <RotateCcw size={16} />
+                  <span>Đi Lại</span>
+                </button>
+              </div>
+
+              {/* Thông tin ván đấu */}
+              <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium px-1">
+                <span class="flex items-center gap-1.5 text-amber-400/90">
+                  <Sparkles size={13} />
+                  <span>
+                    {store.gameMode() === 'campaign'
+                      ? `Ván #${store.seriesGameNumber() || 1}`
+                      : 'Đấu Tập'}
+                  </span>
+                </span>
+                <span>
+                  {store.playerColor() === BLACK ? 'Bạn cầm Đen' : 'Bạn cầm Trắng'}
+                </span>
+              </div>
+            </div>
+          </Match>
+
+          {/* GIAI ĐOẠN 3: GAME_OVER (Khi ván đấu kết thúc) */}
+          <Match when={store.matchStage() === 'game_over'}>
+            <div class="flex flex-col gap-2.5 animate-fade-in">
+              {/* Huy hiệu thông báo kết quả inline */}
+              <div
+                class={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm ${
+                  isPlayerWinner()
+                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-emerald-950/30'
+                    : isDraw()
+                    ? 'bg-slate-800 text-slate-300 border-slate-700'
+                    : 'bg-rose-500/15 text-rose-300 border-rose-500/40 shadow-rose-950/30'
+                }`}
+              >
+                <Show
+                  when={isPlayerWinner()}
+                  fallback={
+                    <Show when={isDraw()} fallback={<span>💥 {store.lastResigned() ? 'Bạn đã nhận thua ván này' : 'Bot đã giành chiến thắng'}</span>}>
+                      <span>🤝 Trận đấu hòa cờ!</span>
+                    </Show>
+                  }
+                >
+                  <span>🎉 Xuất sắc! Bạn đã chiến thắng!</span>
+                </Show>
+              </div>
+
+              {/* Đấu Tùy Chọn */}
+              <Show when={store.gameMode() === 'custom'}>
+                <button
+                  onClick={() => store.startNextGame()}
+                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer animate-start-pulse"
+                >
+                  <Play size={16} fill="currentColor" />
+                  <span>Chơi Lại Ván Mới</span>
+                </button>
+
+                <button
+                  onClick={() => store.goToMainMenu()}
+                  class="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/60 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>🏠 Về Menu Chính</span>
+                </button>
+              </Show>
+
+              {/* Chiến Dịch */}
+              <Show when={store.gameMode() === 'campaign'}>
+                <button
+                  onClick={() => store.startNextGame()}
+                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-black text-sm shadow-md shadow-indigo-500/20 active:scale-95 transition-all cursor-pointer animate-start-pulse"
+                >
+                  <Play size={16} fill="currentColor" />
+                  <span>Ván Tiếp Theo</span>
+                </button>
+
+                <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+                  <div class="flex items-center gap-1.5 text-slate-300 text-center sm:text-left">
+                    <RotateCw size={13} class="text-indigo-400 shrink-0" />
+                    <span>
+                      Lượt đi: <strong class="text-indigo-300 font-semibold">{nextSideText()}</strong>
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => store.resetSeries()}
+                    class="text-[11px] text-slate-400 hover:text-indigo-300 hover:underline transition-all cursor-pointer"
+                  >
+                    Chọn lại lượt đi
+                  </button>
+                </div>
+              </Show>
+            </div>
+          </Match>
+        </Switch>
       </Show>
     </div>
   );
 };
-

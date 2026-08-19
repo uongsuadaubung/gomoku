@@ -1,17 +1,13 @@
 import { Component, Show } from 'solid-js';
 import { Cpu, Zap, Activity, Clock, ShieldAlert } from 'lucide-solid';
-import { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BLACK, WHITE } from '../game/types';
 
-interface AIStatusPanelProps {
-  store: GameStore;
-}
+export const AIStatusPanel: Component = () => {
+  const store = useGame();
 
-export const AIStatusPanel: Component<AIStatusPanelProps> = props => {
-  const { store } = props;
-
-  const isPlayerTurn = () => store.currentTurn() === store.playerColor() && store.gameStatus() === 'playing';
-  const isAiTurn = () => store.currentTurn() === store.aiColor() && store.gameStatus() === 'playing';
+  const isPlayerTurn = () => store.currentTurn() === store.playerColor() && store.matchStage() === 'playing';
+  const isAiTurn = () => store.currentTurn() === store.aiColor() && store.matchStage() === 'playing';
   const playerStoneName = () => (store.playerColor() === BLACK ? 'Quân Đen (●)' : 'Quân Trắng (○)');
   const aiStoneName = () => (store.aiColor() === BLACK ? 'Quân Đen (●)' : 'Quân Trắng (○)');
 
@@ -54,6 +50,16 @@ export const AIStatusPanel: Component<AIStatusPanelProps> = props => {
     return store.aiStats()?.depth || store.currentLevelConfig().depth;
   };
 
+  const getTurnStatusText = () => {
+    const status = store.gameStatus();
+    if (status === 'idle') return 'Chưa bắt đầu';
+    if (status === 'draw') return 'Hòa cờ';
+    const isPlayerWin =
+      (status === 'black_win' && store.playerColor() === BLACK) ||
+      (status === 'white_win' && store.playerColor() === WHITE);
+    return isPlayerWin ? 'Bạn Thắng 🎉' : 'Bot Thắng';
+  };
+
   return (
     <div class="w-full bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5">
       {/* Top: Current Turn Indicator */}
@@ -72,15 +78,7 @@ export const AIStatusPanel: Component<AIStatusPanelProps> = props => {
                 fallback={
                   <Show
                     when={isAiTurn()}
-                    fallback={
-                      store.gameStatus() === 'idle'
-                        ? 'Chưa bắt đầu'
-                        : store.gameStatus() === 'black_win'
-                        ? (store.playerColor() === BLACK ? 'Bạn Thắng 🎉' : 'Bot Thắng')
-                        : store.gameStatus() === 'white_win'
-                        ? (store.playerColor() === WHITE ? 'Bạn Thắng 🎉' : 'Bot Thắng')
-                        : 'Hòa cờ'
-                    }
+                    fallback={getTurnStatusText()}
                   >
                     <span class="text-rose-400 flex items-center gap-1.5">
                       <Cpu size={14} class="animate-spin text-rose-400" /> Bot ({aiStoneName()})

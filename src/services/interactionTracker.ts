@@ -1,19 +1,45 @@
 /**
  * Service theo dõi và đánh giá tần suất tương tác của người dùng
- * (Phát hiện spam thao tác, chuỗi hành động nhanh, cờ trạng thái tạm thời)
+ * (Tối ưu Zero-GC Allocation cho các sự kiện chuột/phím tần suất cao)
  */
 export class InteractionTracker {
   private timestamps: Map<string, number[]> = new Map();
   private flags: Map<string, boolean> = new Map();
+  private recentCellClicks: Array<{ r: number; c: number; time: number }> = [];
+
+  /**
+   * Dọn dẹp in-place các timestamp cũ hơn windowMs để tránh tạo rác Garbage Collection
+   */
+  private pruneOldTimestamps(history: number[], now: number, windowMs: number): void {
+    const cutoff = now - windowMs;
+    let removeCount = 0;
+    while (removeCount < history.length && history[removeCount] < cutoff) {
+      removeCount++;
+    }
+    if (removeCount > 0) {
+      history.splice(0, removeCount);
+    }
+  }
 
   /**
    * Ghi nhận một hành động vừa xảy ra và trả về số lần hành động đó diễn ra trong khoảng thời gian windowMs
    */
   record(actionKey: string, windowMs: number = 5000): number {
     const now = Date.now();
-    const history = (this.timestamps.get(actionKey) || []).filter(t => now - t < windowMs);
+    let history = this.timestamps.get(actionKey);
+    if (!history) {
+      history = [];
+      this.timestamps.set(actionKey, history);
+    }
+
+    this.pruneOldTimestamps(history, now, windowMs);
     history.push(now);
-    this.timestamps.set(actionKey, history);
+
+    // Giới hạn độ dài tối đa để tránh phình to bộ nhớ
+    if (history.length > 50) {
+      history.shift();
+    }
+
     return history.length;
   }
 
@@ -21,8 +47,11 @@ export class InteractionTracker {
    * Kiểm tra xem một hành động có đang bị spam (vượt ngưỡng threshold trong khoảng windowMs) hay không
    */
   isSpammed(actionKey: string, threshold: number = 4, windowMs: number = 3000): boolean {
+    const history = this.timestamps.get(actionKey);
+    if (!history || history.length === 0) return false;
+
     const now = Date.now();
-    const history = (this.timestamps.get(actionKey) || []).filter(t => now - t < windowMs);
+    this.pruneOldTimestamps(history, now, windowMs);
     return history.length >= threshold;
   }
 
@@ -77,19 +106,26 @@ export class InteractionTracker {
     return false;
   }
 
-  private recentCellClicks: Array<{ r: number; c: number; time: number }> = [];
-
   /**
    * Ghi nhận thao tác click vào ô bàn cờ và trả về số ô phân biệt được click trong windowMs
    */
   recordCellClick(r: number, c: number, windowMs: number = 1200): number {
     const now = Date.now();
-    this.recentCellClicks = this.recentCellClicks.filter(item => now - item.time < windowMs);
+    const cutoff = now - windowMs;
+
+    let removeCount = 0;
+    while (removeCount < this.recentCellClicks.length && this.recentCellClicks[removeCount].time < cutoff) {
+      removeCount++;
+    }
+    if (removeCount > 0) {
+      this.recentCellClicks.splice(0, removeCount);
+    }
+
     this.recentCellClicks.push({ r, c, time: now });
 
     const distinct = new Set(this.recentCellClicks.map(item => `${item.r},${item.c}`));
     if (distinct.size >= 3) {
-      this.recentCellClicks = [];
+      this.recentCellClicks.length = 0;
       return distinct.size;
     }
     return distinct.size;
@@ -101,7 +137,7 @@ export class InteractionTracker {
   resetAll(): void {
     this.timestamps.clear();
     this.flags.clear();
-    this.recentCellClicks = [];
+    this.recentCellClicks.length = 0;
   }
 }
 

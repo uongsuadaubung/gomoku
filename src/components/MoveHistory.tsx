@@ -1,16 +1,12 @@
 import { Component, Show, For, createEffect } from 'solid-js';
 import { History } from 'lucide-solid';
-import { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BLACK } from '../game/types';
-
-interface MoveHistoryProps {
-  store: GameStore;
-}
 
 const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
 
-export const MoveHistory: Component<MoveHistoryProps> = props => {
-  const { store } = props;
+export const MoveHistory: Component = () => {
+  const store = useGame();
   let scrollContainerRef: HTMLDivElement | undefined;
 
   const formatCoord = (r: number, c: number) => {

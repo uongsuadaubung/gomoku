@@ -12,6 +12,33 @@ import {
 export type { TauntEvent, BotMood, TauntItem, TauntDefinition };
 export { TAUNT_REGISTRY, TAUNT_DATABASE };
 
+const MOOD_EMOJI_MAP: Record<BotMood, string> = {
+  disdain: '😒',
+  smug: '😏',
+  laugh: '🤣',
+  clown: '🤡',
+  detective: '🧐',
+  bored: '🥱',
+  sleepy: '😴',
+  thinking: '🤔',
+  evil: '😈',
+  lightning: '⚡',
+  cool: '😎',
+  panic: '😱',
+  chill: '☕',
+  rage: '🤬',
+  party: '🥳',
+  angry: '😤',
+  shush: '🤫',
+};
+
+/**
+ * Ánh xạ tâm trạng Bot thành Emoji biểu cảm tương ứng
+ */
+export function getMoodEmoji(mood: BotMood, defaultAvatar: string = '🙄'): string {
+  return MOOD_EMOJI_MAP[mood] || defaultAvatar;
+}
+
 // Lưu index câu thoại vừa nói để tránh lặp lại câu trước đó với chi phí O(1)
 const lastIndexMap: Partial<Record<TauntEvent, number>> = {};
 

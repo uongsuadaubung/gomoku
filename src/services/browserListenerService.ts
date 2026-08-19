@@ -114,38 +114,55 @@ export class BrowserListenerService {
       }
     };
 
-    // 5. Lắc chuột liên hồi (MOUSE_JIGGLE_PANIC)
+    // 5. Lắc chuột liên hồi (MOUSE_JIGGLE_PANIC) - Có throttle & cooldown 45s
     let lastMouseX = 0;
     let lastMouseY = 0;
     let lastDir = 0;
     let dirChanges = 0;
-    let lastJiggleTime = Date.now();
+    let lastCheckTime = 0;
+    let lastJiggleTauntTime = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isGamePlaying() || !isPlayerTurn()) return;
       const now = Date.now();
+
+      // Throttle: chỉ xử lý tối đa mỗi 50ms một lần
+      if (now - lastCheckTime < 50) return;
+      lastCheckTime = now;
+
+      // Cooldown: không kích hoạt lại trong vòng 45 giây
+      if (now - lastJiggleTauntTime < 45000) {
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        return;
+      }
+
+      if (lastMouseX === 0 && lastMouseY === 0) {
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        return;
+      }
+
       const dx = e.clientX - lastMouseX;
       const dy = e.clientY - lastMouseY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist > 20) {
+      if (dist > 35) {
         const dir = Math.atan2(dy, dx);
-        if (Math.abs(dir - lastDir) > 1.4) {
+        // Đảo chiều chuột gắt gao (> 2.4 rad tương đương gần như quay ngoắt 180 độ)
+        if (Math.abs(dir - lastDir) > 2.4) {
           dirChanges++;
-          if (dirChanges >= 7 && now - lastJiggleTime < 800) {
+          if (dirChanges >= 8) {
             dirChanges = 0;
-            lastJiggleTime = now;
+            lastJiggleTauntTime = now;
             triggerTaunt('MOUSE_JIGGLE_PANIC', 150);
           }
+        } else {
+          dirChanges = Math.max(0, dirChanges - 1);
         }
         lastDir = dir;
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-      }
-
-      if (now - lastJiggleTime > 1000) {
-        dirChanges = 0;
-        lastJiggleTime = now;
       }
     };
 

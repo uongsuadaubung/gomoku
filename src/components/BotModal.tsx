@@ -2,59 +2,50 @@ import { type Component, For, Show } from 'solid-js';
 import {
   X,
   Bot,
-  Sparkles,
-  CheckCircle2,
-  Play,
+  Swords,
   Trophy,
+  CheckCircle2,
+  Lock,
+  Flame,
 } from 'lucide-solid';
-import type { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
 import { BLACK } from '../game/types';
 import { ModalBotTaunt } from './ModalBotTaunt';
 
-interface BotModalProps {
-  store: GameStore;
-}
+export const BotModal: Component = () => {
+  const store = useGame();
 
-export const BotModal: Component<BotModalProps> = props => {
-  const { store } = props;
+  const campaignConfig = () => store.campaignLevelConfig();
+  const campaignWins = () => store.stats().campaign?.wins ?? store.stats().wins;
 
-  const stats = () => store.stats();
-  const config = () => store.currentLevelConfig();
-
-  // Tính toán tiến trình lên cấp tiếp theo
-  const nextLevel = () => {
-    const currentId = config().id;
+  // Tính toán tiến trình lên cấp tiếp theo trong Chiến Dịch
+  const nextCampaignLevel = () => {
+    const currentId = campaignConfig().id;
     if (currentId >= AI_LEVELS.length) return null;
     return AI_LEVELS[currentId];
   };
 
-  const progressData = () => {
-    const next = nextLevel();
-    if (!next) return { percent: 100, text: 'Đã đạt cấp độ tối đa', needed: 0, current: 0 };
+  const campaignProgress = () => {
+    const next = nextCampaignLevel();
+    if (!next) return { percent: 100, text: 'Đã mở khóa toàn bộ đối thủ!', needed: 0, current: 0 };
 
-    const winsNeeded = next.minWins - config().minWins;
-    const winsAchieved = stats().wins - config().minWins;
+    const winsNeeded = next.minWins - campaignConfig().minWins;
+    const winsAchieved = campaignWins() - campaignConfig().minWins;
     const clampedWins = Math.max(0, Math.min(winsAchieved, winsNeeded));
     const percent = Math.round((clampedWins / winsNeeded) * 100);
 
     return {
       percent,
-      text: `${clampedWins}/${winsNeeded} ván thắng để lên Level ${next.id}: ${next.vietnameseName}`,
+      text: `${clampedWins}/${winsNeeded} ván thắng để mở khóa đối thủ tiếp theo`,
       needed: winsNeeded,
       current: clampedWins,
     };
   };
 
-  const handleSelectManualLevel = (levelId: number) => {
-    store.setManualLevel(levelId);
-    store.startNewGame(store.playerColor() === BLACK);
+  const handleStartCustomMatchWithBot = (levelId: number) => {
     store.setShowBotModal(false);
-  };
-
-  const handleResetToAuto = () => {
-    store.setManualLevel(null);
-    store.setShowBotModal(false);
+    store.startCustomMatch(levelId);
   };
 
   return (
@@ -68,14 +59,14 @@ export const BotModal: Component<BotModalProps> = props => {
                 <Bot size={22} />
               </div>
               <div>
-                <h2 class="text-lg font-black text-white">Cấp Độ Đối Thủ Bot</h2>
-                <p class="text-xs text-slate-400">Các cấp độ kỳ nghệ của đối thủ bạn đã mở khóa</p>
+                <h2 class="text-lg font-black text-white">Danh Sách Đối Thủ Bot</h2>
+                <p class="text-xs text-slate-400">Hồ sơ các đối thủ kỳ nghệ và tiến trình Chiến Dịch</p>
               </div>
             </div>
 
             <button
               onClick={() => store.setShowBotModal(false)}
-              class="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+              class="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -84,121 +75,149 @@ export const BotModal: Component<BotModalProps> = props => {
           {/* Body */}
           <div class="p-5 overflow-y-auto space-y-4 flex-1">
             {/* Lời thoại của Bot */}
-            <ModalBotTaunt store={store} />
-            
-            {/* Mode Switch: Auto vs Manual */}
-            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <span class="text-xs font-bold text-white block">Cơ chế thăng cấp Bot</span>
-                <span class="text-[11px] text-slate-400">
-                  {stats().manualLevel === null
-                    ? 'Bot đang tự động tăng cấp độ theo số ván bạn thắng'
-                    : `Đang khóa cố định ở Level ${stats().manualLevel}`}
+            <ModalBotTaunt />
+
+            {/* 🌟 TIẾN TRÌNH CHIẾN DỊCH LEO CẤP */}
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-slate-950/70 to-slate-950/70 border border-indigo-500/30">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <Trophy size={16} class="text-amber-400" />
+                  <span class="text-xs font-bold text-white">Tiến trình Chiến Dịch Leo Cấp</span>
+                </div>
+                <span class="text-xs font-black text-indigo-300 font-mono">
+                  {campaignProgress().percent}%
                 </span>
               </div>
 
-              <Show when={stats().manualLevel !== null}>
-                <button
-                  onClick={handleResetToAuto}
-                  class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
-                >
-                  <Sparkles size={14} />
-                  <span>Bật Tự Động Thăng Cấp</span>
-                </button>
-              </Show>
+              <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden relative mb-2">
+                <div
+                  class={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${campaignConfig().gradient}`}
+                  style={{ width: `${campaignProgress().percent}%` }}
+                />
+              </div>
+
+              <div class="flex items-center justify-between text-[11px] text-slate-300 font-medium">
+                <span>{campaignProgress().text}</span>
+                <span class="font-bold text-amber-300 font-mono">Tổng: {campaignWins()} trận thắng</span>
+              </div>
             </div>
 
-            {/* 🌟 TIẾN TRÌNH MỞ KHÓA SỨC MẠNH BOT */}
-            <Show when={stats().manualLevel === null && nextLevel()}>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-slate-950/60 to-slate-950/60 border border-amber-500/30">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center space-x-2">
-                    <Trophy size={16} class="text-amber-400" />
-                    <span class="text-xs font-bold text-white">Tiến trình mở khóa sức mạnh Bot</span>
-                  </div>
-                  <span class="text-xs font-black text-amber-300 font-mono">
-                    {progressData().percent}%
-                  </span>
-                </div>
-
-                <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden relative mb-2">
-                  <div
-                    class={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${config().gradient}`}
-                    style={{ width: `${progressData().percent}%` }}
-                  />
-                </div>
-
-                <p class="text-[11px] text-slate-300 font-medium">
-                  {progressData().text}
-                </p>
-              </div>
-            </Show>
-
-            {/* Unlocked Levels List */}
+            {/* Danh sách toàn bộ 8 cấp độ Bot */}
             <div>
-              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3">
-                Danh Sách Cấp Độ Đã Mở Khóa ({AI_LEVELS.filter(level => stats().wins >= level.minWins).length} / {AI_LEVELS.length})
-              </h3>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                  Cẩm Nang Đối Thủ Kỳ Nghệ
+                </h3>
+                <span class="text-[11px] text-slate-500 font-medium">
+                  Bấm "Đấu Tập" để thử sức ngay
+                </span>
+              </div>
 
               <div class="space-y-2.5">
-                <For each={AI_LEVELS.filter(level => stats().wins >= level.minWins)}>
+                <For each={AI_LEVELS}>
                   {level => {
-                    const isCurrent = () => store.currentLevelConfig().id === level.id;
-                    const isManual = () => stats().manualLevel === level.id;
+                    const isCampaignCurrent = () => campaignConfig().id === level.id;
+                    const isCampaignUnlocked = () => campaignWins() >= level.minWins;
+                    const isMatchCurrent = () => store.currentLevelConfig().id === level.id;
+                    const unlocked = isCampaignUnlocked();
 
                     return (
                       <div
-                        class={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                          isCurrent()
+                        class={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                          isMatchCurrent()
                             ? 'bg-slate-800/90 border-amber-500/50 shadow-md shadow-amber-500/10'
-                            : 'bg-slate-950/50 border-slate-800/80 hover:border-slate-700'
+                            : unlocked
+                            ? 'bg-slate-950/50 border-slate-800/80 hover:border-slate-700'
+                            : 'bg-slate-950/30 border-slate-900 opacity-60'
                         }`}
                       >
                         {/* Avatar & Title */}
-                        <div class="flex items-center space-x-3">
-                          <div class="text-2xl">{level.avatar}</div>
-                          <div>
-                            <div class="flex items-center space-x-2">
+                        <div class="flex items-start space-x-3">
+                          <div class="text-2xl mt-0.5 select-none shrink-0">
+                            {unlocked ? level.avatar : '🔒'}
+                          </div>
+                          <div class="space-y-0.5 min-w-0 flex-1">
+                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
                               <span class="text-xs font-black text-white">
-                                Level {level.id}: {level.vietnameseName}
+                                {unlocked ? `Bot ${level.vietnameseName}` : 'Đối Thủ Bí Ẩn'}
                               </span>
-                              <Show when={isCurrent()}>
-                                <span class="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.2 rounded-full border border-amber-500/40">
-                                  {isManual() ? 'Đang chọn' : 'Hiện tại'}
+                              
+                              <Show when={isMatchCurrent()}>
+                                <span class="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/40 flex items-center gap-1">
+                                  <Flame size={10} /> Đang Đấu
                                 </span>
                               </Show>
-                              <Show when={!isCurrent()}>
-                                <CheckCircle2 size={14} class="text-emerald-400" />
+
+                              <Show when={isCampaignCurrent() && !isMatchCurrent()}>
+                                <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/40">
+                                  Mục Tiêu Chiến Dịch
+                                </span>
+                              </Show>
+
+                              <Show when={unlocked && !isCampaignCurrent() && !isMatchCurrent()}>
+                                <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-0.5">
+                                  <CheckCircle2 size={12} /> Đã Mở Khóa
+                                </span>
+                              </Show>
+
+                              <Show when={!unlocked}>
+                                <span class="text-[10px] text-slate-500 font-bold bg-slate-900/80 px-2 py-0.5 rounded-full border border-slate-800 flex items-center gap-1">
+                                  <Lock size={10} /> Cần vượt qua đối thủ trước
+                                </span>
                               </Show>
                             </div>
-                            <p class="text-[11px] text-slate-400 mt-0.5">
-                              {level.description}
+
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                              {unlocked
+                                ? level.description
+                                : 'Đối thủ bí ẩn đang ẩn mình. Hãy chinh phục các bậc Chiến Dịch trước để giải mã danh tính và phong cách đánh của đối thủ này!'}
                             </p>
-                            <div class="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-mono">
-                              <span>Yêu cầu: {level.minWins === 0 ? 'Cấp khởi đầu' : `${level.minWins}+ ván thắng`}</span>
-                              <span>•</span>
-                              <span>Độ khó: {level.id}/{AI_LEVELS.length}</span>
-                              <Show when={level.vcfDepth > 0}>
+
+                            <Show when={unlocked}>
+                              <div class="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-mono flex-wrap">
+                                <span class="text-slate-400">{level.tag}</span>
                                 <span>•</span>
-                                <span class="text-rose-400 font-bold">Sát cục liên hoàn</span>
-                              </Show>
-                            </div>
+                                <span>Độ sâu AI: {level.depth} bước</span>
+                                <Show when={level.vcfDepth > 0}>
+                                  <span>•</span>
+                                  <span class="text-rose-400 font-bold">VCF Sát cục {level.vcfDepth} tầng</span>
+                                </Show>
+                              </div>
+                            </Show>
+                            
+                            <Show when={!unlocked}>
+                              <div class="mt-1 text-[10px] text-amber-500/80 font-medium">
+                                <span>Cần thêm {Math.max(0, level.minWins - campaignWins())} ván thắng trong Chiến Dịch để mở khóa</span>
+                              </div>
+                            </Show>
                           </div>
                         </div>
 
-                        {/* Action: Select/Practice this unlocked level (Chỉ hiện nút Đấu lại ở các level đã vượt qua) */}
-                        <Show when={!isCurrent()}>
-                          <div>
+                        {/* Action: Thử sức đấu tập ngay (Chỉ cho phép khi đã mở khóa) */}
+                        <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                          <Show
+                            when={unlocked}
+                            fallback={
+                              <span class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-900/60 border border-slate-900 flex items-center gap-1 select-none">
+                                <Lock size={12} />
+                                <span>Bị Khóa</span>
+                              </span>
+                            }
+                          >
                             <button
-                              onClick={() => handleSelectManualLevel(level.id)}
-                              class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 border bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:scale-95"
-                              title={`Chọn đấu lại Level ${level.id}`}
+                              onClick={() => handleStartCustomMatchWithBot(level.id)}
+                              class={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border active:scale-95 cursor-pointer ${
+                                isMatchCurrent()
+                                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 border-amber-400 shadow-sm font-black'
+                                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                              }`}
+                              title={`Bắt đầu trận Đấu Tập với Level ${level.id}`}
                             >
-                              <Play size={12} fill="currentColor" />
-                              <span>Đấu lại</span>
+                              <Swords size={13} />
+                              <span>{isMatchCurrent() ? 'Đang Đấu' : 'Đấu Tập'}</span>
                             </button>
-                          </div>
-                        </Show>
+                          </Show>
+                        </div>
                       </div>
                     );
                   }}

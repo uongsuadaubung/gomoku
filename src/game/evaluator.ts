@@ -167,6 +167,21 @@ function getAllLines(board: BoardMatrix): number[][] {
 }
 
 /**
+ * Tính điểm hình cờ cho 1 đoạn đường thẳng trên toàn bàn cờ
+ */
+function getBoardLineScore(pat: ReturnType<typeof evaluateLinePattern>): number {
+  if (pat.openFour > 0 || pat.blockedFour >= 2) return SCORES.OPEN_FOUR;
+  if (pat.blockedFour > 0 && pat.openThree > 0) return SCORES.OPEN_FOUR;
+  return (
+    pat.blockedFour * SCORES.BLOCKED_FOUR +
+    pat.openThree * SCORES.OPEN_THREE +
+    pat.blockedThree * SCORES.BLOCKED_THREE +
+    pat.openTwo * SCORES.OPEN_TWO +
+    pat.blockedTwo * SCORES.BLOCKED_TWO
+  );
+}
+
+/**
  * Đánh giá điểm tổng thể của toàn bộ bàn cờ cho người chơi (player)
  */
 export function evaluateBoardScore(
@@ -185,31 +200,28 @@ export function evaluateBoardScore(
     // Điểm của AI
     const aiPatterns = evaluateLinePattern(line, aiPlayer);
     if (aiPatterns.five > 0) return SCORES.FIVE;
-    if (aiPatterns.openFour > 0 || aiPatterns.blockedFour >= 2) aiScore += SCORES.OPEN_FOUR;
-    else if (aiPatterns.blockedFour > 0 && aiPatterns.openThree > 0) aiScore += SCORES.OPEN_FOUR;
-    else {
-      aiScore += aiPatterns.blockedFour * SCORES.BLOCKED_FOUR;
-      aiScore += aiPatterns.openThree * SCORES.OPEN_THREE;
-      aiScore += aiPatterns.blockedThree * SCORES.BLOCKED_THREE;
-      aiScore += aiPatterns.openTwo * SCORES.OPEN_TWO;
-      aiScore += aiPatterns.blockedTwo * SCORES.BLOCKED_TWO;
-    }
+    aiScore += getBoardLineScore(aiPatterns);
 
     // Điểm của Đối thủ
     const oppPatterns = evaluateLinePattern(line, oppPlayer);
     if (oppPatterns.five > 0) return -SCORES.FIVE;
-    if (oppPatterns.openFour > 0 || oppPatterns.blockedFour >= 2) oppScore += SCORES.OPEN_FOUR;
-    else if (oppPatterns.blockedFour > 0 && oppPatterns.openThree > 0) oppScore += SCORES.OPEN_FOUR;
-    else {
-      oppScore += oppPatterns.blockedFour * SCORES.BLOCKED_FOUR;
-      oppScore += oppPatterns.openThree * SCORES.OPEN_THREE;
-      oppScore += oppPatterns.blockedThree * SCORES.BLOCKED_THREE;
-      oppScore += oppPatterns.openTwo * SCORES.OPEN_TWO;
-      oppScore += oppPatterns.blockedTwo * SCORES.BLOCKED_TWO;
-    }
+    oppScore += getBoardLineScore(oppPatterns);
   }
 
   return Math.floor(aiScore * attackWeight) - Math.floor(oppScore * defenseWeight);
+}
+
+/**
+ * Tính điểm cục bộ cho 1 đoạn thẳng quanh vị trí dự kiến đặt quân
+ */
+function getLocalPatternScore(pat: ReturnType<typeof evaluateLinePattern>): number {
+  if (pat.five > 0) return SCORES.FIVE;
+  if (pat.openFour > 0) return SCORES.OPEN_FOUR;
+  if (pat.blockedFour > 0) return SCORES.BLOCKED_FOUR;
+  if (pat.openThree > 0) return SCORES.OPEN_THREE;
+  if (pat.blockedThree > 0) return SCORES.BLOCKED_THREE;
+  if (pat.openTwo > 0) return SCORES.OPEN_TWO;
+  return 0;
 }
 
 /**
@@ -239,24 +251,12 @@ export function evaluatePositionScore(
     // 1. Nếu AI đặt quân vào đây
     board[row][col] = aiPlayer;
     const aiLine = extractLocalLine(board, row, col, dir.dr, dir.dc);
-    const aiPat = evaluateLinePattern(aiLine, aiPlayer);
-    if (aiPat.five > 0) attackScore += SCORES.FIVE;
-    else if (aiPat.openFour > 0) attackScore += SCORES.OPEN_FOUR;
-    else if (aiPat.blockedFour > 0) attackScore += SCORES.BLOCKED_FOUR;
-    else if (aiPat.openThree > 0) attackScore += SCORES.OPEN_THREE;
-    else if (aiPat.blockedThree > 0) attackScore += SCORES.BLOCKED_THREE;
-    else if (aiPat.openTwo > 0) attackScore += SCORES.OPEN_TWO;
+    attackScore += getLocalPatternScore(evaluateLinePattern(aiLine, aiPlayer));
 
     // 2. Nếu Đối thủ đặt quân vào đây (để chặn đối thủ)
     board[row][col] = oppPlayer;
     const oppLine = extractLocalLine(board, row, col, dir.dr, dir.dc);
-    const oppPat = evaluateLinePattern(oppLine, oppPlayer);
-    if (oppPat.five > 0) defenseScore += SCORES.FIVE;
-    else if (oppPat.openFour > 0) defenseScore += SCORES.OPEN_FOUR;
-    else if (oppPat.blockedFour > 0) defenseScore += SCORES.BLOCKED_FOUR;
-    else if (oppPat.openThree > 0) defenseScore += SCORES.OPEN_THREE;
-    else if (oppPat.blockedThree > 0) defenseScore += SCORES.BLOCKED_THREE;
-    else if (oppPat.openTwo > 0) defenseScore += SCORES.OPEN_TWO;
+    defenseScore += getLocalPatternScore(evaluateLinePattern(oppLine, oppPlayer));
   }
 
   // Khôi phục lại ô trống

@@ -1,18 +1,15 @@
 import { type Component, For, Show, createSignal, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BOARD_SIZE, EMPTY, BLACK, WHITE } from '../game/types';
 import { STAR_POINTS } from '../game/constants';
 import { interactionTracker } from '../services/interactionTracker';
 
-interface GameBoardProps {
-  store: GameStore;
-}
-
 const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
 const ROW_NUMBERS = Array.from({ length: 15 }, (_, i) => 15 - i); // 15 down to 1
 
-export const GameBoard: Component<GameBoardProps> = props => {
-  const { store } = props;
+export const GameBoard: Component = () => {
+  const store = useGame();
   const [hoverPos, setHoverPos] = createSignal<{ row: number; col: number } | null>(null);
 
   const isStarPoint = (r: number, c: number) => {
@@ -37,7 +34,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
 
   const canPlay = () => {
     return (
-      store.gameStatus() === 'playing' &&
+      store.matchStage() === 'playing' &&
       !store.isAiThinking() &&
       store.currentTurn() === store.playerColor()
     );
@@ -45,6 +42,8 @@ export const GameBoard: Component<GameBoardProps> = props => {
 
   let longHoverTimer: number | null = null;
   let recentHoveredCells: { pos: string; time: number }[] = [];
+  let lastHesitationTauntTime = 0;
+  let lastLongHoverTauntTime = 0;
 
   const clearHoverTimer = () => {
     if (longHoverTimer) {
@@ -60,21 +59,30 @@ export const GameBoard: Component<GameBoardProps> = props => {
     if (canPlay() && cell === EMPTY) {
       const now = Date.now();
       const posKey = `${rIdx},${cIdx}`;
-      recentHoveredCells = recentHoveredCells.filter(item => now - item.time < 2500);
-      if (!recentHoveredCells.some(item => item.pos === posKey)) {
-        recentHoveredCells.push({ pos: posKey, time: now });
-      }
 
-      if (recentHoveredCells.length >= 7) {
-        store.triggerTaunt('HESITATION_DANCE', 100);
-        recentHoveredCells = [];
-      }
-
-      longHoverTimer = window.setTimeout(() => {
-        if (hoverPos()?.row === rIdx && hoverPos()?.col === cIdx && canPlay()) {
-          store.triggerTaunt('LONG_HOVER_CELL', 100);
+      // 1. Cà khịa ngập ngừng (HESITATION_DANCE) - Yêu cầu rà chuột qua 12 ô khác nhau trong 3.5s kèm cooldown 45s
+      if (now - lastHesitationTauntTime > 45000) {
+        recentHoveredCells = recentHoveredCells.filter(item => now - item.time < 3500);
+        if (!recentHoveredCells.some(item => item.pos === posKey)) {
+          recentHoveredCells.push({ pos: posKey, time: now });
         }
-      }, 3500);
+
+        if (recentHoveredCells.length >= 12) {
+          store.triggerTaunt('HESITATION_DANCE', 100);
+          recentHoveredCells = [];
+          lastHesitationTauntTime = now;
+        }
+      }
+
+      // 2. Cà khịa ngâm chuột tại 1 ô quá lâu (LONG_HOVER_CELL) - 6 giây đứng yên kèm cooldown 45s
+      if (now - lastLongHoverTauntTime > 45000) {
+        longHoverTimer = window.setTimeout(() => {
+          if (hoverPos()?.row === rIdx && hoverPos()?.col === cIdx && canPlay()) {
+            store.triggerTaunt('LONG_HOVER_CELL', 100);
+            lastLongHoverTauntTime = Date.now();
+          }
+        }, 6000);
+      }
     }
   };
 
@@ -85,22 +93,19 @@ export const GameBoard: Component<GameBoardProps> = props => {
 
   onCleanup(() => {
     clearHoverTimer();
+    recentHoveredCells = [];
   });
 
   const handleCellClick = (r: number, c: number) => {
     clearHoverTimer();
     // Khi game đã kết thúc (không quan tâm bên nào thắng), nếu người chơi cố ấn thêm vào bàn cờ -> cà khịa
-    if (
-      store.gameStatus() === 'black_win' ||
-      store.gameStatus() === 'white_win' ||
-      store.gameStatus() === 'draw'
-    ) {
+    if (store.matchStage() === 'game_over') {
       store.triggerTaunt('CLICK_AFTER_GAME_OVER', 0);
       return;
     }
 
     if (!canPlay()) {
-      if (store.gameStatus() === 'idle' || !store.isSeriesActive()) {
+      if (store.matchStage() === 'ready') {
         store.triggerTaunt('CLICK_BEFORE_START', 50);
       }
       return;
@@ -123,50 +128,58 @@ export const GameBoard: Component<GameBoardProps> = props => {
   };
 
 
-  const themeClass = () => {
-    const t = store.theme();
-    if (t === 'paper') return 'board-paper border-stone-400/90 shadow-stone-900/40';
-    if (t === 'jade') return 'board-jade border-emerald-600/70 shadow-emerald-950/60';
-    if (t === 'cyber') return 'board-cyber border-cyan-500/60 shadow-cyan-950/80';
-    if (t === 'slate') return 'board-slate border-slate-700/80 shadow-slate-950/70';
-    return 'board-wood border-amber-950/60 shadow-amber-950/70';
+  interface ThemeConfig {
+    board: string;
+    line: string;
+    cellBorder: string;
+    starPoint: string;
+    coordText: string;
+  }
+
+  const THEME_CONFIG: Record<string, ThemeConfig> = {
+    paper: {
+      board: 'board-paper border-stone-400/90 shadow-stone-900/40',
+      line: 'bg-slate-400/80',
+      cellBorder: 'border-slate-300 hover:bg-sky-500/10 active:bg-sky-500/20',
+      starPoint: 'bg-slate-900',
+      coordText: 'text-slate-800 font-extrabold',
+    },
+    jade: {
+      board: 'board-jade border-emerald-600/70 shadow-emerald-950/60',
+      line: 'bg-emerald-300/60',
+      cellBorder: 'border-emerald-500/25 hover:bg-emerald-500/10 active:bg-emerald-500/20',
+      starPoint: 'bg-emerald-300 shadow-[0_0_6px_#34d399]',
+      coordText: 'text-emerald-300/80 font-bold',
+    },
+    cyber: {
+      board: 'board-cyber border-cyan-500/60 shadow-cyan-950/80',
+      line: 'bg-cyan-400/40',
+      cellBorder: 'border-cyan-500/25 hover:bg-cyan-500/10 active:bg-cyan-500/20',
+      starPoint: 'bg-cyan-300 shadow-[0_0_6px_#38bdf8]',
+      coordText: 'text-cyan-400/70',
+    },
+    slate: {
+      board: 'board-slate border-slate-700/80 shadow-slate-950/70',
+      line: 'bg-slate-400/40',
+      cellBorder: 'border-slate-500/25 hover:bg-slate-500/10 active:bg-slate-500/20',
+      starPoint: 'bg-slate-200',
+      coordText: 'text-slate-400',
+    },
+    wood: {
+      board: 'board-wood border-amber-950/60 shadow-amber-950/70',
+      line: 'bg-amber-950/60',
+      cellBorder: 'border-amber-950/30 hover:bg-amber-950/10 active:bg-amber-950/20',
+      starPoint: 'bg-amber-950',
+      coordText: 'text-amber-950/70 font-bold',
+    },
   };
 
-  const lineBg = () => {
-    const t = store.theme();
-    if (t === 'paper') return 'bg-slate-400/80';
-    if (t === 'jade') return 'bg-emerald-300/60';
-    if (t === 'cyber') return 'bg-cyan-400/40';
-    if (t === 'slate') return 'bg-slate-400/40';
-    return 'bg-amber-950/60';
-  };
-
-  const cellBorderColor = () => {
-    const t = store.theme();
-    if (t === 'paper') return 'border-slate-300 hover:bg-sky-500/10 active:bg-sky-500/20';
-    if (t === 'jade') return 'border-emerald-500/25 hover:bg-emerald-500/10 active:bg-emerald-500/20';
-    if (t === 'cyber') return 'border-cyan-500/25 hover:bg-cyan-500/10 active:bg-cyan-500/20';
-    if (t === 'slate') return 'border-slate-500/25 hover:bg-slate-500/10 active:bg-slate-500/20';
-    return 'border-amber-950/30 hover:bg-amber-950/10 active:bg-amber-950/20';
-  };
-
-  const starPointBg = () => {
-    const t = store.theme();
-    if (t === 'paper') return 'bg-slate-900';
-    if (t === 'jade') return 'bg-emerald-300 shadow-[0_0_6px_#34d399]';
-    if (t === 'cyber') return 'bg-cyan-300 shadow-[0_0_6px_#38bdf8]';
-    if (t === 'slate') return 'bg-slate-200';
-    return 'bg-amber-950';
-  };
-
-  const coordTextColor = () => {
-    const t = store.theme();
-    if (t === 'paper') return 'text-slate-800 font-extrabold';
-    if (t === 'jade') return 'text-emerald-300/80 font-bold';
-    if (t === 'cyber') return 'text-cyan-400/70';
-    if (t === 'slate') return 'text-slate-400';
-    return 'text-amber-950/70 font-bold';
-  };
+  const currentThemeConfig = () => THEME_CONFIG[store.theme()] || THEME_CONFIG.wood;
+  const themeClass = () => currentThemeConfig().board;
+  const lineBg = () => currentThemeConfig().line;
+  const cellBorderColor = () => currentThemeConfig().cellBorder;
+  const starPointBg = () => currentThemeConfig().starPoint;
+  const coordTextColor = () => currentThemeConfig().coordText;
 
   return (
     <div class="w-full flex flex-col items-center justify-center select-none touch-manipulation">

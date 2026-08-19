@@ -1,14 +1,10 @@
 import { type Component, Show } from 'solid-js';
 import { Sparkles, ArrowRight } from 'lucide-solid';
-import type { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BLACK } from '../game/types';
 
-interface LevelUpModalProps {
-  store: GameStore;
-}
-
-export const LevelUpModal: Component<LevelUpModalProps> = props => {
-  const { store } = props;
+export const LevelUpModal: Component = () => {
+  const store = useGame();
   const level = () => store.showLevelUpAlert();
 
   return (
@@ -37,7 +33,7 @@ export const LevelUpModal: Component<LevelUpModalProps> = props => {
             {level()?.vietnameseName} ({level()?.tag})
           </span>
 
-          <p class="text-xs text-slate-300 mb-6 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800 text-left leading-relaxed">
+          <p class="text-xs text-slate-300 mb-4 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800 text-left leading-relaxed">
             <strong class="text-amber-400 block mb-1">Đặc tính mới của Bot:</strong>
             {level()?.description}
             <br />
@@ -45,6 +41,11 @@ export const LevelUpModal: Component<LevelUpModalProps> = props => {
               • Chiến thuật: {level()?.tactics}
             </span>
           </p>
+
+          <div class="mb-5 py-2 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 flex items-center justify-center gap-1.5">
+            <Sparkles size={13} class="text-emerald-400" />
+            <span>Đã mở khóa đối thủ này trong Đấu Tập Tự Do!</span>
+          </div>
 
           <button
             onClick={() => {

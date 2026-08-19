@@ -1,14 +1,10 @@
 import { Component, Show } from 'solid-js';
 import { X, BookOpen, CheckCircle, Zap, Lightbulb } from 'lucide-solid';
-import { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { ModalBotTaunt } from './ModalBotTaunt';
 
-interface RulesModalProps {
-  store: GameStore;
-}
-
-export const RulesModal: Component<RulesModalProps> = props => {
-  const { store } = props;
+export const RulesModal: Component = () => {
+  const store = useGame();
 
   return (
     <Show when={store.showRulesModal()}>
@@ -37,7 +33,7 @@ export const RulesModal: Component<RulesModalProps> = props => {
           {/* Body */}
           <div class="p-5 overflow-y-auto space-y-4 text-xs text-slate-300 leading-relaxed flex-1">
             {/* Lời thoại của Bot */}
-            <ModalBotTaunt store={store} />
+            <ModalBotTaunt />
             <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
               <h3 class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-1.5">
                 <CheckCircle size={16} /> 1. Mục Tiêu Trận Đấu

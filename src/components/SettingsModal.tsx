@@ -1,15 +1,11 @@
 import { type Component, For, Show } from 'solid-js';
 import { X, Palette, Volume2, VolumeX, Hash, Grid3X3, Crosshair, MessageSquareQuote } from 'lucide-solid';
-import type { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import type { ThemeType, BoardStyle } from '../game/types';
 import { ModalBotTaunt } from './ModalBotTaunt';
 
-interface SettingsModalProps {
-  store: GameStore;
-}
-
-export const SettingsModal: Component<SettingsModalProps> = props => {
-  const { store } = props;
+export const SettingsModal: Component = () => {
+  const store = useGame();
 
   const themes: Array<{ id: ThemeType; name: string; desc: string; previewBg: string }> = [
     {
@@ -86,7 +82,7 @@ export const SettingsModal: Component<SettingsModalProps> = props => {
           {/* Body */}
           <div class="p-5 overflow-y-auto space-y-6 flex-1">
             {/* Lời thoại của Bot */}
-            <ModalBotTaunt store={store} />
+            <ModalBotTaunt />
 
             {/* 1. Board Style: Intersections vs Cells */}
             <div>

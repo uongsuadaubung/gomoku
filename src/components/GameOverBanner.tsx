@@ -1,28 +1,21 @@
 import { Component, Show, createSignal, createEffect } from 'solid-js';
 import { Trophy, Bot, Equal, X, Play, Eye } from 'lucide-solid';
-import { GameStore } from '../store/gameStore';
+import { useGame } from '../store/GameContext';
 import { BLACK, WHITE } from '../game/types';
 
-interface GameOverBannerProps {
-  store: GameStore;
-}
-
-export const GameOverBanner: Component<GameOverBannerProps> = props => {
-  const { store } = props;
+export const GameOverBanner: Component = () => {
+  const store = useGame();
   const [dismissed, setDismissed] = createSignal(false);
 
   // Reset trạng thái dismissed khi ván cờ mới bắt đầu
   createEffect(() => {
-    if (store.gameStatus() === 'playing') {
+    if (store.matchStage() === 'playing') {
       setDismissed(false);
     }
   });
 
   const isGameOver = () =>
-    (store.gameStatus() === 'black_win' ||
-      store.gameStatus() === 'white_win' ||
-      store.gameStatus() === 'draw') &&
-    !dismissed();
+    store.matchStage() === 'game_over' && !dismissed();
 
   const isPlayerWinner = () => {
     const status = store.gameStatus();
@@ -80,29 +73,57 @@ export const GameOverBanner: Component<GameOverBannerProps> = props => {
           <div>
             <h3 class="text-xl sm:text-2xl font-black text-white">
               <Show
-                when={isPlayerWinner()}
+                when={store.gameMode() === 'puzzle'}
                 fallback={
                   <Show
-                    when={isDraw()}
+                    when={isPlayerWinner()}
                     fallback={
-                      <span class="text-rose-400">
-                        {store.lastResigned() ? 'Bạn Đã Nhận Thua' : 'Bot Đã Giành Chiến Thắng!'}
-                      </span>
+                      <Show
+                        when={isDraw()}
+                        fallback={
+                          <span class="text-rose-400">
+                            {store.lastResigned() ? 'Bạn Đã Nhận Thua' : 'Bot Đã Giành Chiến Thắng!'}
+                          </span>
+                        }
+                      >
+                        <span class="text-slate-200">Trận Đấu Hòa Cờ!</span>
+                      </Show>
                     }
                   >
-                    <span class="text-slate-200">Trận Đấu Hòa Cờ!</span>
+                    <span class="text-emerald-400">Xuất Sắc! Bạn Đã Thắng! 🎉</span>
                   </Show>
                 }
               >
-                <span class="text-emerald-400">Xuất Sắc! Bạn Đã Thắng! 🎉</span>
+                <Show
+                  when={isPlayerWinner()}
+                  fallback={<span class="text-rose-400">Chưa Giải Được Sát Cục! 💥</span>}
+                >
+                  <span class="text-emerald-400">
+                    Sát Cục Thành Công! {'⭐'.repeat(store.currentPuzzle()?.stars || 1)} 🎉
+                  </span>
+                </Show>
               </Show>
             </h3>
             <p class="text-xs sm:text-sm text-slate-400 mt-1">
-              {isPlayerWinner()
-                ? 'Bạn đã hoàn thành chuỗi 5 quân cờ liên tiếp thành công!'
-                : store.lastResigned()
-                ? 'Bạn đã đầu hàng ván đấu này. Hãy phục thù ở ván tiếp theo!'
-                : 'Bot đã hoàn thành chuỗi 5 quân cờ liên tiếp!'}
+              <Show
+                when={store.gameMode() === 'puzzle'}
+                fallback={
+                  isPlayerWinner()
+                    ? 'Bạn đã hoàn thành chuỗi 5 quân cờ liên tiếp thành công!'
+                    : store.lastResigned()
+                    ? 'Bạn đã đầu hàng ván đấu này. Hãy phục thù ở ván tiếp theo!'
+                    : 'Bot đã hoàn thành chuỗi 5 quân cờ liên tiếp!'
+                }
+              >
+                <Show
+                  when={isPlayerWinner()}
+                  fallback={
+                    `Chưa giải được sát cục! Bạn bị tụt về Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐.`
+                  }
+                >
+                  {`Xuất sắc! Bạn đã giải thành công. Thăng cấp lên Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐!`}
+                </Show>
+              </Show>
             </p>
           </div>
 
@@ -111,36 +132,71 @@ export const GameOverBanner: Component<GameOverBannerProps> = props => {
             <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/60 border border-slate-800/50">
               <span class="text-[11px] text-slate-400 font-medium">Số nước đi</span>
               <span class="text-sm sm:text-base font-bold text-amber-300 font-mono mt-0.5">
-                {store.moveHistory().length} nước
+                {store.gameMode() === 'puzzle'
+                  ? `${store.moveHistory().length - (store.currentPuzzle()?.initialMoveHistory.length || 0)} nước thêm`
+                  : `${store.moveHistory().length} nước`}
               </span>
             </div>
 
             <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/60 border border-slate-800/50">
-              <span class="text-[11px] text-slate-400 font-medium">Đối thủ</span>
+              <span class="text-[11px] text-slate-400 font-medium">Chế độ</span>
               <span class="text-xs font-bold text-slate-200 mt-0.5 truncate max-w-[120px]">
-                {store.currentLevelConfig().name} (Lv.{store.currentLevelConfig().id})
+                {store.gameMode() === 'puzzle'
+                  ? `Sát Cục ${store.currentPuzzle()?.stars || 1}⭐`
+                  : store.gameMode() === 'custom'
+                  ? `Đấu Tập (Bot ${store.currentLevelConfig().vietnameseName})`
+                  : `Chiến Dịch (Bot ${store.currentLevelConfig().vietnameseName})`}
               </span>
             </div>
           </div>
 
           {/* Các nút hành động */}
           <div class="w-full flex flex-col gap-2 pt-1">
-            {/* Nút Ván Tiếp Theo */}
-            <button
-              onClick={handleNextGame}
-              class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
+            <Show
+              when={store.gameMode() === 'puzzle'}
+              fallback={
+                <button
+                  onClick={handleNextGame}
+                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
+                >
+                  <Play size={18} fill="currentColor" />
+                  <span>
+                    {store.gameMode() === 'campaign' ? 'Ván Tiếp Theo' : 'Chơi Lại Ván Mới'}
+                  </span>
+                </button>
+              }
             >
-              <Play size={18} fill="currentColor" />
-              <span>Ván Tiếp Theo</span>
-            </button>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setDismissed(true);
+                    store.nextPuzzleScenario();
+                  }}
+                  class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <span>🎲 Câu Đố Mới</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setDismissed(true);
+                    store.restartCurrentPuzzle();
+                  }}
+                  class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs sm:text-sm border border-slate-700 active:scale-95 transition-all cursor-pointer"
+                >
+                  <span>🔄 Chơi Lại</span>
+                </button>
+              </div>
+            </Show>
 
-            {/* Nút Xem Lại Bàn Cờ */}
+            {/* Nút Về Menu Chính */}
             <button
-              onClick={() => setDismissed(true)}
-              class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-bold text-xs sm:text-sm border border-slate-700/60 active:scale-95 transition-all cursor-pointer"
+              onClick={() => {
+                setDismissed(true);
+                store.goToMainMenu();
+              }}
+              class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-slate-700/60 active:scale-95 transition-all cursor-pointer"
             >
-              <Eye size={15} />
-              <span>Xem Lại Bàn Cờ</span>
+              <span>🏠 Về Menu Chính</span>
             </button>
           </div>
         </div>

@@ -1,0 +1,61 @@
+import { GameModeStrategy } from './types';
+import { GameMode, LevelConfig, UserStats } from '../types';
+import { AI_LEVELS } from '../constants';
+
+export class PuzzleStrategy implements GameModeStrategy {
+  public readonly mode: GameMode = 'puzzle';
+
+  public getBotLevel(): LevelConfig {
+    // Chế độ thế cờ luôn đấu với Bot Level 8 (Thần Cờ Bất Khả Chiến Bại)
+    return AI_LEVELS[AI_LEVELS.length - 1];
+  }
+
+  public canUndo(): boolean {
+    // Chế độ thế cờ cấm tuyệt đối Undo để rèn luyện tư duy tính toán chính xác
+    return false;
+  }
+
+  public recordGame(
+    stats: UserStats,
+    result: 'win' | 'loss' | 'draw',
+    extra?: { stars?: number }
+  ): UserStats {
+    if (!stats.puzzle) {
+      stats.puzzle = {
+        currentLevel: 1,
+        totalSolved: 0,
+        totalFailed: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+        totalGames: 0,
+        solvedByStars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      };
+    }
+
+    if (!stats.puzzle.currentLevel) {
+      stats.puzzle.currentLevel = 1;
+    }
+
+    stats.puzzle.totalGames++;
+
+    if (result === 'win') {
+      stats.puzzle.totalSolved++;
+      stats.puzzle.currentStreak++;
+      if (stats.puzzle.currentStreak > stats.puzzle.bestStreak) {
+        stats.puzzle.bestStreak = stats.puzzle.currentStreak;
+      }
+      if (extra?.stars && extra.stars >= 1) {
+        stats.puzzle.solvedByStars[extra.stars] = (stats.puzzle.solvedByStars[extra.stars] || 0) + 1;
+      }
+      // Không giới hạn trần: Cứ giải thắng là tăng tiếp (1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7...)
+      stats.puzzle.currentLevel = (stats.puzzle.currentLevel || 1) + 1;
+    } else {
+      stats.puzzle.totalFailed++;
+      stats.puzzle.currentStreak = 0;
+      // Không giải được (thua hoặc bỏ cuộc) thì tụt level (tối thiểu là mức 1)
+      stats.puzzle.currentLevel = Math.max(1, (stats.puzzle.currentLevel || 1) - 1);
+    }
+
+    return stats;
+  }
+}

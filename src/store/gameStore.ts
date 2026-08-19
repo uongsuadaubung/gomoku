@@ -6,7 +6,10 @@ import {
   BLACK,
   WHITE,
   EMPTY,
+  MatchStage,
   GameStatus,
+  GameMode,
+  CustomGameConfig,
   WinInfo,
   Move,
   AIStats,
@@ -19,10 +22,13 @@ import {
   WorkerMessageOut,
 } from '../game/types';
 import { createEmptyBoard, cloneBoard, checkWin, isBoardFull } from '../game/board';
-import { getLevelConfigByWins, SCORES } from '../game/constants';
-import { soundService } from '../services/soundService';
+import { getLevelConfigByWins, AI_LEVELS, SCORES } from '../game/constants';
+import { generateTacticalScenario, PuzzleScenario, PuzzleDifficulty } from '../game/puzzleGenerator';
 import { StorageService } from '../services/storageService';
-import { TauntService, TauntEvent, BotMood } from '../services/tauntService';
+import { soundService } from '../services/soundService';
+import { TauntService, BotMood } from '../services/tauntService';
+import { TauntEvent } from '../data/taunts/types';
+import { getGameStrategy } from '../game/strategies';
 import { interactionTracker } from '../services/interactionTracker';
 import { TauntEvaluator } from '../services/tauntEvaluator';
 import { BrowserListenerService } from '../services/browserListenerService';
@@ -32,6 +38,7 @@ export function createGameStore() {
   const [board, setBoard] = createSignal<BoardMatrix>(createEmptyBoard());
   const [currentTurn, setCurrentTurn] = createSignal<ActivePlayer>(BLACK);
   const [playerColor, setPlayerColor] = createSignal<ActivePlayer>(BLACK);
+  const [matchStage, setMatchStage] = createSignal<MatchStage>('ready');
   const [gameStatus, setGameStatus] = createSignal<GameStatus>('idle');
   const [winInfo, setWinInfo] = createSignal<WinInfo | null>(null);
   const [moveHistory, setMoveHistory] = createSignal<MoveHistoryItem[]>([]);
@@ -90,9 +97,6 @@ export function createGameStore() {
   const [seriesGameNumber, setSeriesGameNumber] = createSignal<number>(0);
   const [lastResigned, setLastResigned] = createSignal<boolean>(false);
 
-  // Bên đi trước ở ván kế tiếp trong chuỗi (tự động đảo bên)
-  const nextSeriesPlayerSide = createMemo<boolean>(() => playerColor() !== BLACK);
-
   // Modals
   const [showStatsModal, setShowStatsModal] = createSignal<boolean>(false);
   const [showBotModal, setShowBotModal] = createSignal<boolean>(false);
@@ -100,13 +104,38 @@ export function createGameStore() {
   const [showRulesModal, setShowRulesModal] = createSignal<boolean>(false);
   const [showLevelUpAlert, setShowLevelUpAlert] = createSignal<LevelConfig | null>(null);
 
+  // Trạng thái Chế Độ Chơi (Game Mode)
+  const [gameMode, setGameMode] = createSignal<GameMode>('menu');
+  const [currentPuzzle, setCurrentPuzzle] = createSignal<PuzzleScenario | null>(null);
+  const [customConfig, setCustomConfig] = createSignal<CustomGameConfig>({
+    botLevel: 3,
+    playerColor: BLACK,
+  });
+
+  // Bên đi trước ở ván kế tiếp trong chuỗi (tự động đảo bên trong Chiến Dịch, giữ nguyên phe đã chọn trong Đấu Tùy Chọn)
+  const nextSeriesPlayerSide = createMemo<boolean>(() => {
+    if (gameMode() === 'custom') {
+      return customConfig()?.playerColor === BLACK;
+    }
+    return playerColor() !== BLACK;
+  });
+
   // Tính toán AI Color
   const aiColor = createMemo<ActivePlayer>(() => (playerColor() === BLACK ? WHITE : BLACK));
 
-  // Cấu hình cấp độ AI hiện tại (tính từ số trận thắng hoặc manual)
+  // ============================================================================
+  // STRATEGY PATTERN CHO CHẾ ĐỘ CHƠI
+  // ============================================================================
+  const currentStrategy = createMemo(() => getGameStrategy(gameMode()));
+
+  // Cấu hình cấp độ Chiến Dịch thuần túy (dựa trên Strategy Chiến Dịch)
+  const campaignLevelConfig = createMemo<LevelConfig>(() => {
+    return getGameStrategy('campaign').getBotLevel(stats());
+  });
+
+  // Cấu hình cấp độ AI hiện tại (ủy quyền hoàn toàn cho Strategy hiện tại)
   const currentLevelConfig = createMemo<LevelConfig>(() => {
-    const currentStats = stats();
-    return getLevelConfigByWins(currentStats.wins, currentStats.manualLevel);
+    return currentStrategy().getBotLevel(stats(), customConfig());
   });
 
   // ============================================================================
@@ -194,13 +223,33 @@ export function createGameStore() {
 
     // Đăng ký toàn bộ event listeners của trình duyệt thông qua BrowserListenerService
     removeEventListeners = BrowserListenerService.setup({
-      isGamePlaying: () => gameStatus() === 'playing',
+      isGamePlaying: () => matchStage() === 'playing',
       isPlayerTurn: () => currentTurn() === playerColor(),
       triggerTaunt,
     });
 
     resetIdleTimer();
   });
+
+  // Quản lý an toàn các Timeout bất đồng bộ để chống rò rỉ bộ nhớ (Ghost Timers)
+  const pendingTimeouts: number[] = [];
+
+  function setSafeTimeout(fn: () => void, delayMs: number): number {
+    const id = window.setTimeout(() => {
+      const idx = pendingTimeouts.indexOf(id);
+      if (idx !== -1) pendingTimeouts.splice(idx, 1);
+      fn();
+    }, delayMs);
+    pendingTimeouts.push(id);
+    return id;
+  }
+
+  function clearAllPendingTimeouts() {
+    while (pendingTimeouts.length > 0) {
+      const id = pendingTimeouts.pop();
+      if (id !== undefined) clearTimeout(id);
+    }
+  }
 
   onCleanup(() => {
     if (worker) {
@@ -211,38 +260,153 @@ export function createGameStore() {
       removeEventListeners();
       removeEventListeners = null;
     }
+    clearAllPendingTimeouts();
     clearIdleTimer();
-    if (tauntDismissTimer) clearTimeout(tauntDismissTimer);
+    clearTauntQueue();
   });
 
+  interface QueuedTaunt {
+    text: string;
+    mood: BotMood;
+    priority: number;
+    event: TauntEvent;
+  }
+
+  const tauntQueue: QueuedTaunt[] = [];
+  let isProcessingTauntQueue = false;
+  let currentTauntTimer: number | null = null;
+
+  function getTauntPriority(event: TauntEvent): number {
+    const criticalEvents: TauntEvent[] = [
+      'BOT_WIN',
+      'PLAYER_WIN',
+      'PLAYER_WIN_WITH_UNDO',
+      'WIN_RIGHT_AFTER_UNDO',
+      'BOT_WIN_LEADING_SCORE',
+      'CLEAN_SWEEP_DOMINATION',
+      'IRON_CURTAIN_WIN',
+      'GOD_LEVEL_VICTORY',
+      'SPEED_WIN_QUICK',
+      'COMEBACK_WIN',
+      'NO_UNDO_WIN',
+      'IMMEDIATE_REVENGE_CLICK',
+      'PLAYER_RESIGN',
+      'SURRENDER_ON_THREAT',
+      'SURRENDER_AFTER_LONG_THINKING',
+      'RESIGN_WHILE_AI_THINKING',
+      'DEVTOOLS_INSPECT_HACK',
+      'SCREENSHOT_ATTEMPT',
+      'SPACEBAR_SMASH',
+      'RAGE_QUIT_F5_RELOAD',
+      'PERFECT_CENTURY_GAMES',
+      'PLAYER_STREAK_WIN',
+      'REVENGE_WIN_AFTER_LOSS_STREAK',
+      'LEVEL_UP_ALERT',
+    ];
+    if (criticalEvents.includes(event)) return 3;
+
+    const lowEvents: TauntEvent[] = [
+      'MOUSE_JIGGLE_PANIC',
+      'DRAG_SELECT_PANIC',
+      'WINDOW_RESIZE_PANIC',
+      'KEYBOARD_SMASH_SPAM',
+      'IDLE_IN_GAME',
+      'IDLE_THINKING',
+      'IDLE_PRE_GAME',
+      'IDLE_AFTER_LOSS',
+      'STARE_AT_WIN_LINE',
+      'SUPER_SLOW_MOVE',
+      'MOUSE_LEAVE_VIEWPORT',
+    ];
+    if (lowEvents.includes(event)) return 1;
+
+    return 2;
+  }
+
+  function processNextQueuedTaunt() {
+    if (currentTauntTimer) {
+      clearTimeout(currentTauntTimer);
+      currentTauntTimer = null;
+    }
+
+    if (tauntQueue.length === 0) {
+      isProcessingTauntQueue = false;
+      setTauntState(prev => ({ ...prev, visible: false }));
+      return;
+    }
+
+    isProcessingTauntQueue = true;
+    const nextItem = tauntQueue.shift()!;
+
+    setTauntState({
+      text: nextItem.text,
+      mood: nextItem.mood,
+      visible: true,
+      id: Date.now(),
+    });
+
+    soundService.playPopSound();
+
+    // Thời gian hiển thị: tính theo độ dài câu thoại để người chơi kịp đọc hết
+    const displayDuration = Math.min(6500, Math.max(3200, nextItem.text.length * 60 + 1500));
+
+    currentTauntTimer = window.setTimeout(() => {
+      // Ẩn bóng thoại 200ms trước khi nạp câu tiếp theo trong hàng đợi
+      setTauntState(prev => ({ ...prev, visible: false }));
+      currentTauntTimer = window.setTimeout(() => {
+        processNextQueuedTaunt();
+      }, 200);
+    }, displayDuration);
+  }
+
+  function clearTauntQueue() {
+    tauntQueue.length = 0;
+    if (currentTauntTimer) {
+      clearTimeout(currentTauntTimer);
+      currentTauntTimer = null;
+    }
+    isProcessingTauntQueue = false;
+    setTauntState(prev => ({ ...prev, visible: false }));
+  }
+
   /**
-   * Kích hoạt một câu cà khịa từ đối thủ với cơ chế chống ghi đè ưu tiên
+   * Kích hoạt một câu cà khịa từ đối thủ với cơ chế HÀNG ĐỢI (Taunt Queue) chống đè thoại
    * (Nếu người chơi tắt cà khịa, câu thoại sẽ được chuyển đổi thành ký tự kiểm duyệt !@#$%^&*)
    */
   function triggerTaunt(event: TauntEvent, delayMs: number = 0) {
     if (delayMs > 0) {
-      setTimeout(() => triggerTaunt(event, 0), delayMs);
+      setSafeTimeout(() => triggerTaunt(event, 0), delayMs);
       return;
     }
 
     const now = Date.now();
     const isIdle = IDLE_EVENTS.includes(event);
 
-    // Nếu là sự kiện IDLE mà vừa có một Action Taunt trong vòng 7.5s -> Không ghi đè lên Action Taunt
-    if (isIdle && now - lastActionTauntTime < 7500) {
+    // Nếu là sự kiện IDLE mà đang có thoại trong hàng đợi hoặc vừa có Action Taunt trong 7.5s -> Bỏ qua
+    if (isIdle && (isProcessingTauntQueue || tauntQueue.length > 0 || now - lastActionTauntTime < 7500)) {
       return;
     }
 
-    // Nếu là Action Taunt (tương tác trực tiếp, gài bẫy, đổi theme, xin đi lại, v.v.)
     if (!isIdle) {
       lastActionTauntTime = now;
-      // Tự động hủy và dời lịch hẹn Idle Taunt sang 25s - 35s sau
       resetIdleTimer();
     }
 
-    if (tauntDismissTimer) {
-      clearTimeout(tauntDismissTimer);
-      tauntDismissTimer = null;
+    const priority = getTauntPriority(event);
+
+    // Không thêm trùng lặp sự kiện cùng loại đang chờ trong hàng đợi
+    if (tauntQueue.some(item => item.event === event)) {
+      return;
+    }
+
+    // Nếu là sự kiện ưu tiên thấp (lắc chuột, bôi đen) mà đã có câu đang nói hoặc đang chờ -> Bỏ qua tránh spam
+    if (priority === 1 && (tauntQueue.length >= 1 || isProcessingTauntQueue)) {
+      return;
+    }
+
+    // Giới hạn độ dài hàng đợi tối đa 3 câu
+    if (tauntQueue.length >= 3 && priority < 3) {
+      return;
     }
 
     const currentStats = stats();
@@ -255,18 +419,28 @@ export function createGameStore() {
     const isSilenced = !enableTaunts();
     const finalText = isSilenced ? TauntService.censorToGrawlix(item.text) : item.text;
 
-    setTauntState({
+    const queuedItem: QueuedTaunt = {
       text: finalText,
       mood: item.mood,
-      visible: true,
-      id: Date.now(),
-    });
+      priority,
+      event,
+    };
 
-    soundService.playPopSound();
-
-    tauntDismissTimer = window.setTimeout(() => {
-      setTauntState(prev => ({ ...prev, visible: false }));
-    }, 7500);
+    // Nếu là sự kiện Tối Quan Trọng (Thắng/Thua/Đầu Hàng/DevTools), dọn bớt câu ưu tiên thấp
+    if (priority >= 3) {
+      while (tauntQueue.length > 0 && tauntQueue[0].priority < 3) {
+        tauntQueue.shift();
+      }
+      tauntQueue.push(queuedItem);
+      if (!isProcessingTauntQueue) {
+        processNextQueuedTaunt();
+      }
+    } else {
+      tauntQueue.push(queuedItem);
+      if (!isProcessingTauntQueue) {
+        processNextQueuedTaunt();
+      }
+    }
   }
 
   function clearIdleTimer() {
@@ -359,6 +533,11 @@ export function createGameStore() {
    * Khởi động một ván cờ nội bộ
    */
   function launchBoardGame(playAsBlack: boolean) {
+    if (worker && isAiThinking()) {
+      worker.postMessage({ type: 'CANCEL' });
+      setIsAiThinking(false);
+    }
+
     const chosenPlayer: ActivePlayer = playAsBlack ? BLACK : WHITE;
     setPlayerColor(chosenPlayer);
     const emptyBoard = createEmptyBoard();
@@ -432,6 +611,7 @@ export function createGameStore() {
       ]);
       setCurrentTurn(WHITE);
       setGameStatus('playing');
+      setMatchStage('playing');
       soundService.playStoneSound();
       triggerTaunt(getOpeningGreeting(), 250);
       resetIdleTimer();
@@ -442,6 +622,7 @@ export function createGameStore() {
       setLastMove(null);
       setCurrentTurn(BLACK);
       setGameStatus('playing');
+      setMatchStage('playing');
       triggerTaunt(getOpeningGreeting(), 250);
       resetIdleTimer();
     }
@@ -451,6 +632,12 @@ export function createGameStore() {
    * Bắt đầu một chuỗi ván đấu mới từ đầu
    */
   function startNewSeries(playAsBlack: boolean) {
+    if (gameMode() === 'custom') {
+      setCustomConfig(prev => ({
+        ...prev,
+        playerColor: playAsBlack ? BLACK : WHITE,
+      }));
+    }
     setIsSeriesActive(true);
     setSeriesGameNumber(1);
     setLastResigned(false);
@@ -461,8 +648,17 @@ export function createGameStore() {
    * Bắt đầu ván kế tiếp: Tự động đảo lượt đi trước nếu đang trong chuỗi
    */
   function startNextGame() {
+    if (gameMode() === 'custom') {
+      // Trong chế độ Đấu Tùy Chọn: Giữ nguyên cấu hình phe người chơi đã chọn
+      const customPlayAsBlack = customConfig()?.playerColor === BLACK;
+      setSeriesGameNumber(prev => prev + 1);
+      setLastResigned(false);
+      launchBoardGame(customPlayAsBlack);
+      return;
+    }
+
     if (isSeriesActive()) {
-      // Đang trong chuỗi: Tự động đảo lượt đi trước qua lại
+      // Đang trong chuỗi Chiến Dịch: Tự động đảo lượt đi trước qua lại
       const nextPlayAsBlack = playerColor() !== BLACK;
       setSeriesGameNumber(prev => prev + 1);
       setLastResigned(false);
@@ -488,10 +684,14 @@ export function createGameStore() {
    * Đặt lại chuỗi đấu về trạng thái ban đầu để người chơi tự do chọn lại bên
    */
   function resetSeries() {
+    clearAllPendingTimeouts();
+    clearIdleTimer();
+    clearTauntQueue();
     setIsSeriesActive(false);
     setSeriesGameNumber(0);
     setLastResigned(false);
     setGameStatus('idle');
+    setMatchStage('ready');
     setBoard(createEmptyBoard());
     setCurrentTurn(BLACK);
     setMoveHistory([]);
@@ -499,6 +699,116 @@ export function createGameStore() {
     setWinInfo(null);
     setAiStats(null);
     setIsAiThinking(false);
+    soundService.playClickSound();
+  }
+
+  /**
+   * Bắt đầu chế độ Chiến Dịch (Leo Cấp)
+   */
+  function startCampaignMode(playAsBlack?: boolean) {
+    setGameMode('campaign');
+    StorageService.setManualLevel(null);
+    const newStats = StorageService.getStats();
+    setStats({ ...newStats, manualLevel: null });
+    if (playAsBlack !== undefined) {
+      startNewSeries(playAsBlack);
+    } else {
+      resetSeries();
+    }
+  }
+
+  /**
+   * Bắt đầu chế độ Thế Cờ Giữa Trận (Tactical Puzzle 1-5 Sao)
+   */
+  function startPuzzleMode(stars?: number) {
+    const targetStars = stars ?? (stats().puzzle?.currentLevel || 1);
+    const scenario = generateTacticalScenario(targetStars);
+    setGameMode('puzzle');
+    setCurrentPuzzle(scenario);
+    setIsSeriesActive(false);
+    setSeriesGameNumber(0);
+    setLastResigned(false);
+    setPlayerColor(scenario.playerColor);
+    setBoard(cloneBoard(scenario.initialBoard));
+    setMoveHistory([...scenario.initialMoveHistory]);
+    const lastHist = scenario.initialMoveHistory[scenario.initialMoveHistory.length - 1];
+    setLastMove(lastHist ? { row: lastHist.row, col: lastHist.col } : null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setAiThinkingProgress({ depth: 0, nodes: 0 });
+    setGameStatus('playing');
+    setMatchStage('playing');
+    setCurrentTurn(scenario.playerColor);
+
+    soundService.playStoneSound();
+    triggerTaunt('GAME_START', 200);
+    resetIdleTimer();
+  }
+
+  /**
+   * Chơi lại đúng thế cờ hiện tại từ đầu
+   */
+  function restartCurrentPuzzle() {
+    const scenario = currentPuzzle();
+    if (!scenario) {
+      startPuzzleMode();
+      return;
+    }
+    if (worker && isAiThinking()) {
+      worker.postMessage({ type: 'CANCEL' });
+      setIsAiThinking(false);
+    }
+    setBoard(cloneBoard(scenario.initialBoard));
+    setMoveHistory([...scenario.initialMoveHistory]);
+    const lastHist = scenario.initialMoveHistory[scenario.initialMoveHistory.length - 1];
+    setLastMove(lastHist ? { row: lastHist.row, col: lastHist.col } : null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setAiThinkingProgress({ depth: 0, nodes: 0 });
+    setGameStatus('playing');
+    setMatchStage('playing');
+    setCurrentTurn(scenario.playerColor);
+    soundService.playClickSound();
+    resetIdleTimer();
+  }
+
+  /**
+   * Sang thế cờ tiếp theo
+   */
+  function nextPuzzleScenario(stars?: number) {
+    startPuzzleMode(stars);
+  }
+
+  /**
+   * Bắt đầu chế độ Đấu Tùy Chọn với Bot
+   */
+  function startCustomMatch(botLevel: number, playAsBlack?: boolean) {
+    setGameMode('custom');
+    setCustomConfig({
+      botLevel,
+      playerColor: playAsBlack !== undefined ? (playAsBlack ? BLACK : WHITE) : BLACK,
+    });
+    if (playAsBlack !== undefined) {
+      startNewSeries(playAsBlack);
+    } else {
+      resetSeries();
+    }
+  }
+
+  /**
+   * Quay về Màn Hình Menu Chính
+   */
+  function goToMainMenu() {
+    if (worker && isAiThinking()) {
+      worker.postMessage({ type: 'CANCEL' });
+      setIsAiThinking(false);
+    }
+    setGameMode('menu');
+    setGameStatus('idle');
+    setMatchStage('ready');
+    clearTauntQueue();
     soundService.playClickSound();
   }
 
@@ -699,26 +1009,21 @@ export function createGameStore() {
   function handleGameOver(winner: typeof EMPTY | ActivePlayer, winResult: WinInfo | null) {
     clearIdleTimer();
     sessionGamesCount++;
-    interactionTracker.record('GAME_OVER', 60000);
-
-    if (winner === BLACK) {
-      setGameStatus('black_win');
-    } else if (winner === WHITE) {
-      setGameStatus('white_win');
-    } else {
-      setGameStatus('draw');
-    }
+    const statusMap: Record<number, GameStatus> = {
+      [BLACK]: 'black_win',
+      [WHITE]: 'white_win',
+      [EMPTY]: 'draw',
+    };
+    setGameStatus(statusMap[winner] || 'draw');
+    setMatchStage('game_over');
 
     if (winResult) {
       setWinInfo(winResult);
     }
 
-    if (!lastResigned()) {
-      // Kết thúc tự nhiên -> Duy trì chuỗi ván đấu để tự động đảo bên ở ván tiếp theo
-      setIsSeriesActive(true);
-      if (seriesGameNumber() === 0) {
-        setSeriesGameNumber(1);
-      }
+    setIsSeriesActive(true);
+    if (seriesGameNumber() === 0) {
+      setSeriesGameNumber(1);
     }
 
     const player = playerColor();
@@ -739,11 +1044,17 @@ export function createGameStore() {
       // Bỏ qua lỗi sessionStorage
     }
 
+    const currentMode = gameMode();
+    const extraInfo = {
+      stars: currentPuzzle()?.stars,
+      botLevel: currentLevelConfig().id,
+    };
+
     if (winner === player) {
       // Người chơi thắng!
       soundService.playWinSound();
       triggerConfetti();
-      const newStats = StorageService.recordGame('win');
+      const newStats = StorageService.recordGame(currentMode, 'win', extraInfo);
       setStats(newStats);
       matchCtx.wasLastGameSpeedLoss = false;
       matchCtx.wasLastGameDraw = false;
@@ -764,22 +1075,24 @@ export function createGameStore() {
       // Kiểm tra mốc 100 ván đấu (PERFECT_CENTURY_GAMES)
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
-        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+        setSafeTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
       }
 
-      // Kiểm tra thăng cấp AI
-      const newLevel = getLevelConfigByWins(newStats.wins, newStats.manualLevel);
-      if (newLevel.id > oldLevel && newStats.manualLevel === null) {
-        setTimeout(() => {
-          soundService.playLevelUpSound();
-          setShowLevelUpAlert(newLevel);
-          triggerTaunt('LEVEL_UP_ALERT', 400);
-        }, 800);
+      // Kiểm tra thăng cấp AI (chỉ áp dụng cho chế độ Chiến Dịch)
+      if (currentMode === 'campaign') {
+        const newLevel = getLevelConfigByWins(newStats.wins, newStats.manualLevel);
+        if (newLevel.id > oldLevel && newStats.manualLevel === null) {
+          setSafeTimeout(() => {
+            soundService.playLevelUpSound();
+            setShowLevelUpAlert(newLevel);
+            triggerTaunt('LEVEL_UP_ALERT', 400);
+          }, 800);
+        }
       }
     } else if (winner === aiColor()) {
       // Người chơi thua -> Bot cà khịa
       soundService.playLossSound();
-      const newStats = StorageService.recordGame('loss');
+      const newStats = StorageService.recordGame(currentMode, 'loss', extraInfo);
       setStats(newStats);
       matchCtx.wasLastGameDraw = false;
       matchCtx.consecutiveDrawsCount = 0;
@@ -802,20 +1115,20 @@ export function createGameStore() {
       // Kiểm tra mốc 100 ván hoặc tụt winrate dưới 50%
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
-        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+        setSafeTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
       } else {
         const prevTotal = prevStats.wins + prevStats.losses + prevStats.draws;
         const prevWinRate = prevTotal > 0 ? (prevStats.wins / prevTotal) * 100 : 100;
         const currentWinRate = totalGames > 0 ? (newStats.wins / totalGames) * 100 : 0;
         if (totalGames >= 20 && currentWinRate < 50 && prevWinRate >= 50) {
-          setTimeout(() => triggerTaunt('WIN_RATE_DROP_BELOW_50', 400), 1000);
+          setSafeTimeout(() => triggerTaunt('WIN_RATE_DROP_BELOW_50', 400), 1000);
         }
       }
     } else {
       // Hòa
       matchCtx.wasLastGameSpeedLoss = false;
       matchCtx.consecutiveDrawsCount++;
-      const newStats = StorageService.recordGame('draw');
+      const newStats = StorageService.recordGame(currentMode, 'draw', extraInfo);
       setStats(newStats);
       const drawTaunt = TauntEvaluator.evaluateDraw(matchCtx.consecutiveDrawsCount);
       matchCtx.wasLastGameDraw = true;
@@ -823,7 +1136,7 @@ export function createGameStore() {
 
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
-        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+        setSafeTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
       }
     }
 
@@ -844,22 +1157,17 @@ export function createGameStore() {
       setIsAiThinking(false);
     }
 
-    // Chấm dứt chuỗi ván đấu hiện tại khi người chơi đầu hàng
-    setIsSeriesActive(false);
-    setLastResigned(true);
-
     const isLongThinking = interactionTracker.getTimeSinceLast('PLAYER_MOVE') >= 35000;
     const hasThreat = TauntService.hasBotActiveThreat(board(), aiColor());
 
-    if (isAiThinkingWhenResigning) {
-      triggerTaunt('RESIGN_WHILE_AI_THINKING', 200);
-    } else if (isLongThinking) {
-      triggerTaunt('SURRENDER_AFTER_LONG_THINKING', 200);
-    } else if (hasThreat) {
-      triggerTaunt('SURRENDER_ON_THREAT', 200);
-    } else {
-      triggerTaunt('PLAYER_RESIGN', 200);
-    }
+    const getResignTaunt = (): TauntEvent => {
+      if (isAiThinkingWhenResigning) return 'RESIGN_WHILE_AI_THINKING';
+      if (isLongThinking) return 'SURRENDER_AFTER_LONG_THINKING';
+      if (hasThreat) return 'SURRENDER_ON_THREAT';
+      return 'PLAYER_RESIGN';
+    };
+
+    triggerTaunt(getResignTaunt(), 200);
     handleGameOver(aiColor(), null);
   }
 
@@ -887,10 +1195,17 @@ export function createGameStore() {
       return;
     }
     if (isAiThinking()) return;
+    // Kiểm tra quyền Đi Lại từ Strategy của chế độ chơi hiện tại
+    if (!currentStrategy().canUndo()) return;
 
     clearIdleTimer();
     const history = moveHistory();
     if (history.length === 0) return;
+
+    // Người chơi chỉ có thể Đi Lại nếu bản thân người chơi đã thực hiện ít nhất 1 nước cờ
+    const hasPlayerMoved = history.some(item => item.player === playerColor());
+    if (!hasPlayerMoved) return;
+
     matchCtx.undoCount++;
     matchCtx.wasUndoJustUsed = true;
 
@@ -928,6 +1243,7 @@ export function createGameStore() {
     );
     setWinInfo(null);
     setGameStatus('playing');
+    setMatchStage('playing');
     setCurrentTurn(playerColor());
 
     soundService.playClickSound();
@@ -943,88 +1259,57 @@ export function createGameStore() {
   }
 
   /**
-   * Cài đặt cấp độ thủ công hoặc tự động theo số trận thắng
+   * Đặt level thủ công cho Bot
    */
   function setManualLevel(levelId: number | null) {
-    const currentLvl = currentLevelConfig().id;
-    if (levelId !== null) {
-      if (levelId < currentLvl) {
-        triggerTaunt(isRageDowngradeContext() ? 'RAGE_DOWNGRADE_AFTER_LOSS' : 'CHANGE_BOT_LEVEL_DOWN', 200);
-      } else if (levelId > currentLvl) {
-        triggerTaunt('CHANGE_BOT_LEVEL_UP', 200);
-      }
-    }
-
-    const newStats = StorageService.setManualLevel(levelId);
-    setStats(newStats);
-    soundService.playClickSound();
+    StorageService.setManualLevel(levelId);
+    setStats(prev => ({
+      ...prev,
+      manualLevel: levelId,
+    }));
   }
 
   /**
-   * Reset toàn bộ thống kê
+   * Reset toàn bộ thống kê và chuỗi thắng
    */
   function resetAllStats() {
-    const cleanStats = StorageService.resetStats();
-    setStats(cleanStats);
-    soundService.playClickSound();
-    triggerTaunt('RESET_STATS', 200);
+    StorageService.resetStats();
+    setStats(StorageService.getStats());
   }
 
   /**
-   * Đổi theme bàn cờ
+   * Đổi giao diện bàn cờ
    */
-  function setTheme(t: ThemeType) {
-    const count = interactionTracker.record('THEME_CHANGE', 5000);
-
-    setThemeState(t);
-    StorageService.setTheme(t);
-    soundService.playClickSound();
-
-    if (count >= 3) {
-      triggerTaunt('RAPID_THEME_CYCLING', 200);
-    } else {
-      triggerTaunt(isDesperateThemeSwapContext() ? 'DESPERATE_THEME_SWAP' : 'THEME_CHANGE', 200);
-    }
+  function setTheme(newTheme: ThemeType) {
+    setThemeState(newTheme);
+    StorageService.setTheme(newTheme);
   }
 
   /**
-   * Đổi phong cách đặt quân (giao điểm đường kẻ vs giữa ô vuông)
+   * Đổi kiểu hiển thị bàn cờ (Giao điểm hoặc Giữa ô)
    */
-  function setBoardStyle(s: BoardStyle) {
-    setBoardStyleState(s);
-    StorageService.setBoardStyle(s);
-    soundService.playClickSound();
-    if (gameStatus() === 'playing' && moveHistory().length >= 6) {
-      triggerTaunt('SWITCH_BOARD_STYLE_MID_GAME', 200);
-    } else {
-      triggerTaunt('BOARD_STYLE_CHANGE', 200);
-    }
+  function setBoardStyle(newStyle: BoardStyle) {
+    setBoardStyleState(newStyle);
+    StorageService.setBoardStyle(newStyle);
   }
 
   /**
-   * Bật/tắt hiển thị số thứ tự nước đi
+   * Bật/tắt số thứ tự nước đi
    */
   function toggleStepNumbers() {
     const next = !showStepNumbers();
     setShowStepNumbersState(next);
     StorageService.setShowStepNumbers(next);
-    soundService.playClickSound();
-    triggerTaunt('TOGGLE_STEP_NUMBERS', 200);
   }
 
   /**
    * Bật/tắt âm thanh
    */
   function toggleSound() {
-    const isSpam = interactionTracker.record('SOUND_TOGGLE', 3000) >= 4;
-
-    const next = soundService.toggleMute();
+    const next = !isMuted();
     setIsMutedState(next);
-    if (isSpam) {
-      triggerTaunt('SOUND_SPAM_TOGGLE', 150);
-    } else if (next) {
-      triggerTaunt('SOUND_MUTE', 150);
-    } else {
+    soundService.setMuted(next);
+    if (!next && gameMode() !== 'menu') {
       triggerTaunt('SOUND_UNMUTE', 150);
     }
   }
@@ -1045,7 +1330,11 @@ export function createGameStore() {
     currentTurn,
     playerColor,
     aiColor,
+    matchStage,
     gameStatus,
+    gameMode,
+    currentPuzzle,
+    customConfig,
     winInfo,
     moveHistory,
     lastMove,
@@ -1053,7 +1342,9 @@ export function createGameStore() {
     aiStats,
     aiThinkingProgress,
     stats,
+    currentStrategy,
     currentLevelConfig,
+    campaignLevelConfig,
     theme,
     boardStyle,
     showStepNumbers,
@@ -1071,6 +1362,9 @@ export function createGameStore() {
     showLevelUpAlert,
 
     // Setters
+    setMatchStage,
+    setGameMode,
+    setCustomConfig,
     setShowStatsModal,
     setShowBotModal,
     setShowSettingsModal,
@@ -1078,6 +1372,12 @@ export function createGameStore() {
     setShowLevelUpAlert,
 
     // Actions
+    startCampaignMode,
+    startPuzzleMode,
+    restartCurrentPuzzle,
+    nextPuzzleScenario,
+    startCustomMatch,
+    goToMainMenu,
     startNewGame,
     startNewSeries,
     startNextGame,

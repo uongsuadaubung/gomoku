@@ -16,12 +16,21 @@ export interface Move {
 
 export type BoardMatrix = Player[][];
 
+export type MatchStage = 'ready' | 'playing' | 'game_over';
+
 export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw';
+
+export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom';
 
 export interface WinInfo {
   winner: ActivePlayer;
   line: [number, number][];
   direction: 'horizontal' | 'vertical' | 'main_diagonal' | 'anti_diagonal';
+}
+
+export interface CustomGameConfig {
+  botLevel: number;
+  playerColor: ActivePlayer;
 }
 
 export type ThemeType = 'wood' | 'paper' | 'cyber' | 'slate' | 'jade';
@@ -58,7 +67,38 @@ export interface LevelConfig {
   tactics: string;
 }
 
+export interface ModeStats {
+  wins: number;
+  losses: number;
+  draws: number;
+  currentStreak: number;
+  bestStreak: number;
+  totalGames: number;
+}
+
+export interface PuzzleStats {
+  currentLevel: number; // Cấp độ thế cờ hiện tại (1 sao trở lên)
+  totalSolved: number;
+  totalFailed: number;
+  currentStreak: number;
+  bestStreak: number;
+  totalGames: number;
+  solvedByStars: Record<number, number>;
+}
+
+export interface CustomStats extends ModeStats {
+  byBotLevel: Record<number, { wins: number; losses: number; draws: number }>;
+}
+
 export interface UserStats {
+  // 🏆 1. Chiến dịch (Campaign)
+  campaign: ModeStats;
+  // 🧩 2. Thế cờ giữa trận (Puzzle)
+  puzzle: PuzzleStats;
+  // ⚔️ 3. Đấu tùy chọn (Custom)
+  custom: CustomStats;
+
+  // Dữ liệu tương thích cấp cao
   wins: number;
   losses: number;
   draws: number;

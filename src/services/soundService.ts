@@ -1,13 +1,11 @@
+import { StorageService } from './storageService';
+
 class SoundService {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
 
   constructor() {
-    // Mute state khởi tạo từ localStorage nếu có
-    const saved = localStorage.getItem('gomoku_muted');
-    if (saved !== null) {
-      this.isMuted = saved === 'true';
-    }
+    this.isMuted = StorageService.getMuted();
   }
 
   private initContext(): AudioContext | null {
@@ -29,7 +27,7 @@ class SoundService {
 
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
-    localStorage.setItem('gomoku_muted', String(muted));
+    StorageService.setMuted(muted);
   }
 
   public toggleMute(): boolean {
@@ -219,36 +217,21 @@ class SoundService {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
-    let baseFreq = 420;
-    let waveType: OscillatorType = 'triangle';
+    const voiceConfigMap: Record<string, { base: number; variance: number; type: OscillatorType }> = {
+      rage: { base: 180, variance: 50, type: 'sawtooth' },
+      angry: { base: 180, variance: 50, type: 'sawtooth' },
+      laugh: { base: 580, variance: 120, type: 'sine' },
+      clown: { base: 580, variance: 120, type: 'sine' },
+      party: { base: 580, variance: 120, type: 'sine' },
+      shocked: { base: 320, variance: 80, type: 'sawtooth' },
+      mindblown: { base: 320, variance: 80, type: 'sawtooth' },
+      sleepy: { base: 220, variance: 30, type: 'sine' },
+      bored: { base: 220, variance: 30, type: 'sine' },
+    };
 
-    switch (mood) {
-      case 'rage':
-      case 'angry':
-        baseFreq = 180 + Math.random() * 50;
-        waveType = 'sawtooth';
-        break;
-      case 'laugh':
-      case 'clown':
-      case 'party':
-        baseFreq = 580 + Math.random() * 120;
-        waveType = 'sine';
-        break;
-      case 'shocked':
-      case 'mindblown':
-        baseFreq = 320 + Math.random() * 80;
-        waveType = 'sawtooth';
-        break;
-      case 'sleepy':
-      case 'bored':
-        baseFreq = 220 + Math.random() * 30;
-        waveType = 'sine';
-        break;
-      default:
-        baseFreq = 390 + Math.random() * 90;
-        waveType = 'triangle';
-        break;
-    }
+    const cfg = voiceConfigMap[mood] || { base: 390, variance: 90, type: 'triangle' };
+    const baseFreq = cfg.base + Math.random() * cfg.variance;
+    const waveType: OscillatorType = cfg.type;
 
     osc.type = waveType;
     osc.frequency.setValueAtTime(baseFreq, now);

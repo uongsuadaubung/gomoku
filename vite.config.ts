@@ -11,4 +11,21 @@ export default defineConfig({
   worker: {
     format: 'es',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('lucide-solid') || id.includes('canvas-confetti')) {
+              return 'vendor-ui';
+            }
+            return 'vendor';
+          }
+          if (id.includes('/data/taunts/') || id.includes('\\data\\taunts\\')) {
+            return 'taunt-database';
+          }
+        },
+      },
+    },
+  },
 });

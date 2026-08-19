@@ -1,15 +1,75 @@
 import { Component, Show, createSignal, createEffect, onCleanup } from 'solid-js';
-import type { GameStore } from '../store/gameStore';
-import type { BotMood } from '../services/tauntService';
+import { useGame } from '../store/GameContext';
+import { getMoodEmoji, type BotMood } from '../services/tauntService';
 import { soundService } from '../services/soundService';
 import { interactionTracker } from '../services/interactionTracker';
 
-interface BotCharacterProps {
-  store: GameStore;
-}
+const MOOD_ANIMATIONS: Record<string, string> = {
+  rage: 'scale-110 animate-bounce',
+  clown: 'scale-110 animate-bounce',
+  panic: 'scale-110 animate-bounce',
+  party: 'scale-115 rotate-6 animate-pulse',
+  laugh: 'scale-115 rotate-6 animate-pulse',
+  sleepy: 'scale-95 opacity-90',
+  bored: 'scale-95 opacity-90',
+  lightning: 'scale-115 rotate-3 animate-bounce',
+  chill: 'scale-105 rotate-1',
+  cool: 'scale-110 rotate-2 shadow-amber-500/50',
+  evil: 'scale-110 rotate-2 shadow-amber-500/50',
+  smug: 'scale-110 rotate-2 shadow-amber-500/50',
+  disdain: 'scale-110 rotate-2 shadow-amber-500/50',
+};
 
-export const BotCharacter: Component<BotCharacterProps> = props => {
-  const { store } = props;
+const BUBBLE_THEMES: Record<string, { box: string; arrow: string }> = {
+  rage: {
+    box: 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 text-white border-2 border-rose-300 shadow-rose-500/40 animate-bubble-shake',
+    arrow: 'bg-rose-600 border-l-2 border-b-2 border-rose-400',
+  },
+  angry: {
+    box: 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 text-white border-2 border-rose-300 shadow-rose-500/40 animate-bubble-shake',
+    arrow: 'bg-rose-600 border-l-2 border-b-2 border-rose-400',
+  },
+  panic: {
+    box: 'bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 text-white border-2 border-amber-300 shadow-orange-500/50 animate-bubble-shake',
+    arrow: 'bg-amber-600 border-l-2 border-b-2 border-amber-300',
+  },
+  lightning: {
+    box: 'bg-gradient-to-r from-cyan-500 via-amber-400 to-yellow-300 text-slate-950 border-2 border-cyan-200 shadow-cyan-500/40 animate-bubble-bouncy',
+    arrow: 'bg-cyan-500 border-l-2 border-b-2 border-cyan-300',
+  },
+  chill: {
+    box: 'bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 text-white border-2 border-emerald-300 shadow-emerald-500/30',
+    arrow: 'bg-emerald-600 border-l-2 border-b-2 border-emerald-300',
+  },
+  laugh: {
+    box: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30 animate-bubble-bouncy',
+    arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+  },
+  clown: {
+    box: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30 animate-bubble-bouncy',
+    arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+  },
+  party: {
+    box: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30 animate-bubble-bouncy',
+    arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+  },
+  sleepy: {
+    box: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-100 border-2 border-slate-600 shadow-slate-900/50',
+    arrow: 'bg-slate-800 border-l-2 border-b-2 border-slate-600',
+  },
+  bored: {
+    box: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-100 border-2 border-slate-600 shadow-slate-900/50',
+    arrow: 'bg-slate-800 border-l-2 border-b-2 border-slate-600',
+  },
+};
+
+const DEFAULT_BUBBLE_THEME = {
+  box: 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30',
+  arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+};
+
+export const BotCharacter: Component = () => {
+  const store = useGame();
   const config = () => store.currentLevelConfig();
   const taunt = () => store.tauntState();
 
@@ -65,52 +125,11 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     if (typingTimer) clearInterval(typingTimer);
   });
 
-  // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại (17 sắc thái cà khịa & gáy bẩn)
+  // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại
   const moodEmoji = () => {
-    // Nếu người chơi tắt cà khịa trong Cài đặt -> Hiển thị icon bịt miệng cấm nói
-    if (!store.enableTaunts()) {
-      return '🤐';
-    }
+    if (!store.enableTaunts()) return '🤐';
     if (!taunt().visible) return config().avatar;
-    const m: BotMood = taunt().mood;
-    switch (m) {
-      case 'disdain':
-        return '😒';
-      case 'smug':
-        return '😏';
-      case 'laugh':
-        return '🤣';
-      case 'clown':
-        return '🤡';
-      case 'detective':
-        return '🧐';
-      case 'bored':
-        return '🥱';
-      case 'sleepy':
-        return '😴';
-      case 'thinking':
-        return '🤔';
-      case 'evil':
-        return '😈';
-      case 'lightning':
-        return '⚡';
-      case 'cool':
-        return '😎';
-      case 'panic':
-        return '😱';
-      case 'chill':
-        return '☕';
-      case 'rage':
-        return '🤬';
-      case 'party':
-        return '🥳';
-      case 'angry':
-        return '😤';
-      case 'shush':
-        return '🤫';
-      default:
-        return config().avatar;
-    }
+    return getMoodEmoji(taunt().mood, config().avatar);
   };
 
   // Hiệu ứng chuyển động Avatar theo tâm trạng
@@ -119,84 +138,18 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
       return taunt().visible ? 'scale-105 animate-bubble-shake' : 'group-hover:scale-105 opacity-80';
     }
     if (!taunt().visible) return 'group-hover:scale-105';
-    const m: BotMood = taunt().mood;
-    switch (m) {
-      case 'rage':
-      case 'clown':
-      case 'panic':
-        return 'scale-110 animate-bounce';
-      case 'party':
-      case 'laugh':
-        return 'scale-115 rotate-6 animate-pulse';
-      case 'sleepy':
-      case 'bored':
-        return 'scale-95 opacity-90';
-      case 'lightning':
-        return 'scale-115 rotate-3 animate-bounce';
-      case 'chill':
-        return 'scale-105 rotate-1';
-      case 'cool':
-      case 'evil':
-      case 'smug':
-      case 'disdain':
-        return 'scale-110 rotate-2 shadow-amber-500/50';
-      default:
-        return 'scale-110 rotate-3';
-    }
+    return MOOD_ANIMATIONS[taunt().mood] || 'scale-110 rotate-3';
   };
 
   // Phong cách & Màu sắc Bong bóng thoại thích ứng theo Mood
   const bubbleTheme = () => {
-    // Phong cách đặc biệt khi Bot bị bịt miệng (Censored Theme)
     if (!store.enableTaunts()) {
       return {
         box: 'bg-gradient-to-r from-slate-950 via-zinc-900 to-slate-950 text-rose-400 border-2 border-rose-500/70 shadow-rose-950/60 font-mono tracking-wider',
         arrow: 'bg-slate-950 border-l-2 border-b-2 border-rose-500/70',
       };
     }
-
-    const m: BotMood = taunt().mood;
-    switch (m) {
-      case 'rage':
-      case 'angry':
-        return {
-          box: 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 text-white border-2 border-rose-300 shadow-rose-500/40 animate-bubble-shake',
-          arrow: 'bg-rose-600 border-l-2 border-b-2 border-rose-400',
-        };
-      case 'panic':
-        return {
-          box: 'bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 text-white border-2 border-amber-300 shadow-orange-500/50 animate-bubble-shake',
-          arrow: 'bg-amber-600 border-l-2 border-b-2 border-amber-300',
-        };
-      case 'lightning':
-        return {
-          box: 'bg-gradient-to-r from-cyan-500 via-amber-400 to-yellow-300 text-slate-950 border-2 border-cyan-200 shadow-cyan-500/40 animate-bubble-bouncy',
-          arrow: 'bg-cyan-500 border-l-2 border-b-2 border-cyan-300',
-        };
-      case 'chill':
-        return {
-          box: 'bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 text-white border-2 border-emerald-300 shadow-emerald-500/30',
-          arrow: 'bg-emerald-600 border-l-2 border-b-2 border-emerald-300',
-        };
-      case 'laugh':
-      case 'clown':
-      case 'party':
-        return {
-          box: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30 animate-bubble-bouncy',
-          arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
-        };
-      case 'sleepy':
-      case 'bored':
-        return {
-          box: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-100 border-2 border-slate-600 shadow-slate-900/50',
-          arrow: 'bg-slate-800 border-l-2 border-b-2 border-slate-600',
-        };
-      default:
-        return {
-          box: 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30',
-          arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
-        };
-    }
+    return BUBBLE_THEMES[taunt().mood] || DEFAULT_BUBBLE_THEME;
   };
 
   const handlePoke = () => {

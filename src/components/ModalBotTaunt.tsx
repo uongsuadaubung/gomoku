@@ -1,55 +1,10 @@
 import { Component, Show } from 'solid-js';
 import { MessageSquareQuote } from 'lucide-solid';
-import type { GameStore } from '../store/gameStore';
-import type { BotMood } from '../services/tauntService';
+import { useGame } from '../store/GameContext';
+import { getMoodEmoji } from '../services/tauntService';
 
-interface ModalBotTauntProps {
-  store: GameStore;
-}
-
-export const getMoodEmoji = (mood: BotMood, defaultAvatar: string = '🙄'): string => {
-  switch (mood) {
-    case 'disdain':
-      return '😒';
-    case 'smug':
-      return '😏';
-    case 'laugh':
-      return '🤣';
-    case 'clown':
-      return '🤡';
-    case 'detective':
-      return '🧐';
-    case 'bored':
-      return '🥱';
-    case 'sleepy':
-      return '😴';
-    case 'thinking':
-      return '🤔';
-    case 'evil':
-      return '😈';
-    case 'lightning':
-      return '⚡';
-    case 'cool':
-      return '😎';
-    case 'panic':
-      return '😱';
-    case 'chill':
-      return '☕';
-    case 'rage':
-      return '🤬';
-    case 'party':
-      return '🥳';
-    case 'angry':
-      return '😤';
-    case 'shush':
-      return '🤫';
-    default:
-      return defaultAvatar;
-  }
-};
-
-export const ModalBotTaunt: Component<ModalBotTauntProps> = props => {
-  const { store } = props;
+export const ModalBotTaunt: Component = () => {
+  const store = useGame();
   const taunt = () => store.tauntState();
   const config = () => store.currentLevelConfig();
 
