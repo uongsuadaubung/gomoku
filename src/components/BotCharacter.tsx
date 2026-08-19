@@ -2,6 +2,7 @@ import { Component, Show, createSignal, createEffect, onCleanup } from 'solid-js
 import type { GameStore } from '../store/gameStore';
 import type { BotMood } from '../services/tauntService';
 import { soundService } from '../services/soundService';
+import { interactionTracker } from '../services/interactionTracker';
 
 interface BotCharacterProps {
   store: GameStore;
@@ -172,13 +173,9 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     }
   };
 
-  let pokeTimestamps: number[] = [];
   const handlePoke = () => {
-    const now = Date.now();
-    pokeTimestamps = pokeTimestamps.filter(t => now - t < 4000);
-    pokeTimestamps.push(now);
-
-    if (pokeTimestamps.length >= 4) {
+    const isSpam = interactionTracker.record('POKE_BOT', 4000) >= 4;
+    if (isSpam) {
       store.triggerTaunt('SPAM_POKE_BOT');
     } else {
       store.triggerTaunt('POKE_BOT');

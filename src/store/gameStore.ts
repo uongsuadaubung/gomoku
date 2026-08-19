@@ -23,6 +23,8 @@ import { getLevelConfigByWins, SCORES } from '../game/constants';
 import { soundService } from '../services/soundService';
 import { StorageService } from '../services/storageService';
 import { TauntService, TauntEvent, BotMood } from '../services/tauntService';
+import { interactionTracker } from '../services/interactionTracker';
+import { TauntEvaluator } from '../services/tauntEvaluator';
 
 export function createGameStore() {
   // Trạng thái bàn cờ
@@ -65,20 +67,14 @@ export function createGameStore() {
 
   let tauntDismissTimer: number | null = null;
   let idleThinkingTimer: number | null = null;
-  let recentUndoTimestamps: number[] = [];
   let lastActionTauntTime: number = 0;
-  let lastGameOverTimestamp: number = 0;
-  let lastPlayerMoveTimestamp: number = 0;
   let hadHighAiAdvantage: boolean = false;
   let botEverHadOpenThreat: boolean = false;
   let wasLastGameSpeedLoss: boolean = false;
   let wasUndoJustUsed: boolean = false;
-  let recentThemeChangeTimestamps: number[] = [];
-  let recentSoundToggleTimestamps: number[] = [];
   let mouseLeaveTimer: number | null = null;
   let undoCountInMatch: number = 0;
   let sessionGamesCount: number = 0;
-  let hasTriggeredStareAtWinLine: boolean = false;
   const IDLE_EVENTS: TauntEvent[] = [
     'IDLE_IN_GAME',
     'IDLE_THINKING',
@@ -142,94 +138,6 @@ export function createGameStore() {
   /** Ngữ cảnh đổi theme cầu may để giải hạn khi thua đậm (Desperate Theme Swap) */
   const isDesperateThemeSwapContext = () => isPlayerInHeavyLossStreak();
 
-  /**
-   * Đánh giá kịch bản nước đi chiến thuật của Người chơi để kích hoạt sự kiện tương tác phù hợp
-   */
-  function evaluatePlayerMoveTaunt(
-    prevBoard: BoardMatrix,
-    nextBoard: BoardMatrix,
-    row: number,
-    col: number,
-    player: ActivePlayer,
-    ai: ActivePlayer,
-    history: MoveHistoryItem[]
-  ): TauntEvent | null {
-    const playerMoves = history.filter(m => m.player === player).map(m => ({ row: m.row, col: m.col }));
-    const botMoves = history.filter(m => m.player === ai).map(m => ({ row: m.row, col: m.col }));
-    const lastPlayerMove = playerMoves.length >= 2 ? playerMoves[playerMoves.length - 2] : null;
-
-    if (TauntService.isBlockAndCounterFour(prevBoard, nextBoard, ai, player, row, col)) {
-      return 'BLOCK_AND_COUNTER_FOUR';
-    }
-    if (TauntService.isSymmetryBreakSurprise(history, row, col, player, ai)) {
-      return 'SYMMETRY_BREAK_SURPRISE';
-    }
-    if (TauntService.hasMissedWinningMove(prevBoard, player, row, col)) {
-      return 'MISSED_WINNING_MOVE';
-    }
-    if (TauntService.isForkAttackDefenseFail(prevBoard, ai, player, row, col)) {
-      return 'FORK_ATTACK_DEFENSE_FAIL';
-    }
-    if (TauntService.isDeadFourBlocked(nextBoard, player, row, col)) {
-      return 'DEAD_FOUR_BLOCKED';
-    }
-    if (TauntService.hasAccidentalSelfBlock(nextBoard, player, row, col)) {
-      return 'ACCIDENTAL_SELF_BLOCK';
-    }
-    if (TauntService.isSplitBoardExpedition(lastPlayerMove, { row, col }, history.length)) {
-      return 'SPLIT_BOARD_EXPEDITION';
-    }
-    if (TauntService.isTriangleFormation(nextBoard, player, row, col)) {
-      return 'TRIANGLE_FORMATION';
-    }
-    if (TauntService.isIsolatedFarMove(prevBoard, row, col)) {
-      return 'ISOLATED_FAR_MOVE';
-    }
-    if (TauntService.isCloseCombatHug(playerMoves, botMoves)) {
-      return 'CLOSE_COMBAT_HUG';
-    }
-    if (TauntService.isPlayerBlunder(nextBoard, ai, row, col)) {
-      return 'BLUNDER_MOVE';
-    }
-    if (TauntService.isPlayerDoubleThreat(nextBoard, player)) {
-      return 'DOUBLE_THREE_TRAP';
-    }
-    if (TauntService.isPlayerThreatMove(nextBoard, player) && Math.random() < 0.45) {
-      return 'PLAYER_GOOD_MOVE';
-    }
-    return null;
-  }
-
-  /**
-   * Đánh giá kịch bản khi Người chơi giành chiến thắng
-   */
-  function evaluatePlayerWinTaunt(
-    moveCount: number,
-    hadComeback: boolean,
-    undoCount: number,
-    prevStats: UserStats
-  ): TauntEvent {
-    if (wasUndoJustUsed) return 'WIN_RIGHT_AFTER_UNDO';
-    if (moveCount <= 10) return 'SPEED_WIN_QUICK';
-    if (moveCount >= 50) return 'IRON_CURTAIN_WIN';
-    if (!botEverHadOpenThreat && moveCount >= 10) return 'CLEAN_SWEEP_DOMINATION';
-    if (hadComeback) return 'COMEBACK_WIN';
-    if (undoCount === 0 && moveCount >= 14) return 'NO_UNDO_WIN';
-    if (prevStats.losses >= 3 && prevStats.currentStreak === 0) return 'REVENGE_WIN_AFTER_LOSS_STREAK';
-    if (isPlayerInWinStreak(2)) return 'PLAYER_STREAK_WIN';
-    return 'PLAYER_WIN';
-  }
-
-  /**
-   * Đánh giá kịch bản khi Bot giành chiến thắng
-   */
-  function evaluateBotWinTaunt(moveCount: number): TauntEvent {
-    if (moveCount <= 12 && wasLastGameSpeedLoss) return 'CONSECUTIVE_SPEED_LOSSES';
-    if (moveCount <= 10) return 'SPEED_WIN_QUICK';
-    if (isPlayerInHeavyLossStreak()) return 'STREAK_LOSS';
-    return 'BOT_WIN';
-  }
-
   let worker: Worker | null = null;
   let removeEventListeners: (() => void) | null = null;
 
@@ -269,16 +177,12 @@ export function createGameStore() {
     }
 
     // 1. Bắt tương tác spam gõ phím khi chơi cờ (KEYBOARD_SMASH_SPAM)
-    let recentKeyPressTimes: number[] = [];
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameStatus() !== 'playing') return;
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
-      const now = Date.now();
-      recentKeyPressTimes = recentKeyPressTimes.filter(t => now - t < 2000);
-      recentKeyPressTimes.push(now);
-      if (recentKeyPressTimes.length >= 6) {
-        recentKeyPressTimes = [];
+      if (interactionTracker.record('KEYBOARD_PRESS', 2000) >= 6) {
+        interactionTracker.clearAction('KEYBOARD_PRESS');
         triggerTaunt('KEYBOARD_SMASH_SPAM', 100);
       }
     };
@@ -430,6 +334,16 @@ export function createGameStore() {
         }
 
         const status = gameStatus();
+        const idleResult = TauntEvaluator.evaluateIdle({
+          isPlaying: status === 'playing',
+          isAiThinking: isAiThinking(),
+          isPlayerLastGameLost: isPlayerLastGameLost(),
+          hasTriggeredStareAtWinLine: interactionTracker.getFlag('STARE_AT_WIN_LINE'),
+        });
+
+        if (idleResult.consumeStareAtWinLine) {
+          interactionTracker.setFlag('STARE_AT_WIN_LINE', true);
+        }
 
         // 1. ĐANG TRONG TRẬN ĐẤU (status === 'playing')
         if (status === 'playing') {
@@ -443,18 +357,7 @@ export function createGameStore() {
         } 
         // 2. NGOÀI TRẬN ĐẤU (status !== 'playing': 'idle', 'black_win', 'white_win', 'draw')
         else {
-          if (isPlayerLastGameLost()) {
-            if (!hasTriggeredStareAtWinLine) {
-              hasTriggeredStareAtWinLine = true;
-              triggerTaunt('STARE_AT_WIN_LINE');
-            } else {
-              // AFK sau khi bị THUA mà không chịu bấm Ván Mới
-              triggerTaunt('IDLE_AFTER_LOSS');
-            }
-          } else {
-            // AFK khi ở sảnh / trạng thái chờ 'idle' / sau khi thắng hoặc hòa
-            triggerTaunt('IDLE_PRE_GAME');
-          }
+          triggerTaunt(idleResult.event);
           scheduleNextIdleTaunt(getRandomInterval());
         }
       }, delay);
@@ -509,13 +412,12 @@ export function createGameStore() {
     botEverHadOpenThreat = false;
     wasUndoJustUsed = false;
     undoCountInMatch = 0;
-    hasTriggeredStareAtWinLine = false;
+    interactionTracker.setFlag('STARE_AT_WIN_LINE', false);
 
     const currentHour = new Date().getHours();
     const isLateNight = currentHour >= 0 && currentHour < 5;
-    const now = Date.now();
     const isImmediateRevenge =
-      lastGameOverTimestamp > 0 && now - lastGameOverTimestamp < 600 && isPlayerLastGameLost();
+      interactionTracker.getTimeSinceLast('GAME_OVER') < 600 && isPlayerLastGameLost();
 
     if (!playAsBlack) {
       // Bot cầm quân Đen đi trước -> Hạ cờ ngay tại trung tâm Thiên Nguyên (7, 7)
@@ -719,41 +621,21 @@ export function createGameStore() {
     const currentBoard = cloneBoard(board());
     if (currentBoard[row][col] !== EMPTY) return;
 
-    const now = Date.now();
-    lastPlayerMoveTimestamp = now;
     const history = moveHistory();
+    const timeSinceLastMove = interactionTracker.getTimeSinceLast('PLAYER_MOVE');
+    interactionTracker.record('PLAYER_MOVE', 60000);
 
-    // 1. Kiểm tra nếu đánh nước mở màn vào tâm Thiên Nguyên (7,7)
-    if (row === 7 && col === 7 && history.length <= 1) {
-      triggerTaunt('CENTER_MOVE', 150);
-    }
-    // 2. Kiểm tra nếu đánh vào 4 góc bàn cờ (nước cờ dị)
-    else if ((row === 0 || row === 14) && (col === 0 || col === 14)) {
-      triggerTaunt('CORNER_MOVE', 150);
-    }
-    // 3. Kiểm tra nếu đánh dạt ra mép viền ngoài (hàng 0/14 hoặc cột 0/14 khi ván cờ còn sớm)
-    else if ((row === 0 || row === 14 || col === 0 || col === 14) && history.length <= 25) {
-      triggerTaunt('EDGE_WALK_MOVE', 150);
-    }
-    // 4. Kiểm tra nếu đánh đối xứng sao chép nước đi của Bot (COPYCAT_MOVE)
-    else if (history.length >= 1) {
-      const lastBotMove = history[history.length - 1];
-      if (lastBotMove.player === aiColor() && TauntService.isMirrorMove(lastBotMove.row, lastBotMove.col, row, col)) {
-        if (Math.random() < 0.6) {
-          triggerTaunt('COPYCAT_MOVE', 150);
-        }
-      }
-    }
-
-    // Kiểm tra nếu đánh quá nhanh không cần suy nghĩ (< 450ms -> RUSH_MOVE, < 800ms -> FAST_MOVE_TAUNT)
-    if (history.length >= 2) {
-      const lastStep = history[history.length - 1];
-      const diff = now - lastStep.timestamp;
-      if (diff < 450 && Math.random() < 0.6) {
-        triggerTaunt('RUSH_MOVE', 150);
-      } else if (diff < 800 && Math.random() < 0.35) {
-        triggerTaunt('FAST_MOVE_TAUNT', 150);
-      }
+    // 1. Đánh giá mở cờ / vị trí đặc biệt / tốc độ đánh (Pre-Move Pipeline)
+    const preMoveTaunt = TauntEvaluator.evaluatePreMove({
+      row,
+      col,
+      history,
+      player: playerColor(),
+      ai: aiColor(),
+      timeSinceLastMove,
+    });
+    if (preMoveTaunt) {
+      triggerTaunt(preMoveTaunt, 150);
     }
 
     const player = playerColor();
@@ -770,7 +652,7 @@ export function createGameStore() {
         col,
         player,
         stepNumber: moveHistory().length + 1,
-        timestamp: now,
+        timestamp: Date.now(),
       },
     ];
     setMoveHistory(newHistory);
@@ -795,8 +677,16 @@ export function createGameStore() {
       return;
     }
 
-    // Đánh giá và kích hoạt phản hồi lời thoại theo tình huống cờ
-    const moveTaunt = evaluatePlayerMoveTaunt(previousBoard, currentBoard, row, col, player, aiColor(), newHistory);
+    // Đánh giá và kích hoạt phản hồi lời thoại theo tình huống cờ (Move Pipeline)
+    const moveTaunt = TauntEvaluator.evaluatePlayerMove({
+      prevBoard: previousBoard,
+      nextBoard: currentBoard,
+      row,
+      col,
+      player,
+      ai: aiColor(),
+      history: newHistory,
+    });
     if (moveTaunt) {
       triggerTaunt(moveTaunt, 150);
     }
@@ -812,7 +702,7 @@ export function createGameStore() {
   function handleGameOver(winner: typeof EMPTY | ActivePlayer, winResult: WinInfo | null) {
     clearIdleTimer();
     sessionGamesCount++;
-    lastGameOverTimestamp = Date.now();
+    interactionTracker.record('GAME_OVER', 60000);
 
     if (winner === BLACK) {
       setGameStatus('black_win');
@@ -855,7 +745,14 @@ export function createGameStore() {
       wasLastGameSpeedLoss = false;
 
       // Đánh giá kịch bản thắng của Người chơi
-      const winTaunt = evaluatePlayerWinTaunt(moveCount, hadHighAiAdvantage, undoCountInMatch, prevStats);
+      const winTaunt = TauntEvaluator.evaluatePlayerWin({
+        moveCount,
+        hadComeback: hadHighAiAdvantage,
+        undoCount: undoCountInMatch,
+        wasUndoJustUsed,
+        botEverHadOpenThreat,
+        prevStats,
+      });
       triggerTaunt(winTaunt, 500);
 
       // Kiểm tra thăng cấp AI
@@ -874,7 +771,11 @@ export function createGameStore() {
       setStats(newStats);
 
       // Đánh giá kịch bản thắng của Bot
-      const botWinTaunt = evaluateBotWinTaunt(moveCount);
+      const botWinTaunt = TauntEvaluator.evaluateBotWin({
+        moveCount,
+        wasLastGameSpeedLoss,
+        isHeavyLossStreak: isPlayerInHeavyLossStreak(),
+      });
       wasLastGameSpeedLoss = moveCount <= 12;
       triggerTaunt(botWinTaunt, 400);
     } else {
@@ -906,8 +807,7 @@ export function createGameStore() {
     setIsSeriesActive(false);
     setLastResigned(true);
 
-    const now = Date.now();
-    const isLongThinking = now - lastPlayerMoveTimestamp >= 35000;
+    const isLongThinking = interactionTracker.getTimeSinceLast('PLAYER_MOVE') >= 35000;
     const hasThreat = TauntService.hasBotActiveThreat(board(), aiColor());
 
     if (isAiThinkingWhenResigning) {
@@ -985,18 +885,14 @@ export function createGameStore() {
 
     soundService.playClickSound();
     undoCountInMatch++;
-    const now = Date.now();
-    const isInstantUndo = now - lastPlayerMoveTimestamp < 350;
-    recentUndoTimestamps = recentUndoTimestamps.filter(t => now - t < 10000);
-    recentUndoTimestamps.push(now);
+    const isInstantUndo = interactionTracker.getTimeSinceLast('PLAYER_MOVE') < 350;
+    const recentUndoCount = interactionTracker.record('UNDO', 10000);
 
-    if (isInstantUndo) {
-      triggerTaunt('UNDO_BEFORE_AI_MOVES', 300);
-    } else if (recentUndoTimestamps.length >= 3) {
-      triggerTaunt('MULTI_UNDO', 300);
-    } else {
-      triggerTaunt('PLAYER_UNDO', 300);
-    }
+    const undoTaunt = TauntEvaluator.evaluateUndo({
+      isInstantUndo,
+      recentUndoCount,
+    });
+    triggerTaunt(undoTaunt, 300);
     resetIdleTimer();
   }
 
@@ -1032,15 +928,13 @@ export function createGameStore() {
    * Đổi theme bàn cờ
    */
   function setTheme(t: ThemeType) {
-    const now = Date.now();
-    recentThemeChangeTimestamps = recentThemeChangeTimestamps.filter(ts => now - ts < 5000);
-    recentThemeChangeTimestamps.push(now);
+    const count = interactionTracker.record('THEME_CHANGE', 5000);
 
     setThemeState(t);
     StorageService.setTheme(t);
     soundService.playClickSound();
 
-    if (recentThemeChangeTimestamps.length >= 3) {
+    if (count >= 3) {
       triggerTaunt('RAPID_THEME_CYCLING', 200);
     } else {
       triggerTaunt(isDesperateThemeSwapContext() ? 'DESPERATE_THEME_SWAP' : 'THEME_CHANGE', 200);
@@ -1076,13 +970,11 @@ export function createGameStore() {
    * Bật/tắt âm thanh
    */
   function toggleSound() {
-    const now = Date.now();
-    recentSoundToggleTimestamps = recentSoundToggleTimestamps.filter(t => now - t < 3000);
-    recentSoundToggleTimestamps.push(now);
+    const isSpam = interactionTracker.record('SOUND_TOGGLE', 3000) >= 4;
 
     const next = soundService.toggleMute();
     setIsMutedState(next);
-    if (recentSoundToggleTimestamps.length >= 4) {
+    if (isSpam) {
       triggerTaunt('SOUND_SPAM_TOGGLE', 150);
     } else if (next) {
       triggerTaunt('SOUND_MUTE', 150);
