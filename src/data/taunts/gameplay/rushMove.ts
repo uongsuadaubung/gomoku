@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const RUSH_MOVE: TauntDefinition = {
   event: 'RUSH_MOVE',
-  mood: 'clown',
+  mood: 'lightning',
   texts: [
     "Đánh nhanh thế? Tay nhanh hơn não rồi lát lại đòi bấm Đi Lại cho xem!",
     "Chưa kịp chớp mắt đã đặt cờ, vào bẫy của tôi rồi bạn trẻ ơi!",

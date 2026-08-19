@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const SCREENSHOT_ATTEMPT: TauntDefinition = {
   event: 'SCREENSHOT_ATTEMPT',
-  mood: 'shocked',
+  mood: 'smug',
   texts: [
     "Chụp màn hình gửi vào nhóm cầu cứu tổ tiên hay tính khoe pha tự hủy đi vào lòng đất thế?",
     "Đừng chụp ảnh màn hình bạn ơi, ván này thua nhục lắm chụp lại chỉ tổ xấu hổ thêm thôi!",

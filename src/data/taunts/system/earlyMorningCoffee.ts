@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const EARLY_MORNING_COFFEE: TauntDefinition = {
   event: 'EARLY_MORNING_COFFEE',
-  mood: 'cool',
+  mood: 'chill',
   texts: [
     "Sáng sớm tinh mơ chưa kịp uống ngụm cà phê đã mò vào đây nộp mạng, nghiện cờ hay nghiện ăn hành thế sếp?",
     "Cà phê sáng thơm lừng cũng không át nổi vị cay đắng của trận thua mở bát ngày mới này đâu bạn ơi!",

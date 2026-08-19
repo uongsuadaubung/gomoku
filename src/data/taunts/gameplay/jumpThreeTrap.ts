@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const JUMP_THREE_TRAP: TauntDefinition = {
   event: 'JUMP_THREE_TRAP',
-  mood: 'shocked',
+  mood: 'evil',
   texts: [
     "Ui chà, bẫy ba nhảy cách cơ đấy!",
     "Nhảy cách một ô hiểm hóc thế à?",

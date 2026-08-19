@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const ONE_MINUTE_BULLET_WIN: TauntDefinition = {
   event: 'ONE_MINUTE_BULLET_WIN',
-  mood: 'bored',
+  mood: 'lightning',
   texts: [
     "Ván cờ chưa đầy 1 phút đã xong xuôi! Đánh nhanh thắng nhanh như chạy giặc vậy bạn ơi!",
     "Một phút huy hoàng rồi vụt tắt! Bạn nộp mạng với tốc độ ánh sáng làm tôi chưa kịp khởi động!",

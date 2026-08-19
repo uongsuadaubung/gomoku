@@ -7,23 +7,22 @@ import type { TauntEvent, BotMood } from '../src/data/taunts/types';
 
 // Bảng biểu tượng cảm xúc cho từng BotMood
 const MOOD_EMOJIS: Record<BotMood, string> = {
+  disdain: '😒 Khinh bỉ',
   smug: '😏 Cười khẩy',
   laugh: '🤣 Cười ngả nghiêng',
   clown: '🤡 Mặt hề',
-  cool: '😎 Ngầu đét',
-  evil: '😈 Ác quỷ',
-  angry: '😤 Bực mình',
-  rage: '🤬 Nổi giận',
+  detective: '🧐 Soi xét',
   bored: '🥱 Ngáp ngủ',
   sleepy: '😴 Buồn ngủ',
-  shocked: '😳 Bất ngờ',
-  mindblown: '🤯 Nổ đầu',
   thinking: '🤔 Đăm chiêu',
-  disdain: '😒 Khinh bỉ',
-  salute: '🫡 Chào tiễn biệt',
-  relieved: '😅 Toát mồ hôi',
-  detective: '🧐 Soi xét',
+  evil: '😈 Ác quỷ',
+  lightning: '⚡ Tia chớp',
+  cool: '😎 Ngầu đét',
+  panic: '😱 Hoảng loạn',
+  chill: '☕ Thảnh thơi',
+  rage: '🤬 Nổi giận',
   party: '🥳 Ăn mừng',
+  angry: '😤 Bực mình',
   shush: '🤫 Im lặng',
 };
 
@@ -106,7 +105,7 @@ function runStats() {
 
   // 2. Thống kê theo 18 Biểu cảm (BotMood)
   console.log('========================================================================================');
-  console.log('🎭 THỐNG KÊ THEO 18 CẢM XÚC CỦA BOT (BOT MOODS)');
+  console.log('🎭 THỐNG KÊ THEO 17 CẢM XÚC CỦA BOT (BOT MOODS)');
   console.log('========================================================================================');
   
   const sortedMoods = Object.entries(moodStats).sort((a, b) => b[1].count - a[1].count);

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const CLEAN_SWEEP_DOMINATION: TauntDefinition = {
   event: 'CLEAN_SWEEP_DOMINATION',
-  mood: 'shocked',
+  mood: 'smug',
   texts: [
     "Ván này bạn đánh như hack vậy, nuốt trọn không cho tôi thở nổi một phát nào... Khá khen đấy!",
     "Ủa alo? Bạn vừa bật chế độ đại kiện tướng quốc tế lên để đánh với tôi đấy à? Áp đảo kinh khủng!",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const RAGE_DOWNGRADE_AFTER_LOSS: TauntDefinition = {
   event: 'RAGE_DOWNGRADE_AFTER_LOSS',
-  mood: 'clown',
+  mood: 'laugh',
   texts: [
     "Bị tôi bán hành no nê nên phải chạy về tìm mấy bé Cấp 1 để bắt nạt tìm lại tự tin à?",
     "Biết tự lượng sức mình rồi đấy, về cấp mầm non chơi cho đỡ tổn thương tâm lý nhé!",

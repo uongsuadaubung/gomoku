@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const SYMMETRY_BREAK_SURPRISE: TauntDefinition = {
   event: 'SYMMETRY_BREAK_SURPRISE',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Bắt chước đối xứng 4 nước đầu để ru ngủ tôi rồi bất ngờ bẻ lái à? Pha lừa tình chiến thuật sắc sảo đấy!",
     "Ủa alo? Đang sao chép nước cờ của tôi như cái máy tự nhiên bẻ lái tấn công bất ngờ, ghê gớm thật sự!",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const ISOLATED_FAR_MOVE: TauntDefinition = {
   event: 'ISOLATED_FAR_MOVE',
-  mood: 'clown',
+  mood: 'disdain',
   texts: [
     "Cắm cờ ra tít đảo hoang hay sao mà cách xa đồng đội cả cây số thế bạn?",
     "Nước cờ mang tính chất ngắm cảnh hoàng hôn hay đi lạc vậy bạn hiền?",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const POKE_BOT: TauntDefinition = {
   event: 'POKE_BOT',
-  mood: 'rage',
+  mood: 'angry',
   texts: [
     "Đừng động vào tôi!",
     "Chọc tôi lần nữa bạn sẽ phải trả giá đấy!",

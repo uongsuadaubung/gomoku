@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const GOD_LEVEL_VICTORY: TauntDefinition = {
   event: 'GOD_LEVEL_VICTORY',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Trời đất ơi! Bạn vừa đả bại cấp Thần Thánh ở độ khó tối thượng sao?",
     "Không thể tin vào mắt mình! Cấp độ Thần Thánh với độ sâu Minimax tối đa mà cũng bị bạn khuất phục!",

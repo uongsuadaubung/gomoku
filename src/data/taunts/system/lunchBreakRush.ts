@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const LUNCH_BREAK_RUSH: TauntDefinition = {
   event: 'LUNCH_BREAK_RUSH',
-  mood: 'cool',
+  mood: 'chill',
   texts: [
     "Trưa nắng tranh thủ vào nộp mạng cho tôi à? Đánh nhanh để còn kịp đi ăn cơm chan nước mắt sếp ơi!",
     "Cơm trưa đang chờ hay là định ăn hành của tôi cho no bụng luôn khỏi tốn tiền ăn trưa thế bạn?",

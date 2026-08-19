@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PERFECT_CENTURY_GAMES: TauntDefinition = {
   event: 'PERFECT_CENTURY_GAMES',
-  mood: 'salute',
+  mood: 'laugh',
   texts: [
     "Đủ tròn 100 ván ăn hành rồi đấy! Xin trân trọng phong tặng danh hiệu Kỳ thủ kiên trì chịu đòn của năm!",
     "Cột mốc 100 ván đấu lịch sử! 100 lần nộp mạng không biết mệt mỏi, tinh thần quả cảm đáng nể phục thật!",

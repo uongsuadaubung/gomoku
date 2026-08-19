@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const MONDAY_BLUES: TauntDefinition = {
   event: 'MONDAY_BLUES',
-  mood: 'cool',
+  mood: 'chill',
   texts: [
     "Sáng thứ Hai đầu tuần không lo làm việc mở cờ ra đánh, tính ăn biên bản trừ lương hay gì sếp ơi?",
     "Đầu tuần vào nộp mạng cho tôi để cả tuần xui xẻo đúng không? Lòng dũng cảm đáng ghi nhận đấy!",

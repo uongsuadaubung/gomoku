@@ -6,37 +6,36 @@ Tài liệu này định nghĩa chi tiết toàn bộ các sự kiện tương t
 
 ## 📊 TỔNG QUAN & THỐNG KÊ HỆ THỐNG
 
-- **Tổng số sự kiện**: `132 sự kiện` (62 Gameplay, 6 Idle, 35 Interaction, 29 System)
-- **Tổng số câu thoại**: `15,377 câu` ($\ge 100$ câu mỗi sự kiện, đạt chuẩn tự nhiên, không từ ngữ máy móc, không sến súa, 0% trùng lặp).
-- **Số loại cảm xúc (`BotMood`)**: `18 biểu cảm` đi kèm hoạt họa avatar và giao diện đổi màu động.
+- **Tổng số sự kiện**: `132 sự kiện` (59 Gameplay, 6 Idle, 35 Interaction, 29 System)
+- **Tổng số câu thoại**: `16,787 câu` ($\ge 120$ câu mỗi sự kiện, đạt chuẩn tự nhiên, không phán xét cá nhân, 0% trùng lặp).
+- **Số loại cảm xúc (`BotMood`)**: `17 biểu cảm độc mồm & cà khịa` đi kèm hoạt họa avatar và giao diện đổi màu động.
 - **Kiến trúc dữ liệu**: Mỗi sự kiện được đóng gói trong một module độc lập (`TauntDefinition`), tối ưu hóa tải bộ nhớ.
 - **Thuật toán lựa chọn**: $O(1)$ Zero-Heap Allocation, cơ chế ghi nhớ `lastIndexMap` chống lặp lại câu trước đó.
 - **Tỷ lệ đấu nối**: `100% (132/132 sự kiện)` được tích hợp thuật toán nhận diện và kích hoạt trong trò chơi.
 
 ---
 
-## 🎭 BẢNG GIẢI NGHĨA 18 CẢM XÚC BOT (BOT MOODS)
+## 🎭 BẢNG GIẢI NGHĨA 17 CẢM XÚC BOT (BOT MOODS)
 
-| Mood | Emoji | Tên biểu cảm | Ý nghĩa ngữ cảnh |
+| Mood | Emoji | Tên biểu cảm | Định hướng cà khịa / Gáy bẩn / Phủ nhận |
 |---|:---:|---|---|
-| `smug` | 😏 | Cười khẩy | Đắc thắng, bắt bài, tự tin chiếm thế thượng phong, ngắm đường thắng |
-| `laugh` | 🤣 | Cười ngả nghiêng | Thắng trận, người chơi thua chuỗi dài, bịt nhầm đầu, tái đấu vội vàng, thua tốc hành, song tứ tử |
-| `clown` | 🤡 | Mặt hề | Nước đi ngáo, bỏ lỡ nước thắng, đi lạc đảo hoang, tự bóp, ngâm lâu rồi đi blunder |
-| `cool` | 😎 | Ngầu đét | Khai cuộc tự tin, bot đi trước, tăng độ khó, mở màn tuần mới, thế cờ zic-zắc |
-| `evil` | 😈 | Ác quỷ | Giăng bẫy sát cục hiểm hóc, tứ tam 4-3, khóa chặt thế cờ, góc chết, nước 13 tử thần |
-| `angry` | 😤 | Bực mình | Người chơi chuyển tab bỏ mặc, không tôn trọng ván cờ |
-| `rage` | 🤬 | Nổi giận | Bị người chơi click chọc (poke) liên tục, spam nút âm thanh, đập phím Space |
-| `bored` | 🥱 | Ngáp ngủ | Người chơi suy nghĩ quá lâu, thủ mai rùa, ván cờ 100 quân, hòa liên tiếp, ván 1 phút |
-| `sleepy` | 😴 | Buồn ngủ | Người chơi AFK lâu, chơi cờ lúc nửa đêm khuya 3h sáng, căng da bụng sau ăn trưa |
-| `shocked` | 😳 | Bất ngờ | Người chơi đi nước cờ hay, bẻ lái bất ngờ, vừa chặn vừa tạo nước 4, chụp màn hình |
-| `mindblown` | 🤯 | Nổ đầu | Người chơi ngắt chuỗi thua, thắng chuỗi dài, phục thù oanh liệt |
-| `thinking` | 🤔 | Đăm chiêu | Người chơi rê chuột do dự, ngập ngừng nút Undo, click loạn ô trống, cờ so le |
-| `disdain` | 😒 | Khinh bỉ | Người chơi xin đi lại (undo), dạt góc, dạt mép, hạ cấp bot, đánh ôm sát bám đuôi |
-| `salute` | 🫡 | Chào tiễn biệt | Người chơi nhận thua đầu hàng, thắng quân tử không undo, mốc 100 ván |
-| `relieved` | 😅 | Toát mồ hôi | Kết quả hòa cờ sau trận đấu nghẹt thở |
-| `detective` | 🧐 | Soi xét | Người chơi mở xem bảng thống kê, xem luật, chuột phải inspect, copy text, thế cờ chữ X |
-| `party` | 🥳 | Ăn mừng | Thăng cấp AI, người chơi marathon 10 ván liên tục, chiều thứ Sáu tan làm |
-| `shush` | 🤫 | Im lặng | Người chơi bấm tắt toàn bộ âm thanh trò chơi |
+| `disdain` | 😒 | Khinh bỉ / Phủ nhận | Phủ nhận chiến thắng đối thủ ("ăn may", "tôi nhường"), chê bai hối cờ, dạt biên, bám đỉa |
+| `smug` | 😏 | Cười khẩy / Gáy bẩn | Bot thắng ván, dẫn điểm, ép đối thủ đầu hàng, F5 reload, chụp ảnh màn hình |
+| `laugh` | 🤣 | Cười ngả nghiêng | Chế giễu đối thủ thua chuỗi, thua nhanh, bỏ sót 4 mở, 100 ván ăn hành |
+| `clown` | 🤡 | Coi là gánh xiếc | Châm chọc nước đi blunder tự hủy, bắt chước máy móc, xếp cờ tam giác/chữ T |
+| `detective` | 🧐 | Kính lúp bắt thóp | Bắt quả tang mở F12 devtools, xem luật cờ, xem thống kê, đổi theme cầu may |
+| `bored` | 🥱 | Khinh thường / Ngáp ngủ | Chê đối thủ đánh nhạt nhẽo, thủ rùa bê tông, trận cờ 100 quân, ngâm cờ câu giờ |
+| `sleepy` | 😴 | Buồn ngủ / Gục ngã | Châm chọc đối thủ AFK bỏ trận, chuột rời màn hình, chơi cờ nửa đêm 3h sáng |
+| `thinking` | 🤔 | Đăm chiêu phân tích | Giả vờ tính toán, bóc mẽ khi đối thủ hover ngập ngừng, dệt cờ so le, quây tâm |
+| `evil` | 😈 | Ác quỷ mưu mô | Giăng bẫy 4-3 sát cục, bẫy 3 nhảy cóc, dồn vào góc tử thần, nước 13 định mệnh |
+| `lightning` | ⚡ | Tia chớp hủy diệt | Gáy về tốc độ kết liễu siêu nhanh (1 phút bullet, đánh vội, zic-zắc tốc độ) |
+| `cool` | 😎 | Ngầu đét thượng đẳng | Tự tin khai cuộc, chấp đối thủ đi trước, mở cao tốc chéo, tăng độ khó tối đa |
+| `panic` | 😱 | Cà khịa hoảng loạn | Bắt bài khi đối thủ lắc chuột loạn xạ, quét bôi đen, co giãn cửa sổ trình duyệt |
+| `chill` | ☕ | Thảnh thơi bán hành | Thảnh thơi nhâm nhi cà phê sáng, nghỉ trưa, đầu tuần, cuối tuần trong khi bán hành |
+| `rage` | 🤬 | Nổi đóa bật lại | Đanh đá mắng đối thủ khi bị đập phím Space, spam nút chọc bot, spam loa |
+| `party` | 🥳 | Ăn mừng của bot | Ăn mừng khi bot thăng cấp, cày marathon 10 ván, chiều thứ Sáu tan sở |
+| `angry` | 😤 | Bực dọc | Cảnh cáo khi bị chọc nhẹ avatar bot, rời tab trình duyệt đi tra Google |
+| `shush` | 🤫 | Suỵt im lặng | Châm chọc khi đối thủ tắt âm thanh để đỡ bị nghe cà khịa |
 
 ---
 

@@ -140,23 +140,22 @@ export type TauntEvent =
   | 'WIN_RATE_DROP_BELOW_50';
 
 export type BotMood =
-  | 'smug'        // 😏 Cười khẩy đắc thắng
-  | 'laugh'       // 🤣 Cười ngả nghiêng
-  | 'clown'       // 🤡 Mặt hề (Blunder, tự hủy, bấm ẩu, bắt chước)
-  | 'cool'        // 😎 Ngầu đét (Khai cuộc, bot tiên thủ, tăng độ khó)
-  | 'evil'        // 😈 Ác quỷ mưu mô (Gài bẫy sát cục)
-  | 'angry'       // 😤 Bực mình phì khói
-  | 'rage'        // 🤬 Nổi trận lôi đình (Bị chọc poke bot, spam nút, đập phím)
-  | 'bored'       // 🥱 Ngáp ngủ (Nghĩ lâu, ván cờ 100 quân, đổ bê tông)
-  | 'sleepy'      // 😴 Ngủ khò khò (AFK sâu, cày đêm khuya)
-  | 'shocked'     // 😳 Bất ngờ mở to mắt (Bẫy đôi 3-3, nước đi tốt, clean sweep)
-  | 'mindblown'   // 🤯 Choáng váng nổ đầu (Lội ngược dòng, ngắt chuỗi)
-  | 'thinking'    // 🤔 Đăm chiêu suy nghĩ (Hover ngập ngừng)
-  | 'disdain'     // 😒 Khinh bỉ liếc xéo (Undo, dạt góc, dạt mép viền, hạ cấp, bám đuôi)
-  | 'salute'      // 🫡 Chào tiễn biệt (Người chơi đầu hàng, thắng no-undo)
-  | 'relieved'    // 😅 Cười trừ toát mồ hôi (Hòa cờ)
-  | 'detective'   // 🧐 Kính lúp soi xét (Xem luật, xem thống kê, đổi theme, inspect)
-  | 'party'       // 🥳 Ăn mừng tưng bừng (Level up, marathon 10 ván)
+  | 'disdain'     // 😒 Khinh bỉ / Phủ nhận đối thủ (Người chơi thắng ăn may, đi nước hay do rùa, dùng Undo, dạt mép biên, hạ cấp)
+  | 'smug'        // 😏 Cười khẩy đắc thắng / Gáy bẩn (Bot thắng, dẫn điểm, người chơi đầu hàng, F5 reload, chụp ảnh màn hình)
+  | 'laugh'       // 🤣 Cười ngả nghiêng chế giễu (Người chơi thua chuỗi, thua nhanh, bỏ lỡ 4 mở, 100 ván ăn hành)
+  | 'clown'       // 🤡 Coi đối thủ là gánh xiếc (Blunder tự hủy, bắt chước máy móc, xếp cờ tam giác/chữ T)
+  | 'detective'   // 🧐 Kính lúp bắt thóp (F12 devtools, xem luật, xem thống kê, đổi theme, zoom bàn cờ)
+  | 'bored'       // 🥱 Chê bai đối thủ nhàm chán (Thủ rùa bò, ván cờ 100 quân, ngâm cờ quá lâu, hòa liên tiếp)
+  | 'sleepy'      // 😴 Buồn ngủ / Khinh thường (AFK, chuột rời màn hình, cày đêm muộn, trưa buồn ngủ)
+  | 'thinking'    // 🤔 Đăm chiêu phân tích (Hover ngập ngừng, dệt so le, quây tâm)
+  | 'evil'        // 😈 Ác quỷ mưu mô (Bẫy 4-3 sát cục, bẫy 3 nhảy cóc, góc tử thần)
+  | 'lightning'   // ⚡ Gáy về tốc độ hủy diệt (Đánh vội, 1 phút bullet, thắng chớp nhoáng, zic-zắc)
+  | 'cool'        // 😎 Ngầu đét chấp đối thủ (Khai cuộc, cao tốc đường chéo, tăng độ khó)
+  | 'panic'       // 😱 Cà khịa sự hoảng loạn của đối thủ (Kéo rê chuột, lắc chuột, resize màn hình, click loạn)
+  | 'chill'       // ☕ Thảnh thơi vừa uống cà phê vừa bán hành (Sáng sớm, nghỉ trưa, đầu tuần, cuối tuần)
+  | 'rage'        // 🤬 Nổi đóa bật lại (Đập phím, spam phím cách, spam chọc bot, spam loa)
+  | 'party'       // 🥳 Ăn mừng thành tích của bot (Level up, marathon 10 ván, chiều thứ 6)
+  | 'angry'       // 😤 Bực dọc (Chọc nhẹ bot, rời tab)
   | 'shush';      // 🤫 Suỵt im lặng (Mute âm thanh)
 
 export interface TauntItem {

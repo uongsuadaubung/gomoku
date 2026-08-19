@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const OPEN_FOUR_BLUNDER: TauntDefinition = {
   event: 'OPEN_FOUR_BLUNDER',
-  mood: 'clown',
+  mood: 'laugh',
   texts: [
     "Mắt để dưới gót chân hay sao mà để tôi tạo 4 mở hai đầu toang hoác thế kia?",
     "Tặng không tôi nước 4 mở hai đầu luôn à? Tấm lòng bồ tát hay là đang mù màu vậy sếp?",

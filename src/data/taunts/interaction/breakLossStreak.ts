@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const BREAK_LOSS_STREAK: TauntDefinition = {
   event: 'BREAK_LOSS_STREAK',
-  mood: 'mindblown',
+  mood: 'laugh',
   texts: [
     "Thắng được một ván rùa mà mặt hớn hở như vô địch thế giới vậy!",
     "Mèo mù vớ cá rán được 1 ván thôi, ván sau tôi sẽ lấy lại cả vốn lẫn lãi!",

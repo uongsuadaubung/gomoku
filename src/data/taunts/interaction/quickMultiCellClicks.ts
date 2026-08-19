@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const QUICK_MULTI_CELL_CLICKS: TauntDefinition = {
   event: 'QUICK_MULTI_CELL_CLICKS',
-  mood: 'thinking',
+  mood: 'panic',
   texts: [
     "Bấm loạn xạ khắp bàn cờ xem ô nào hợp phong thủy à? Bấm chỗ nào thì kết quả vẫn là thua thôi!",
     "Tay run như thằn lằn đứt đuôi, click dồn dập vào mấy ô trống để giải tỏa căng thẳng đúng không?",

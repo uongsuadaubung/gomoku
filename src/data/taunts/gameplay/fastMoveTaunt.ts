@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const FAST_MOVE_TAUNT: TauntDefinition = {
   event: 'FAST_MOVE_TAUNT',
-  mood: 'clown',
+  mood: 'lightning',
   texts: [
     "Tay nhanh hơn não à bạn ơi?",
     "Đánh nhanh thế tưởng mình là thần cờ à? Lát nữa lại bấm Đi Lại cho xem!",

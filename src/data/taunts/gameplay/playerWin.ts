@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PLAYER_WIN: TauntDefinition = {
   event: 'PLAYER_WIN',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Hên thôi! Chắc chắn là do ăn may, ván sau tôi nghiêm túc thì bạn không có cửa!",
     "Bạn vừa nhìn lén màn hình của tôi đúng không? Đánh kiểu này gian lận chắc luôn!",

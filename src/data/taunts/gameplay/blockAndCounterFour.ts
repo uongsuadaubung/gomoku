@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const BLOCK_AND_COUNTER_FOUR: TauntDefinition = {
   event: 'BLOCK_AND_COUNTER_FOUR',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Vừa chặn đứng nước thắng của tôi vừa phản công tạo nước 4, pha phản đòn này ảo ma thực sự đấy!",
     "Ủa alo? Một mũi tên trúng hai đích, vừa bịt họng pháo của tôi vừa giương súng đe dọa lại tôi à?",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const DOUBLE_THREE_TRAP: TauntDefinition = {
   event: 'DOUBLE_THREE_TRAP',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Úi chà! Đòn bẫy đôi 3-3 này sắc sảo đấy, học lỏm ở đâu mà kín kẽ thế bạn?",
     "Gài được thế đôi 3-3 hiểm hóc thế này, bạn làm tôi phải mở to mắt nhìn lại rồi!",

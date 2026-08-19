@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const SURRENDER_AFTER_LONG_THINKING: TauntDefinition = {
   event: 'SURRENDER_AFTER_LONG_THINKING',
-  mood: 'clown',
+  mood: 'laugh',
   texts: [
     "Ngồi ngâm cờ suy nghĩ đăm chiêu 40 giây như đại kiện tướng quốc tế, xong quyết định cuối cùng là bấm nút Đầu Hàng à? Danh hài của năm đây rồi!",
     "Tôi tưởng bạn đang tính toán ma trận sát cục 10 nước, ai ngờ tính tới tính lui xong tự nguyện giơ cờ trắng, buồn cười ghê!",

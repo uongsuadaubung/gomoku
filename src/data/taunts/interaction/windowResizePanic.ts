@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const WINDOW_RESIZE_PANIC: TauntDefinition = {
   event: 'WINDOW_RESIZE_PANIC',
-  mood: 'laugh',
+  mood: 'panic',
   texts: [
     "Thu nhỏ cửa sổ trình duyệt lại để thế cờ hiểm của tôi trông bớt to lớn và đáng sợ hơn à?",
     "Đang đánh cờ tự nhiên co giãn màn hình liên tục, tính dùng hiệu ứng co giãn để làm méo mó nước cờ của tôi đấy à?",

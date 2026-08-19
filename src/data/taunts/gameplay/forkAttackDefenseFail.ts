@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const FORK_ATTACK_DEFENSE_FAIL: TauntDefinition = {
   event: 'FORK_ATTACK_DEFENSE_FAIL',
-  mood: 'clown',
+  mood: 'panic',
   texts: [
     "Đòn nĩa đôi ở bên trái mà bạn lại chạy sang bên phải chặn, hoa mắt chóng mặt đến mức nhìn gà hóa cuốc rồi à?",
     "Tôi giăng bẫy 4-3 đôi ngả, bạn chặn một đầu thì đầu kia vẫn toang hoác thôi bạn hiền ơi!",

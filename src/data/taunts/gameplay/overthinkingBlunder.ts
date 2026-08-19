@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const OVERTHINKING_BLUNDER: TauntDefinition = {
   event: 'OVERTHINKING_BLUNDER',
-  mood: 'clown',
+  mood: 'thinking',
   texts: [
     "Vắt óc suy nghĩ cả buổi rồi chốt hạ một nước cờ đi vào lòng đất! Đúng là nghĩ lắm chỉ tổ lú người!",
     "Ngồi ngâm cờ hơn 20 giây như đại kiện tướng thế giới, cuối cùng đi ra một nước tự bóp không thể ngáo hơn!",

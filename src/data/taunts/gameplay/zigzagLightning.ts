@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const ZIGZAG_LIGHTNING: TauntDefinition = {
   event: 'ZIGZAG_LIGHTNING',
-  mood: 'cool',
+  mood: 'lightning',
   texts: [
     "Xếp cờ hình tia chớp zic-zắc nhìn nghệ thuật đấy, tiếc là sét đánh không trúng ai mà toàn tự hủy!",
     "Đánh cờ kiểu uốn lượn hình con rắn zic-zắc thế này tính làm xiếc trên bàn cờ hay gì bạn ơi?",

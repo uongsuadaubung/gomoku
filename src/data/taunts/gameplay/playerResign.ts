@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PLAYER_RESIGN: TauntDefinition = {
   event: 'PLAYER_RESIGN',
-  mood: 'salute',
+  mood: 'smug',
   texts: [
     "Chưa chi đã đầu hàng rồi à, yếu đuối thế!",
     "Biết điều đấy, đỡ mất thời gian của tôi!",

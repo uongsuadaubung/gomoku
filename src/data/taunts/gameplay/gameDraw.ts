@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const GAME_DRAW: TauntDefinition = {
   event: 'GAME_DRAW',
-  mood: 'relieved',
+  mood: 'smug',
   texts: [
     "May mắn cho bạn là bàn cờ hết chỗ chứa đấy nhé!",
     "Hòa được với tôi là thành tựu lớn nhất cuộc đời bạn rồi đấy!",

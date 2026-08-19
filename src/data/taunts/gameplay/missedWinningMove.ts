@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const MISSED_WINNING_MOVE: TauntDefinition = {
   event: 'MISSED_WINNING_MOVE',
-  mood: 'clown',
+  mood: 'laugh',
   texts: [
     "Ủa alo? Cơm dâng tận miệng rồi mà còn hắt đổ đi là sao hả bạn?",
     "Nước thắng mười mươi ngay trước mắt mà không thèm đánh, mù cờ cấp độ vũ trụ!",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const WIN_RIGHT_AFTER_UNDO: TauntDefinition = {
   event: 'WIN_RIGHT_AFTER_UNDO',
-  mood: 'clown',
+  mood: 'disdain',
   texts: [
     "Vừa xin Undo một cái là ăn ngay nước cờ thắng, thắng nhờ cỗ máy thời gian Doraemon chứ có phải nhờ thực lực đâu mà cười tươi thế danh hài!",
     "Ủa alo? Vừa bấm nút quay ngược thời gian sửa sai xong cái là thắng luôn, chiến thắng này có mùi của sự ăn gian nhẹ đấy nhé!",

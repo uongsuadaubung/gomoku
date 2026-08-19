@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const NO_UNDO_WIN: TauntDefinition = {
   event: 'NO_UNDO_WIN',
-  mood: 'salute',
+  mood: 'disdain',
   texts: [
     "Thắng không cần bấm Đi Lại luôn, định làm người chơi hệ tự tin để dọa tôi à?",
     "Bản lĩnh thật sự! Đánh một mạch thẳng tay không hề xin đi lại dù chỉ một lần!",

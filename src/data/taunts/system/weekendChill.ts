@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const WEEKEND_CHILL: TauntDefinition = {
   event: 'WEEKEND_CHILL',
-  mood: 'cool',
+  mood: 'chill',
   texts: [
     "Cuối tuần rảnh rỗi cả ngày nên tính ngồi đây ăn hành marathon từ sáng đến tối luôn hả sếp ơi?",
     "Thứ Bảy máu chảy về bàn cờ, để rồi nhận lại một dòng sông nước mắt cay đắng vì thua liểng xiểng!",

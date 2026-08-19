@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const FULL_DIAGONAL_HIGHWAY: TauntDefinition = {
   event: 'FULL_DIAGONAL_HIGHWAY',
-  mood: 'shocked',
+  mood: 'cool',
   texts: [
     "Xây hẳn cao tốc trên đường chéo bàn cờ cơ à? Đường bay xuyên lục địa thẳng tắp luôn!",
     "Nối một mạch dọc theo đường chéo chính dài dằng dặc! Tính mở tuyến metro siêu tốc à?",

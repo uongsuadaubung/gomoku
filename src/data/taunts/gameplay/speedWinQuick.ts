@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const SPEED_WIN_QUICK: TauntDefinition = {
   event: 'SPEED_WIN_QUICK',
-  mood: 'clown',
+  mood: 'lightning',
   texts: [
     "Ủa chưa kịp nóng máy bạn đã gục ngã rồi à? Nhanh như một cơn gió vậy!",
     "Ván cờ chớp nhoáng quá, tôi còn chưa kịp uống xong ngụm nước nữa!",

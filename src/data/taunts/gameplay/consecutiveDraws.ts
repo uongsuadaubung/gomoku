@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const CONSECUTIVE_DRAWS: TauntDefinition = {
   event: 'CONSECUTIVE_DRAWS',
-  mood: 'relieved',
+  mood: 'bored',
   texts: [
     "Lại hòa nữa à? Hai bên bất phân thắng bại mấy ván liền rồi đấy! Kẻ tám lạng người nửa cân!",
     "Hòa cờ liên tiếp thế này thì chứng tỏ chúng ta ngang tài ngang sức hay là cùng nhau đổ bê tông?",

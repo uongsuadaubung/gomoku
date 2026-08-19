@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const BOT_WIN: TauntDefinition = {
   event: 'BOT_WIN',
-  mood: 'laugh',
+  mood: 'smug',
   texts: [
     "Gà!",
     "Non và xanh lắm bạn ơi!",

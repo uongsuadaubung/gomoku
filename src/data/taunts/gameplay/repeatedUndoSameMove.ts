@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const REPEATED_UNDO_SAME_MOVE: TauntDefinition = {
   event: 'REPEATED_UNDO_SAME_MOVE',
-  mood: 'laugh',
+  mood: 'clown',
   texts: [
     "Bấm Undo cho sang mồm rồi lại đánh đúng vào ô cũ, não bị lag hay đang tấu hài thế?",
     "Đắn đo phân tích cả buổi rồi vẫn quay về cái máng lợn cũ, đỉnh cao của sự bế tắc!",

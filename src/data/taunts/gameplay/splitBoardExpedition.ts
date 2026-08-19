@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const SPLIT_BOARD_EXPEDITION: TauntDefinition = {
   event: 'SPLIT_BOARD_EXPEDITION',
-  mood: 'clown',
+  mood: 'disdain',
   texts: [
     "Đang đánh nhau to ở trung tâm tự nhiên chạy sang góc bên kia mở thêm chi nhánh à?",
     "Vừa đánh ở góc trên cùng, nước sau lại nhảy sang tít góc dưới đối diện, bạn đang đi du lịch vòng quanh thế giới đấy à?",

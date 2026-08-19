@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PLAYER_GOOD_MOVE: TauntDefinition = {
   event: 'PLAYER_GOOD_MOVE',
-  mood: 'shocked',
+  mood: 'disdain',
   texts: [
     "Hên thôi, đừng tưởng bở!",
     "Cũng biết giãy đấy nhỉ?",

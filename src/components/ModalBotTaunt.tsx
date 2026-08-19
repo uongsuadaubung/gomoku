@@ -9,40 +9,38 @@ interface ModalBotTauntProps {
 
 export const getMoodEmoji = (mood: BotMood, defaultAvatar: string = '🙄'): string => {
   switch (mood) {
-    case 'laugh':
-      return '🤣';
+    case 'disdain':
+      return '😒';
     case 'smug':
       return '😏';
+    case 'laugh':
+      return '🤣';
     case 'clown':
       return '🤡';
-    case 'cool':
-      return '😎';
-    case 'evil':
-      return '😈';
-    case 'angry':
-      return '😤';
-    case 'rage':
-      return '🤬';
+    case 'detective':
+      return '🧐';
     case 'bored':
       return '🥱';
     case 'sleepy':
       return '😴';
-    case 'shocked':
-      return '😳';
-    case 'mindblown':
-      return '🤯';
     case 'thinking':
       return '🤔';
-    case 'disdain':
-      return '😒';
-    case 'salute':
-      return '🫡';
-    case 'relieved':
-      return '😅';
-    case 'detective':
-      return '🧐';
+    case 'evil':
+      return '😈';
+    case 'lightning':
+      return '⚡';
+    case 'cool':
+      return '😎';
+    case 'panic':
+      return '😱';
+    case 'chill':
+      return '☕';
+    case 'rage':
+      return '🤬';
     case 'party':
       return '🥳';
+    case 'angry':
+      return '😤';
     case 'shush':
       return '🤫';
     default:

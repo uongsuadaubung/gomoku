@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const COMEBACK_WIN: TauntDefinition = {
   event: 'COMEBACK_WIN',
-  mood: 'mindblown',
+  mood: 'disdain',
   texts: [
     "Không thể tin được! Bạn lội ngược dòng từ cõi chết trở về à?! Quá ngoạn mục!",
     "Một pha thoát hiểm và lật kèo thần thánh! Tôi chịu thua nước cờ xuất thần này của bạn!",

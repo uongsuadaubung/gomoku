@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PLAYER_WIN_WITH_UNDO: TauntDefinition = {
   event: 'PLAYER_WIN_WITH_UNDO',
-  mood: 'clown',
+  mood: 'disdain',
   texts: [
     "Thắng nhờ bấm Undo {undo_count} lần trong ván này mà cũng dám vênh mặt à?",
     "Không có nút Undo cứu mạng {undo_count} lần thì bạn nát cờ từ tám hoánh rồi nhé!",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const WIN_RATE_DROP_BELOW_50: TauntDefinition = {
   event: 'WIN_RATE_DROP_BELOW_50',
-  mood: 'smug',
+  mood: 'disdain',
   texts: [
     "Tỷ lệ thắng chính thức rơi xuống đáy xã hội rồi sếp ơi! Đổi sang chơi cờ cá ngựa cho lành!",
     "Winrate tụt dốc không phanh xuống dưới 50% rồi kìa, chuẩn bị xuống hạng bán chuyên nghiệp thôi bạn!",

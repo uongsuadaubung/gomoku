@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const PLAYER_STREAK_WIN: TauntDefinition = {
   event: 'PLAYER_STREAK_WIN',
-  mood: 'mindblown',
+  mood: 'disdain',
   texts: [
     "Thắng liên tiếp mấy ván là bắt đầu thấy trời đất đảo lộn rồi đúng không? Ván tới tôi đánh bại bạn!",
     "Được ngày phong độ xuất thần đấy, nhưng chuỗi may mắn của bạn sắp cạn kiệt rồi!",

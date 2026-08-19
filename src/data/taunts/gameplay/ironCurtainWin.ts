@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const IRON_CURTAIN_WIN: TauntDefinition = {
   event: 'IRON_CURTAIN_WIN',
-  mood: 'bored',
+  mood: 'smug',
   texts: [
     "Bê tông cốt thép cấp quốc gia! Đỡ cờ kiên trì đến mức hơn 60 nước làm tôi phát mệt luôn đấy!",
     "Bạn xây bức tường thành Vạn Lý Trường Thành trên bàn cờ hay sao mà thủ lì đòn đến mức khó tin thế?",

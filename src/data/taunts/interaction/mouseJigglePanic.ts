@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const MOUSE_JIGGLE_PANIC: TauntDefinition = {
   event: 'MOUSE_JIGGLE_PANIC',
-  mood: 'laugh',
+  mood: 'panic',
   texts: [
     "Lắc chuột loạn xạ thế kia? Bí nước quá nên lắc chuột để tìm linh cảm à sếp?",
     "Chuột chạy loạn như ong vỡ tổ! Tay run hay chuột bị dính bụi mà lắc dữ dội vậy?",

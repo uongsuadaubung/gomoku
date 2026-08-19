@@ -65,45 +65,43 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     if (typingTimer) clearInterval(typingTimer);
   });
 
-  // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại (18 sắc thái cảm xúc)
+  // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại (17 sắc thái cà khịa & gáy bẩn)
   const moodEmoji = () => {
     if (!taunt().visible) return config().avatar;
     const m: BotMood = taunt().mood;
     switch (m) {
-      case 'laugh':
-        return '🤣';
+      case 'disdain':
+        return '😒';
       case 'smug':
         return '😏';
+      case 'laugh':
+        return '🤣';
       case 'clown':
         return '🤡';
-      case 'cool':
-        return '😎';
-      case 'evil':
-        return '😈';
-      case 'angry':
-        return '😤';
-      case 'rage':
-        return '🤬';
+      case 'detective':
+        return '🧐';
       case 'bored':
         return '🥱';
       case 'sleepy':
         return '😴';
-      case 'shocked':
-        return '😳';
-      case 'mindblown':
-        return '🤯';
       case 'thinking':
         return '🤔';
-      case 'disdain':
-        return '😒';
-      case 'salute':
-        return '🫡';
-      case 'relieved':
-        return '😅';
-      case 'detective':
-        return '🧐';
+      case 'evil':
+        return '😈';
+      case 'lightning':
+        return '⚡';
+      case 'cool':
+        return '😎';
+      case 'panic':
+        return '😱';
+      case 'chill':
+        return '☕';
+      case 'rage':
+        return '🤬';
       case 'party':
         return '🥳';
+      case 'angry':
+        return '😤';
       case 'shush':
         return '🤫';
       default:
@@ -118,18 +116,22 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     switch (m) {
       case 'rage':
       case 'clown':
+      case 'panic':
         return 'scale-110 animate-bounce';
       case 'party':
       case 'laugh':
         return 'scale-115 rotate-6 animate-pulse';
-      case 'shocked':
-      case 'mindblown':
-        return 'scale-120 -rotate-3';
       case 'sleepy':
       case 'bored':
         return 'scale-95 opacity-90';
+      case 'lightning':
+        return 'scale-115 rotate-3 animate-bounce';
+      case 'chill':
+        return 'scale-105 rotate-1';
       case 'cool':
       case 'evil':
+      case 'smug':
+      case 'disdain':
         return 'scale-110 rotate-2 shadow-amber-500/50';
       default:
         return 'scale-110 rotate-3';
@@ -146,11 +148,20 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
           box: 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 text-white border-2 border-rose-300 shadow-rose-500/40 animate-bubble-shake',
           arrow: 'bg-rose-600 border-l-2 border-b-2 border-rose-400',
         };
-      case 'shocked':
-      case 'mindblown':
+      case 'panic':
         return {
-          box: 'bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 text-white border-2 border-indigo-300 shadow-indigo-500/40 animate-bubble-wobble',
-          arrow: 'bg-purple-600 border-l-2 border-b-2 border-indigo-400',
+          box: 'bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 text-white border-2 border-amber-300 shadow-orange-500/50 animate-bubble-shake',
+          arrow: 'bg-amber-600 border-l-2 border-b-2 border-amber-300',
+        };
+      case 'lightning':
+        return {
+          box: 'bg-gradient-to-r from-cyan-500 via-amber-400 to-yellow-300 text-slate-950 border-2 border-cyan-200 shadow-cyan-500/40 animate-bubble-bouncy',
+          arrow: 'bg-cyan-500 border-l-2 border-b-2 border-cyan-300',
+        };
+      case 'chill':
+        return {
+          box: 'bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 text-white border-2 border-emerald-300 shadow-emerald-500/30',
+          arrow: 'bg-emerald-600 border-l-2 border-b-2 border-emerald-300',
         };
       case 'laugh':
       case 'clown':

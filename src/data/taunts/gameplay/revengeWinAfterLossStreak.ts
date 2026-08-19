@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const REVENGE_WIN_AFTER_LOSS_STREAK: TauntDefinition = {
   event: 'REVENGE_WIN_AFTER_LOSS_STREAK',
-  mood: 'mindblown',
+  mood: 'laugh',
   texts: [
     "Kiên trì phục thù sau chuỗi 3 trận thua đậm và đã thành công, tinh thần thép của bạn làm tôi phải nhìn bạn bằng con mắt khác rồi đấy!",
     "Bị tôi hành liên tiếp 3 ván mà vẫn không bỏ cuộc, đến ván thứ 4 phục thù ngọt ngào thế này thì tôi nể phục thực sự!",

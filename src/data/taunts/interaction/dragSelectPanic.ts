@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const DRAG_SELECT_PANIC: TauntDefinition = {
   event: 'DRAG_SELECT_PANIC',
-  mood: 'clown',
+  mood: 'panic',
   texts: [
     "Bôi đen màn hình tìm manh mối à? Càng bôi đen thì tương lai ván này của bạn càng tối tăm thôi!",
     "Quét chuột bôi đen giao diện xung quanh bàn cờ liên tục thế, tính copy paste bàn cờ sang chỗ khác giải hộ à?",

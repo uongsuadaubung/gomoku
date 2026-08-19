@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const WHEEL_ZOOM_ATTEMPT: TauntDefinition = {
   event: 'WHEEL_ZOOM_ATTEMPT',
-  mood: 'thinking',
+  mood: 'detective',
   texts: [
     "Cuộn chuột định zoom to bàn cờ để soi từng thớ gỗ à? Bàn cờ chuẩn kích thước rồi, soi kỹ thế sếp!",
     "Lăn chuột lia lịa tính phóng to thu nhỏ bàn cờ sao? Mắt kém hay là đang tìm kính lúp để đếm ô thế bạn?",

@@ -2,7 +2,7 @@ import type { TauntDefinition } from '../types';
 
 export const DIAGONAL_CROSS_FORMATION: TauntDefinition = {
   event: 'DIAGONAL_CROSS_FORMATION',
-  mood: 'detective',
+  mood: 'cool',
   texts: [
     "Tính vẽ hoa thị hay ký tên điểm chỉ lên bàn cờ để nhận quyền sử dụng đất thế bạn ơi?",
     "Tạo hình chữ X to tướng giữa bàn cờ định triệu hồi siêu nhân hay tính làm phép trừ tà vậy?",
