@@ -72,6 +72,7 @@ export function createGameStore() {
   let hasTriggeredStareAtWinLine: boolean = false;
   let recentSoundToggleTimestamps: number[] = [];
   let hadHighAiAdvantage: boolean = false;
+  let botEverHadOpenThreat: boolean = false;
   let undoCountInMatch: number = 0;
   let sessionGamesCount: number = 0;
   const IDLE_EVENTS: TauntEvent[] = [
@@ -146,10 +147,18 @@ export function createGameStore() {
     row: number,
     col: number,
     player: ActivePlayer,
-    ai: ActivePlayer
+    ai: ActivePlayer,
+    history: MoveHistoryItem[]
   ): TauntEvent | null {
+    const playerMoves = history.filter(m => m.player === player).map(m => ({ row: m.row, col: m.col }));
+    const botMoves = history.filter(m => m.player === ai).map(m => ({ row: m.row, col: m.col }));
+    const lastPlayerMove = playerMoves.length >= 2 ? playerMoves[playerMoves.length - 2] : null;
+
     if (TauntService.hasMissedWinningMove(prevBoard, player, row, col)) {
       return 'MISSED_WINNING_MOVE';
+    }
+    if (TauntService.isForkAttackDefenseFail(prevBoard, ai, player, row, col)) {
+      return 'FORK_ATTACK_DEFENSE_FAIL';
     }
     if (TauntService.isDeadFourBlocked(nextBoard, player, row, col)) {
       return 'DEAD_FOUR_BLOCKED';
@@ -157,8 +166,17 @@ export function createGameStore() {
     if (TauntService.hasAccidentalSelfBlock(nextBoard, player, row, col)) {
       return 'ACCIDENTAL_SELF_BLOCK';
     }
+    if (TauntService.isSplitBoardExpedition(lastPlayerMove, { row, col }, history.length)) {
+      return 'SPLIT_BOARD_EXPEDITION';
+    }
+    if (TauntService.isTriangleFormation(nextBoard, player, row, col)) {
+      return 'TRIANGLE_FORMATION';
+    }
     if (TauntService.isIsolatedFarMove(prevBoard, row, col)) {
       return 'ISOLATED_FAR_MOVE';
+    }
+    if (TauntService.isCloseCombatHug(playerMoves, botMoves)) {
+      return 'CLOSE_COMBAT_HUG';
     }
     if (TauntService.isPlayerBlunder(nextBoard, ai, row, col)) {
       return 'BLUNDER_MOVE';
@@ -182,6 +200,8 @@ export function createGameStore() {
     prevStats: UserStats
   ): TauntEvent {
     if (moveCount <= 10) return 'SPEED_WIN_QUICK';
+    if (moveCount >= 50) return 'IRON_CURTAIN_WIN';
+    if (!botEverHadOpenThreat && moveCount >= 10) return 'CLEAN_SWEEP_DOMINATION';
     if (hadComeback) return 'COMEBACK_WIN';
     if (undoCount === 0 && moveCount >= 14) return 'NO_UNDO_WIN';
     if (prevStats.losses >= 3 && prevStats.currentStreak === 0) return 'BREAK_LOSS_STREAK';
@@ -199,8 +219,9 @@ export function createGameStore() {
   }
 
   let worker: Worker | null = null;
+  let removeEventListeners: (() => void) | null = null;
 
-  // Khởi tạo Web Worker
+  // Khởi tạo Web Worker & Global Browser Listeners
   onMount(() => {
     try {
       worker = new Worker(new URL('../workers/ai.worker.ts', import.meta.url), {
@@ -234,6 +255,55 @@ export function createGameStore() {
     } catch (err) {
       console.error('Không thể khởi tạo Web Worker:', err);
     }
+
+    // 1. Bắt tương tác spam gõ phím khi chơi cờ (KEYBOARD_SMASH_SPAM)
+    let recentKeyPressTimes: number[] = [];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameStatus() !== 'playing') return;
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      const now = Date.now();
+      recentKeyPressTimes = recentKeyPressTimes.filter(t => now - t < 2000);
+      recentKeyPressTimes.push(now);
+      if (recentKeyPressTimes.length >= 6) {
+        recentKeyPressTimes = [];
+        triggerTaunt('KEYBOARD_SMASH_SPAM', 100);
+      }
+    };
+
+    // 2. Bắt tương tác co giãn cửa sổ trình duyệt khi đang trong trận (WINDOW_RESIZE_PANIC)
+    let resizeDebounceTimer: number | null = null;
+    const handleResize = () => {
+      if (gameStatus() !== 'playing') return;
+      if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+      resizeDebounceTimer = window.setTimeout(() => {
+        triggerTaunt('WINDOW_RESIZE_PANIC', 200);
+      }, 400);
+    };
+
+    // 3. Bắt tương tác bôi đen chọn văn bản xung quanh bàn cờ (DRAG_SELECT_PANIC)
+    let selectionDebounceTimer: number | null = null;
+    const handleSelectionChange = () => {
+      if (gameStatus() !== 'playing') return;
+      const sel = window.getSelection()?.toString() || '';
+      if (sel.trim().length >= 8) {
+        if (selectionDebounceTimer) clearTimeout(selectionDebounceTimer);
+        selectionDebounceTimer = window.setTimeout(() => {
+          triggerTaunt('DRAG_SELECT_PANIC', 200);
+        }, 500);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('selectionchange', handleSelectionChange);
+
+    removeEventListeners = () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+
     resetIdleTimer();
   });
 
@@ -241,6 +311,10 @@ export function createGameStore() {
     if (worker) {
       worker.terminate();
       worker = null;
+    }
+    if (removeEventListeners) {
+      removeEventListeners();
+      removeEventListeners = null;
     }
     clearIdleTimer();
     if (tauntDismissTimer) clearTimeout(tauntDismissTimer);
@@ -398,6 +472,7 @@ export function createGameStore() {
     setAiThinkingProgress({ depth: 0, nodes: 0 });
     soundService.playClickSound();
     hadHighAiAdvantage = false;
+    botEverHadOpenThreat = false;
     undoCountInMatch = 0;
     hasTriggeredStareAtWinLine = false;
 
@@ -581,7 +656,10 @@ export function createGameStore() {
       return;
     }
 
-    // Kiểm tra nếu Bot vừa tạo bẫy / sát cục VCF
+    // Kiểm tra nếu Bot vừa tạo bẫy / sát cục VCF hoặc đe dọa mở
+    if (TauntService.isPlayerThreatMove(currentBoard, ai)) {
+      botEverHadOpenThreat = true;
+    }
     const statsObj = aiStats();
     if (statsObj?.vcfFound || (statsObj?.bestScore || 0) >= SCORES.OPEN_FOUR) {
       triggerTaunt('BOT_TRAP', 200);
@@ -683,7 +761,7 @@ export function createGameStore() {
     }
 
     // Đánh giá và kích hoạt phản hồi lời thoại theo tình huống cờ
-    const moveTaunt = evaluatePlayerMoveTaunt(previousBoard, currentBoard, row, col, player, aiColor());
+    const moveTaunt = evaluatePlayerMoveTaunt(previousBoard, currentBoard, row, col, player, aiColor(), newHistory);
     if (moveTaunt) {
       triggerTaunt(moveTaunt, 150);
     }

@@ -19,7 +19,7 @@ const tauntsDir = path.resolve(__dirname, '../src/data/taunts');
  * 🚀 Cách chạy: bun run taunts:append
  */
 export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
-  // ── 1. DIỄN BIẾN TRẬN ĐẤU (Gameplay - 30 sự kiện) ──
+  // ── 1. DIỄN BIẾN TRẬN ĐẤU (Gameplay - 36 sự kiện) ──
   ACCIDENTAL_SELF_BLOCK: [],
   BLOCK_WRONG_END: [],
   BLUNDER_MOVE: [],
@@ -28,6 +28,8 @@ export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
   BOT_WIN: [],
   BOT_WIN_LEADING_SCORE: [],
   CENTER_MOVE: [],
+  CLEAN_SWEEP_DOMINATION: [],
+  CLOSE_COMBAT_HUG: [],
   CLUTCH_100_STONES: [],
   COMEBACK_WIN: [],
   COPYCAT_MOVE: [],
@@ -36,7 +38,9 @@ export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
   DOUBLE_THREE_TRAP: [],
   EDGE_WALK_MOVE: [],
   FAST_MOVE_TAUNT: [],
+  FORK_ATTACK_DEFENSE_FAIL: [],
   GAME_DRAW: [],
+  IRON_CURTAIN_WIN: [],
   ISOLATED_FAR_MOVE: [],
   LONG_GAME: [],
   MISSED_WINNING_MOVE: [],
@@ -48,7 +52,9 @@ export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
   PLAYER_WIN_WITH_UNDO: [],
   RUSH_MOVE: [],
   SPEED_WIN_QUICK: [],
+  SPLIT_BOARD_EXPEDITION: [],
   SURRENDER_ON_THREAT: [],
+  TRIANGLE_FORMATION: [],
   TURTLE_DEFENSE: [],
 
   // ── 2. TRẠNG THÁI CHỜ / AFK (Idle - 6 sự kiện) ──
@@ -59,13 +65,15 @@ export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
   STARE_AT_WIN_LINE: [],
   SUPER_SLOW_MOVE: [],
 
-  // ── 3. TƯƠNG TÁC NGƯỜI CHƠI (Interaction - 18 sự kiện) ──
+  // ── 3. TƯƠNG TÁC NGƯỜI CHƠI (Interaction - 22 sự kiện) ──
   BREAK_LOSS_STREAK: [],
   CLICK_AFTER_GAME_OVER: [],
   CLICK_BEFORE_START: [],
+  DRAG_SELECT_PANIC: [],
   GAME_START: [],
   HESITATION_DANCE: [],
   IMMEDIATE_REVENGE_CLICK: [],
+  KEYBOARD_SMASH_SPAM: [],
   LEVEL_UP_ALERT: [],
   LONG_HOVER_CELL: [],
   MARATHON_SERIES: [],
@@ -73,11 +81,13 @@ export const NEW_TAUNTS_TO_APPEND: Record<TauntEvent, string[]> = {
   PLAYER_GOOD_MOVE: [],
   POKE_BOT: [],
   RAGE_DOWNGRADE_AFTER_LOSS: [],
+  RIGHT_CLICK_INSPECT: [],
   SPAM_POKE_BOT: [],
   STREAK_LOSS: [],
   SWAP_SIDE_BOT_FIRST: [],
   SWAP_SIDE_PLAYER_FIRST: [],
   UNDO_BEFORE_AI_MOVES: [],
+  WINDOW_RESIZE_PANIC: [],
 
   // ── 4. HỆ THỐNG & CÀI ĐẶT UI (System - 17 sự kiện) ──
   BOARD_STYLE_CHANGE: [],

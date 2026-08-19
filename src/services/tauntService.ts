@@ -361,6 +361,93 @@ export class TauntService {
   ): boolean {
     return this.isPlayerThreatMove(board, botColor);
   }
+
+  /**
+   * Kiểm tra xem người chơi có cản trượt đòn nĩa đôi (4-3 hoặc 3-3) của Bot hay không
+   */
+  static isForkAttackDefenseFail(
+    board: BoardMatrix,
+    botColor: ActivePlayer,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    // Tạm xóa quân người chơi vừa đánh để kiểm tra xem trước đó Bot có bẫy đôi không
+    board[row][col] = EMPTY;
+    const hadDoubleThreat = this.isPlayerDoubleThreat(board, botColor);
+    board[row][col] = playerColor;
+
+    // Nếu trước đó Bot có bẫy đôi và sau khi người chơi đánh Bot vẫn còn mối đe dọa thắng
+    if (hadDoubleThreat) {
+      const stillHasThreat = this.hasBotActiveThreat(board, botColor);
+      return stillHasThreat;
+    }
+    return false;
+  }
+
+  /**
+   * Kiểm tra xem người chơi có đánh ôm sát liên tiếp nhiều nước với Bot hay không
+   */
+  static isCloseCombatHug(
+    recentPlayerMoves: Array<{ row: number; col: number }>,
+    recentBotMoves: Array<{ row: number; col: number }>
+  ): boolean {
+    if (recentPlayerMoves.length < 6 || recentBotMoves.length < 6) return false;
+    const count = Math.min(recentPlayerMoves.length, recentBotMoves.length, 8);
+    for (let i = 0; i < count; i++) {
+      const p = recentPlayerMoves[recentPlayerMoves.length - 1 - i];
+      const b = recentBotMoves[recentBotMoves.length - 1 - i];
+      const dist = Math.max(Math.abs(p.row - b.row), Math.abs(p.col - b.col));
+      if (dist > 1) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Kiểm tra xem 2 nước đi liên tiếp của người chơi có cách xa nhau như 2 đầu bán cầu (> 8 ô) không
+   */
+  static isSplitBoardExpedition(
+    prevMove: { row: number; col: number } | null,
+    currMove: { row: number; col: number },
+    totalStones: number
+  ): boolean {
+    if (!prevMove || totalStones < 6) return false;
+    const dist = Math.max(Math.abs(prevMove.row - currMove.row), Math.abs(prevMove.col - currMove.col));
+    return dist >= 8;
+  }
+
+  /**
+   * Kiểm tra xem nước cờ vừa đánh có tạo thành cụm tam giác 3 ô bo kín (nhầm sang cờ vây) không
+   */
+  static isTriangleFormation(
+    board: BoardMatrix,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    const size = board.length;
+    // Kiểm tra 4 góc vuông tam giác 2x2 liền kề
+    const cornerOffsets = [
+      [[-1, 0], [0, -1]], // Trên & Trái
+      [[-1, 0], [0, 1]],  // Trên & Phải
+      [[1, 0], [0, -1]],  // Dưới & Trái
+      [[1, 0], [0, 1]],   // Dưới & Phải
+    ];
+
+    for (const [o1, o2] of cornerOffsets) {
+      const r1 = row + o1[0];
+      const c1 = col + o1[1];
+      const r2 = row + o2[0];
+      const c2 = col + o2[1];
+      if (
+        r1 >= 0 && r1 < size && c1 >= 0 && c1 < size && board[r1][c1] === playerColor &&
+        r2 >= 0 && r2 < size && c2 >= 0 && c2 < size && board[r2][c2] === playerColor
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 

@@ -180,6 +180,16 @@ const EVENT_CONTEXT_KEYWORDS: Partial<Record<TauntEvent, string[]>> = {
   IMMEDIATE_REVENGE_CLICK: ['bấm ván mới', 'nhanh', 'mắt cay', 'phục thù', 'máu nóng', 'tái đấu', 'nóng vội'],
   UNDO_BEFORE_AI_MOVES: ['undo', 'rút', 'đặt xuống', 'giật mình', 'hối hận', 'tay nhanh', 'than hồng', 'chớp mắt'],
   SOUND_SPAM_TOGGLE: ['âm thanh', 'loa', 'dj', 'quẩy', 'bật tắt', 'nút', 'mute', 'spam'],
+  FORK_ATTACK_DEFENSE_FAIL: ['nĩa đôi', 'bẫy 4-3', 'chặn nhầm', 'tử huyệt', 'hoa mắt', 'toang', 'hai đầu', 'giao điểm'],
+  CLOSE_COMBAT_HUG: ['ôm sát', 'bám đuôi', 'đỉa', 'dính', 'sát sạt', 'yêu', 'theo đuôi', 'kèm'],
+  SPLIT_BOARD_EXPEDITION: ['bán cầu', 'chi nhánh', 'xa xôi', 'thám hiểm', 'hai đầu', 'đối diện', 'du lịch', 'vũ trụ'],
+  TRIANGLE_FORMATION: ['tam giác', 'cờ vây', 'vây đất', 'nhầm game', 'khoanh vùng', '3 quân', 'bo góc'],
+  CLEAN_SWEEP_DOMINATION: ['nuốt trọn', 'áp đảo', 'không kịp thở', 'out trình', 'đỉnh', 'hack', 'bất khả chiến bại', 'sốc'],
+  IRON_CURTAIN_WIN: ['bê tông', 'cốt thép', 'lì đòn', 'tử thủ', 'phòng ngự', 'kiên trì', 'hết pin', 'dai'],
+  KEYBOARD_SMASH_SPAM: ['bàn phím', 'gõ phím', 'côm cốp', 'đập phím', 'audition', 'liên minh', 'spam', 'nát phím'],
+  RIGHT_CLICK_INSPECT: ['chuột phải', 'inspect', 'f12', 'cheat', 'sửa điểm', 'mã nguồn', 'hack'],
+  WINDOW_RESIZE_PANIC: ['thu nhỏ', 'phóng to', 'cửa sổ', 'màn hình', 'resize', 'sợ', 'thu hẹp'],
+  DRAG_SELECT_PANIC: ['bôi đen', 'quét chuột', 'chọn chữ', 'kéo rê', 'mật mã', 'rối loạn', 'hoang mang'],
 };
 
 const RHETORICAL_QUESTION_REGEX = /(à|hả|chứ|hay gì|sao|đúng không|phải không|nhỉ|cơ à|thế à|đâu|sao nổi)\s*\?*$/i;

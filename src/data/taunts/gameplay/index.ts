@@ -7,6 +7,8 @@ import { BOT_TRAP } from './botTrap';
 import { BOT_WIN } from './botWin';
 import { BOT_WIN_LEADING_SCORE } from './botWinLeadingScore';
 import { CENTER_MOVE } from './centerMove';
+import { CLEAN_SWEEP_DOMINATION } from './cleanSweepDomination';
+import { CLOSE_COMBAT_HUG } from './closeCombatHug';
 import { CLUTCH_100_STONES } from './clutch100Stones';
 import { COMEBACK_WIN } from './comebackWin';
 import { COPYCAT_MOVE } from './copycatMove';
@@ -15,7 +17,9 @@ import { DEAD_FOUR_BLOCKED } from './deadFourBlocked';
 import { DOUBLE_THREE_TRAP } from './doubleThreeTrap';
 import { EDGE_WALK_MOVE } from './edgeWalkMove';
 import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
+import { FORK_ATTACK_DEFENSE_FAIL } from './forkAttackDefenseFail';
 import { GAME_DRAW } from './gameDraw';
+import { IRON_CURTAIN_WIN } from './ironCurtainWin';
 import { ISOLATED_FAR_MOVE } from './isolatedFarMove';
 import { LONG_GAME } from './longGame';
 import { MISSED_WINNING_MOVE } from './missedWinningMove';
@@ -27,7 +31,9 @@ import { PLAYER_WIN } from './playerWin';
 import { PLAYER_WIN_WITH_UNDO } from './playerWinWithUndo';
 import { RUSH_MOVE } from './rushMove';
 import { SPEED_WIN_QUICK } from './speedWinQuick';
+import { SPLIT_BOARD_EXPEDITION } from './splitBoardExpedition';
 import { SURRENDER_ON_THREAT } from './surrenderOnThreat';
+import { TRIANGLE_FORMATION } from './triangleFormation';
 import { TURTLE_DEFENSE } from './turtleDefense';
 
 export * from './accidentalSelfBlock';
@@ -38,6 +44,8 @@ export * from './botTrap';
 export * from './botWin';
 export * from './botWinLeadingScore';
 export * from './centerMove';
+export * from './cleanSweepDomination';
+export * from './closeCombatHug';
 export * from './clutch100Stones';
 export * from './comebackWin';
 export * from './copycatMove';
@@ -46,7 +54,9 @@ export * from './deadFourBlocked';
 export * from './doubleThreeTrap';
 export * from './edgeWalkMove';
 export * from './fastMoveTaunt';
+export * from './forkAttackDefenseFail';
 export * from './gameDraw';
+export * from './ironCurtainWin';
 export * from './isolatedFarMove';
 export * from './longGame';
 export * from './missedWinningMove';
@@ -58,7 +68,9 @@ export * from './playerWin';
 export * from './playerWinWithUndo';
 export * from './rushMove';
 export * from './speedWinQuick';
+export * from './splitBoardExpedition';
 export * from './surrenderOnThreat';
+export * from './triangleFormation';
 export * from './turtleDefense';
 
 export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
@@ -70,6 +82,8 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   BOT_WIN,
   BOT_WIN_LEADING_SCORE,
   CENTER_MOVE,
+  CLEAN_SWEEP_DOMINATION,
+  CLOSE_COMBAT_HUG,
   CLUTCH_100_STONES,
   COMEBACK_WIN,
   COPYCAT_MOVE,
@@ -78,7 +92,9 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   DOUBLE_THREE_TRAP,
   EDGE_WALK_MOVE,
   FAST_MOVE_TAUNT,
+  FORK_ATTACK_DEFENSE_FAIL,
   GAME_DRAW,
+  IRON_CURTAIN_WIN,
   ISOLATED_FAR_MOVE,
   LONG_GAME,
   MISSED_WINNING_MOVE,
@@ -90,6 +106,8 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   PLAYER_WIN_WITH_UNDO,
   RUSH_MOVE,
   SPEED_WIN_QUICK,
+  SPLIT_BOARD_EXPEDITION,
   SURRENDER_ON_THREAT,
+  TRIANGLE_FORMATION,
   TURTLE_DEFENSE,
 };

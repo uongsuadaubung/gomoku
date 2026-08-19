@@ -1,5 +1,5 @@
 export type TauntEvent =
-  // 1. Gameplay (30 sự kiện)
+  // 1. Gameplay (36 sự kiện)
   | 'BOT_WIN'
   | 'PLAYER_WIN'
   | 'PLAYER_WIN_WITH_UNDO'
@@ -11,6 +11,12 @@ export type TauntEvent =
   | 'ACCIDENTAL_SELF_BLOCK'
   | 'DEAD_FOUR_BLOCKED'
   | 'SURRENDER_ON_THREAT'
+  | 'FORK_ATTACK_DEFENSE_FAIL'
+  | 'CLOSE_COMBAT_HUG'
+  | 'SPLIT_BOARD_EXPEDITION'
+  | 'TRIANGLE_FORMATION'
+  | 'CLEAN_SWEEP_DOMINATION'
+  | 'IRON_CURTAIN_WIN'
   | 'PLAYER_RESIGN'
   | 'PLAYER_UNDO'
   | 'BLUNDER_MOVE'
@@ -39,9 +45,13 @@ export type TauntEvent =
   | 'IDLE_AFTER_LOSS'
   | 'SUPER_SLOW_MOVE'
 
-  // 3. Interaction (18 sự kiện)
+  // 3. Interaction (22 sự kiện)
   | 'IMMEDIATE_REVENGE_CLICK'
   | 'UNDO_BEFORE_AI_MOVES'
+  | 'KEYBOARD_SMASH_SPAM'
+  | 'RIGHT_CLICK_INSPECT'
+  | 'WINDOW_RESIZE_PANIC'
+  | 'DRAG_SELECT_PANIC'
   | 'GAME_START'
   | 'PLAYER_GOOD_MOVE'
   | 'HESITATION_DANCE'
@@ -85,16 +95,16 @@ export type BotMood =
   | 'cool'        // 😎 Ngầu đét (Khai cuộc, bot tiên thủ, tăng độ khó)
   | 'evil'        // 😈 Ác quỷ mưu mô (Gài bẫy sát cục)
   | 'angry'       // 😤 Bực mình phì khói
-  | 'rage'        // 🤬 Nổi trận lôi đình (Bị chọc poke bot, spam nút)
-  | 'bored'       // 🥱 Ngáp ngủ (Nghĩ lâu, ván cờ dài 100 quân)
+  | 'rage'        // 🤬 Nổi trận lôi đình (Bị chọc poke bot, spam nút, đập phím)
+  | 'bored'       // 🥱 Ngáp ngủ (Nghĩ lâu, ván cờ 100 quân, đổ bê tông)
   | 'sleepy'      // 😴 Ngủ khò khò (AFK sâu, cày đêm khuya)
-  | 'shocked'     // 😳 Bất ngờ mở to mắt (Bẫy đôi 3-3, nước đi tốt)
+  | 'shocked'     // 😳 Bất ngờ mở to mắt (Bẫy đôi 3-3, nước đi tốt, clean sweep)
   | 'mindblown'   // 🤯 Choáng váng nổ đầu (Lội ngược dòng, ngắt chuỗi)
   | 'thinking'    // 🤔 Đăm chiêu suy nghĩ (Hover ngập ngừng)
-  | 'disdain'     // 😒 Khinh bỉ liếc xéo (Undo, dạt góc, dạt mép viền, hạ cấp)
+  | 'disdain'     // 😒 Khinh bỉ liếc xéo (Undo, dạt góc, dạt mép viền, hạ cấp, bám đuôi)
   | 'salute'      // 🫡 Chào tiễn biệt (Người chơi đầu hàng, thắng no-undo)
   | 'relieved'    // 😅 Cười trừ toát mồ hôi (Hòa cờ)
-  | 'detective'   // 🧐 Kính lúp soi xét (Xem luật, xem thống kê, đổi theme)
+  | 'detective'   // 🧐 Kính lúp soi xét (Xem luật, xem thống kê, đổi theme, inspect)
   | 'party'       // 🥳 Ăn mừng tưng bừng (Level up, marathon 10 ván)
   | 'shush';      // 🤫 Suỵt im lặng (Mute âm thanh)
 

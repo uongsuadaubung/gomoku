@@ -161,6 +161,10 @@ export const GameBoard: Component<GameBoardProps> = props => {
     <div class="w-full flex flex-col items-center justify-center select-none touch-manipulation">
       {/* Khung viền Bàn cờ chính */}
       <div
+        onContextMenu={e => {
+          e.preventDefault();
+          store.triggerTaunt('RIGHT_CLICK_INSPECT', 100);
+        }}
         class={`w-full max-w-[min(96vw,560px)] md:max-w-[600px] aspect-square p-2 sm:p-3.5 md:p-4 rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-300 shadow-2xl relative flex items-center justify-center ${themeClass()}`}
       >
         {/* Hệ thống 3x3 Grid khóa tọa độ tuyệt đối với lưới 15x15 */}
