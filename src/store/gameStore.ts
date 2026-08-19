@@ -227,8 +227,6 @@ export function createGameStore() {
       isPlayerTurn: () => currentTurn() === playerColor(),
       triggerTaunt,
     });
-
-    resetIdleTimer();
   });
 
   // Quản lý an toàn các Timeout bất đồng bộ để chống rò rỉ bộ nhớ (Ghost Timers)
@@ -374,6 +372,11 @@ export function createGameStore() {
    * (Nếu người chơi tắt cà khịa, câu thoại sẽ được chuyển đổi thành ký tự kiểm duyệt !@#$%^&*)
    */
   function triggerTaunt(event: TauntEvent, delayMs: number = 0) {
+    // VÔ HIỆU HÓA HOÀN TOÀN KHI Ở MENU CHÍNH
+    if (gameMode() === 'menu') {
+      return;
+    }
+
     if (delayMs > 0) {
       setSafeTimeout(() => triggerTaunt(event, 0), delayMs);
       return;
@@ -452,8 +455,10 @@ export function createGameStore() {
 
   function resetIdleTimer() {
     clearIdleTimer();
-
-    // Vòng lặp liên tục khi người chơi AFK: ngẫu nhiên từ 25 đến 35 giây một câu
+    // KHÔNG CHẠY IDLE TIMER KHI Ở MENU CHÍNH
+    if (gameMode() === 'menu') {
+      return;
+    }
     const getRandomInterval = () => 25000 + Math.floor(Math.random() * 10000); // 25s - 35s
 
     const scheduleNextIdleTaunt = (delay: number) => {

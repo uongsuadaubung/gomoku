@@ -32,6 +32,11 @@ export class BrowserListenerService {
 
     // 1. Phím tắt và spam gõ phím (CTRL_Z, DEVTOOLS, SCREENSHOT, SPACEBAR, KEYBOARD_SMASH)
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isGamePlaying()) return;
+
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+
       // Bắt phím tắt DevTools (F12, Ctrl+Shift+I/J/C, Ctrl+U)
       if (
         e.key === 'F12' ||
@@ -63,9 +68,6 @@ export class BrowserListenerService {
         }
       }
 
-      if (!isGamePlaying()) return;
-      const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
       if (interactionTracker.record('KEYBOARD_PRESS', 2000) >= 6) {
         interactionTracker.clearAction('KEYBOARD_PRESS');
         triggerTaunt('KEYBOARD_SMASH_SPAM', 100);
