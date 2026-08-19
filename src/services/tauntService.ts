@@ -448,6 +448,58 @@ export class TauntService {
     }
     return false;
   }
+  /**
+   * Kiểm tra xem người chơi vừa chặn đòn sát cục của Bot đồng thời tạo nước 4 đe dọa thắng ngược lại
+   */
+  static isBlockAndCounterFour(
+    previousBoard: BoardMatrix,
+    currentBoard: BoardMatrix,
+    botColor: ActivePlayer,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    // 1. Kiểm tra xem ô (row, col) trước đó có phải là điểm thắng của Bot không
+    previousBoard[row][col] = botColor;
+    const botWin = checkWin(previousBoard);
+    previousBoard[row][col] = EMPTY;
+
+    if (!botWin || botWin.winner !== botColor) return false;
+
+    // 2. Kiểm tra xem nước đi của Người chơi có tạo thành đòn đe dọa thắng (nước 4) của Người chơi không
+    return this.isPlayerThreatMove(currentBoard, playerColor);
+  }
+
+  /**
+   * Kiểm tra xem người chơi có bắt chước đối xứng 4 nước đầu rồi bất ngờ bẻ lái ở nước thứ 5 hay không
+   */
+  static isSymmetryBreakSurprise(
+    history: Array<{ row: number; col: number; player: ActivePlayer }>,
+    row: number,
+    col: number,
+    playerColor: ActivePlayer,
+    botColor: ActivePlayer
+  ): boolean {
+    const playerMoves = history.filter(h => h.player === playerColor);
+    const botMoves = history.filter(h => h.player === botColor);
+
+    // Kiểm tra đúng nước thứ 5 của người chơi
+    if (playerMoves.length !== 5 || botMoves.length < 4) return false;
+
+    // 4 nước đầu của người chơi có phải đều là đối xứng với nước đi trước đó của bot không
+    for (let i = 0; i < 4; i++) {
+      const pm = playerMoves[i];
+      const bm = botMoves[i];
+      if (!this.isMirrorMove(bm.row, bm.col, pm.row, pm.col)) {
+        return false;
+      }
+    }
+
+    // Nước thứ 5 hiện tại không còn là đối xứng nữa
+    const lastBotMove = botMoves[botMoves.length - 1];
+    const isStillMirror = this.isMirrorMove(lastBotMove.row, lastBotMove.col, row, col);
+    return !isStillMirror;
+  }
 }
 
 

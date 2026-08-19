@@ -1,5 +1,6 @@
 import type { TauntDefinition } from '../types';
 import { ACCIDENTAL_SELF_BLOCK } from './accidentalSelfBlock';
+import { BLOCK_AND_COUNTER_FOUR } from './blockAndCounterFour';
 import { BLOCK_WRONG_END } from './blockWrongEnd';
 import { BLUNDER_MOVE } from './blunderMove';
 import { BOT_BLOCK_THREAT } from './botBlockThreat';
@@ -11,6 +12,7 @@ import { CLEAN_SWEEP_DOMINATION } from './cleanSweepDomination';
 import { CLOSE_COMBAT_HUG } from './closeCombatHug';
 import { CLUTCH_100_STONES } from './clutch100Stones';
 import { COMEBACK_WIN } from './comebackWin';
+import { CONSECUTIVE_SPEED_LOSSES } from './consecutiveSpeedLosses';
 import { COPYCAT_MOVE } from './copycatMove';
 import { CORNER_MOVE } from './cornerMove';
 import { DEAD_FOUR_BLOCKED } from './deadFourBlocked';
@@ -29,14 +31,19 @@ import { PLAYER_STREAK_WIN } from './playerStreakWin';
 import { PLAYER_UNDO } from './playerUndo';
 import { PLAYER_WIN } from './playerWin';
 import { PLAYER_WIN_WITH_UNDO } from './playerWinWithUndo';
+import { REVENGE_WIN_AFTER_LOSS_STREAK } from './revengeWinAfterLossStreak';
 import { RUSH_MOVE } from './rushMove';
 import { SPEED_WIN_QUICK } from './speedWinQuick';
 import { SPLIT_BOARD_EXPEDITION } from './splitBoardExpedition';
+import { SURRENDER_AFTER_LONG_THINKING } from './surrenderAfterLongThinking';
 import { SURRENDER_ON_THREAT } from './surrenderOnThreat';
+import { SYMMETRY_BREAK_SURPRISE } from './symmetryBreakSurprise';
 import { TRIANGLE_FORMATION } from './triangleFormation';
 import { TURTLE_DEFENSE } from './turtleDefense';
+import { WIN_RIGHT_AFTER_UNDO } from './winRightAfterUndo';
 
 export * from './accidentalSelfBlock';
+export * from './blockAndCounterFour';
 export * from './blockWrongEnd';
 export * from './blunderMove';
 export * from './botBlockThreat';
@@ -48,6 +55,7 @@ export * from './cleanSweepDomination';
 export * from './closeCombatHug';
 export * from './clutch100Stones';
 export * from './comebackWin';
+export * from './consecutiveSpeedLosses';
 export * from './copycatMove';
 export * from './cornerMove';
 export * from './deadFourBlocked';
@@ -66,15 +74,20 @@ export * from './playerStreakWin';
 export * from './playerUndo';
 export * from './playerWin';
 export * from './playerWinWithUndo';
+export * from './revengeWinAfterLossStreak';
 export * from './rushMove';
 export * from './speedWinQuick';
 export * from './splitBoardExpedition';
+export * from './surrenderAfterLongThinking';
 export * from './surrenderOnThreat';
+export * from './symmetryBreakSurprise';
 export * from './triangleFormation';
 export * from './turtleDefense';
+export * from './winRightAfterUndo';
 
 export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   ACCIDENTAL_SELF_BLOCK,
+  BLOCK_AND_COUNTER_FOUR,
   BLOCK_WRONG_END,
   BLUNDER_MOVE,
   BOT_BLOCK_THREAT,
@@ -86,6 +99,7 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   CLOSE_COMBAT_HUG,
   CLUTCH_100_STONES,
   COMEBACK_WIN,
+  CONSECUTIVE_SPEED_LOSSES,
   COPYCAT_MOVE,
   CORNER_MOVE,
   DEAD_FOUR_BLOCKED,
@@ -104,10 +118,14 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   PLAYER_UNDO,
   PLAYER_WIN,
   PLAYER_WIN_WITH_UNDO,
+  REVENGE_WIN_AFTER_LOSS_STREAK,
   RUSH_MOVE,
   SPEED_WIN_QUICK,
   SPLIT_BOARD_EXPEDITION,
+  SURRENDER_AFTER_LONG_THINKING,
   SURRENDER_ON_THREAT,
+  SYMMETRY_BREAK_SURPRISE,
   TRIANGLE_FORMATION,
   TURTLE_DEFENSE,
+  WIN_RIGHT_AFTER_UNDO,
 };

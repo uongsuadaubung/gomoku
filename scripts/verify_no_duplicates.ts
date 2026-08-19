@@ -190,6 +190,18 @@ const EVENT_CONTEXT_KEYWORDS: Partial<Record<TauntEvent, string[]>> = {
   RIGHT_CLICK_INSPECT: ['chuột phải', 'inspect', 'f12', 'cheat', 'sửa điểm', 'mã nguồn', 'hack'],
   WINDOW_RESIZE_PANIC: ['thu nhỏ', 'phóng to', 'cửa sổ', 'màn hình', 'resize', 'sợ', 'thu hẹp'],
   DRAG_SELECT_PANIC: ['bôi đen', 'quét chuột', 'chọn chữ', 'kéo rê', 'mật mã', 'rối loạn', 'hoang mang'],
+  SURRENDER_AFTER_LONG_THINKING: ['ngâm cờ', 'suy nghĩ', '40 giây', 'đầu hàng', 'đăm chiêu', 'nghĩ lâu', 'cuối cùng', 'nhận thua'],
+  BLOCK_AND_COUNTER_FOUR: ['phản công', 'chặn', 'nước 4', 'họng pháo', 'vừa thủ', 'vừa công', 'ảo ma', 'phản đòn'],
+  REVENGE_WIN_AFTER_LOSS_STREAK: ['phục thù', '3 ván', 'chuỗi thua', 'oanh liệt', 'tinh thần thép', 'lội ngược dòng', 'nợ'],
+  CONSECUTIVE_SPEED_LOSSES: ['liên tiếp', 'tốc hành', 'ấm nước', '12 nước', 'chớp nhoáng', 'guinness', 'ăn hành', 'nhanh'],
+  SYMMETRY_BREAK_SURPRISE: ['đối xứng', 'bắt chước', 'bẻ lái', 'bẻ hướng', 'ru ngủ', 'lừa tình', 'bất ngờ', 'chiêu bài'],
+  WIN_RIGHT_AFTER_UNDO: ['undo', 'đi lại', 'cỗ máy thời gian', 'thắng', 'quay ngược', 'doraemon', 'thực lực', 'ăn may'],
+  HOVER_UNDO_HESITATION: ['rê chuột', 'ngập ngừng', 'undo', 'do dự', 'rút tay', 'xấu hổ', 'đấu tranh', 'đi lại'],
+  RESIGN_WHILE_AI_THINKING: ['đầu hàng', 'đang tính', 'suy nghĩ', 'kết liễu', 'vội vàng', 'sát cục', 'tiết kiệm'],
+  CLICK_OWN_STONE: ['quân cờ', 'chính mình', 'nhấc quân', 'cờ tướng', 'bấm nhầm', 'quân mình', 'vô thức'],
+  MOUSE_LEAVE_VIEWPORT: ['buông chuột', 'ngả lưng', 'màn hình', 'khoanh tay', 'rời khỏi', 'đại kiện tướng', 'uống nước'],
+  RAPID_THEME_CYCLING: ['thời trang', 'thử theme', 'đổi màu', 'gỗ', 'giấy', 'ngọc', 'cyber', 'slate', 'liên tục'],
+  SWITCH_BOARD_STYLE_MID_GAME: ['đổi chế độ', 'giữa ô', 'giao điểm', 'đường kẻ', 'hoa mắt', 'giữa trận', 'bàn cờ'],
 };
 
 const RHETORICAL_QUESTION_REGEX = /(à|hả|chứ|hay gì|sao|đúng không|phải không|nhỉ|cơ à|thế à|đâu|sao nổi)\s*\?*$/i;

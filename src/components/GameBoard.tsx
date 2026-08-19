@@ -105,7 +105,11 @@ export const GameBoard: Component<GameBoardProps> = props => {
       return;
     }
     if (store.board()[r][c] !== EMPTY) {
-      store.triggerTaunt('CLICK_OCCUPIED_CELL', 100);
+      if (store.board()[r][c] === store.playerColor()) {
+        store.triggerTaunt('CLICK_OWN_STONE', 100);
+      } else {
+        store.triggerTaunt('CLICK_OCCUPIED_CELL', 100);
+      }
       return;
     }
     store.makePlayerMove(r, c);

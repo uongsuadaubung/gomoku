@@ -8,10 +8,12 @@ import { LATE_NIGHT_PLAY } from './lateNightPlay';
 import { OPEN_BOT_MODAL } from './openBotModal';
 import { OPEN_RULES } from './openRules';
 import { OPEN_STATS } from './openStats';
+import { RAPID_THEME_CYCLING } from './rapidThemeCycling';
 import { RESET_STATS } from './resetStats';
 import { SOUND_MUTE } from './soundMute';
 import { SOUND_SPAM_TOGGLE } from './soundSpamToggle';
 import { SOUND_UNMUTE } from './soundUnmute';
+import { SWITCH_BOARD_STYLE_MID_GAME } from './switchBoardStyleMidGame';
 import { TAB_BLUR } from './tabBlur';
 import { TAB_FOCUS } from './tabFocus';
 import { THEME_CHANGE } from './themeChange';
@@ -26,10 +28,12 @@ export * from './lateNightPlay';
 export * from './openBotModal';
 export * from './openRules';
 export * from './openStats';
+export * from './rapidThemeCycling';
 export * from './resetStats';
 export * from './soundMute';
 export * from './soundSpamToggle';
 export * from './soundUnmute';
+export * from './switchBoardStyleMidGame';
 export * from './tabBlur';
 export * from './tabFocus';
 export * from './themeChange';
@@ -45,10 +49,12 @@ export const SYSTEM_TAUNTS: Record<string, TauntDefinition> = {
   OPEN_BOT_MODAL,
   OPEN_RULES,
   OPEN_STATS,
+  RAPID_THEME_CYCLING,
   RESET_STATS,
   SOUND_MUTE,
   SOUND_SPAM_TOGGLE,
   SOUND_UNMUTE,
+  SWITCH_BOARD_STYLE_MID_GAME,
   TAB_BLUR,
   TAB_FOCUS,
   THEME_CHANGE,

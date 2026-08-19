@@ -69,12 +69,16 @@ export function createGameStore() {
   let lastActionTauntTime: number = 0;
   let lastGameOverTimestamp: number = 0;
   let lastPlayerMoveTimestamp: number = 0;
-  let hasTriggeredStareAtWinLine: boolean = false;
-  let recentSoundToggleTimestamps: number[] = [];
   let hadHighAiAdvantage: boolean = false;
   let botEverHadOpenThreat: boolean = false;
+  let wasLastGameSpeedLoss: boolean = false;
+  let wasUndoJustUsed: boolean = false;
+  let recentThemeChangeTimestamps: number[] = [];
+  let recentSoundToggleTimestamps: number[] = [];
+  let mouseLeaveTimer: number | null = null;
   let undoCountInMatch: number = 0;
   let sessionGamesCount: number = 0;
+  let hasTriggeredStareAtWinLine: boolean = false;
   const IDLE_EVENTS: TauntEvent[] = [
     'IDLE_IN_GAME',
     'IDLE_THINKING',
@@ -154,6 +158,12 @@ export function createGameStore() {
     const botMoves = history.filter(m => m.player === ai).map(m => ({ row: m.row, col: m.col }));
     const lastPlayerMove = playerMoves.length >= 2 ? playerMoves[playerMoves.length - 2] : null;
 
+    if (TauntService.isBlockAndCounterFour(prevBoard, nextBoard, ai, player, row, col)) {
+      return 'BLOCK_AND_COUNTER_FOUR';
+    }
+    if (TauntService.isSymmetryBreakSurprise(history, row, col, player, ai)) {
+      return 'SYMMETRY_BREAK_SURPRISE';
+    }
     if (TauntService.hasMissedWinningMove(prevBoard, player, row, col)) {
       return 'MISSED_WINNING_MOVE';
     }
@@ -199,12 +209,13 @@ export function createGameStore() {
     undoCount: number,
     prevStats: UserStats
   ): TauntEvent {
+    if (wasUndoJustUsed) return 'WIN_RIGHT_AFTER_UNDO';
     if (moveCount <= 10) return 'SPEED_WIN_QUICK';
     if (moveCount >= 50) return 'IRON_CURTAIN_WIN';
     if (!botEverHadOpenThreat && moveCount >= 10) return 'CLEAN_SWEEP_DOMINATION';
     if (hadComeback) return 'COMEBACK_WIN';
     if (undoCount === 0 && moveCount >= 14) return 'NO_UNDO_WIN';
-    if (prevStats.losses >= 3 && prevStats.currentStreak === 0) return 'BREAK_LOSS_STREAK';
+    if (prevStats.losses >= 3 && prevStats.currentStreak === 0) return 'REVENGE_WIN_AFTER_LOSS_STREAK';
     if (isPlayerInWinStreak(2)) return 'PLAYER_STREAK_WIN';
     return 'PLAYER_WIN';
   }
@@ -213,6 +224,7 @@ export function createGameStore() {
    * Đánh giá kịch bản khi Bot giành chiến thắng
    */
   function evaluateBotWinTaunt(moveCount: number): TauntEvent {
+    if (moveCount <= 12 && wasLastGameSpeedLoss) return 'CONSECUTIVE_SPEED_LOSSES';
     if (moveCount <= 10) return 'SPEED_WIN_QUICK';
     if (isPlayerInHeavyLossStreak()) return 'STREAK_LOSS';
     return 'BOT_WIN';
@@ -294,14 +306,36 @@ export function createGameStore() {
       }
     };
 
+    // 4. Bắt tương tác chuột rời màn hình quá 15s (MOUSE_LEAVE_VIEWPORT)
+    const handleMouseLeave = () => {
+      if (gameStatus() !== 'playing' || currentTurn() !== playerColor()) return;
+      if (mouseLeaveTimer) clearTimeout(mouseLeaveTimer);
+      mouseLeaveTimer = window.setTimeout(() => {
+        if (gameStatus() === 'playing' && currentTurn() === playerColor()) {
+          triggerTaunt('MOUSE_LEAVE_VIEWPORT', 200);
+        }
+      }, 15000);
+    };
+
+    const handleMouseEnter = () => {
+      if (mouseLeaveTimer) {
+        clearTimeout(mouseLeaveTimer);
+        mouseLeaveTimer = null;
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('resize', handleResize);
     document.addEventListener('selectionchange', handleSelectionChange);
+    document.documentElement.addEventListener('mouseleave', handleMouseLeave);
+    document.documentElement.addEventListener('mouseenter', handleMouseEnter);
 
     removeEventListeners = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('selectionchange', handleSelectionChange);
+      document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
+      document.documentElement.removeEventListener('mouseenter', handleMouseEnter);
     };
 
     resetIdleTimer();
@@ -473,6 +507,7 @@ export function createGameStore() {
     soundService.playClickSound();
     hadHighAiAdvantage = false;
     botEverHadOpenThreat = false;
+    wasUndoJustUsed = false;
     undoCountInMatch = 0;
     hasTriggeredStareAtWinLine = false;
 
@@ -817,6 +852,7 @@ export function createGameStore() {
       triggerConfetti();
       const newStats = StorageService.recordGame('win');
       setStats(newStats);
+      wasLastGameSpeedLoss = false;
 
       // Đánh giá kịch bản thắng của Người chơi
       const winTaunt = evaluatePlayerWinTaunt(moveCount, hadHighAiAdvantage, undoCountInMatch, prevStats);
@@ -839,9 +875,11 @@ export function createGameStore() {
 
       // Đánh giá kịch bản thắng của Bot
       const botWinTaunt = evaluateBotWinTaunt(moveCount);
+      wasLastGameSpeedLoss = moveCount <= 12;
       triggerTaunt(botWinTaunt, 400);
     } else {
       // Hòa
+      wasLastGameSpeedLoss = false;
       const newStats = StorageService.recordGame('draw');
       setStats(newStats);
       triggerTaunt('GAME_DRAW', 400);
@@ -858,7 +896,8 @@ export function createGameStore() {
     if (gameStatus() !== 'playing') return;
     clearIdleTimer();
 
-    if (worker && isAiThinking()) {
+    const isAiThinkingWhenResigning = isAiThinking();
+    if (worker && isAiThinkingWhenResigning) {
       worker.postMessage({ type: 'CANCEL' });
       setIsAiThinking(false);
     }
@@ -867,8 +906,15 @@ export function createGameStore() {
     setIsSeriesActive(false);
     setLastResigned(true);
 
+    const now = Date.now();
+    const isLongThinking = now - lastPlayerMoveTimestamp >= 35000;
     const hasThreat = TauntService.hasBotActiveThreat(board(), aiColor());
-    if (hasThreat) {
+
+    if (isAiThinkingWhenResigning) {
+      triggerTaunt('RESIGN_WHILE_AI_THINKING', 200);
+    } else if (isLongThinking) {
+      triggerTaunt('SURRENDER_AFTER_LONG_THINKING', 200);
+    } else if (hasThreat) {
       triggerTaunt('SURRENDER_ON_THREAT', 200);
     } else {
       triggerTaunt('PLAYER_RESIGN', 200);
@@ -905,6 +951,7 @@ export function createGameStore() {
     const history = moveHistory();
     if (history.length === 0) return;
     undoCountInMatch++;
+    wasUndoJustUsed = true;
 
     const currentBoard = createEmptyBoard();
     let stepsToUndo = 1;
@@ -916,7 +963,6 @@ export function createGameStore() {
     }
 
     const remainingHistory = history.slice(0, history.length - stepsToUndo);
-
 
     // Tái dựng lại bàn cờ từ lịch sử còn lại
     remainingHistory.forEach(item => {
@@ -986,10 +1032,19 @@ export function createGameStore() {
    * Đổi theme bàn cờ
    */
   function setTheme(t: ThemeType) {
+    const now = Date.now();
+    recentThemeChangeTimestamps = recentThemeChangeTimestamps.filter(ts => now - ts < 5000);
+    recentThemeChangeTimestamps.push(now);
+
     setThemeState(t);
     StorageService.setTheme(t);
     soundService.playClickSound();
-    triggerTaunt(isDesperateThemeSwapContext() ? 'DESPERATE_THEME_SWAP' : 'THEME_CHANGE', 200);
+
+    if (recentThemeChangeTimestamps.length >= 3) {
+      triggerTaunt('RAPID_THEME_CYCLING', 200);
+    } else {
+      triggerTaunt(isDesperateThemeSwapContext() ? 'DESPERATE_THEME_SWAP' : 'THEME_CHANGE', 200);
+    }
   }
 
   /**
@@ -999,7 +1054,11 @@ export function createGameStore() {
     setBoardStyleState(s);
     StorageService.setBoardStyle(s);
     soundService.playClickSound();
-    triggerTaunt('BOARD_STYLE_CHANGE', 200);
+    if (gameStatus() === 'playing' && moveHistory().length >= 6) {
+      triggerTaunt('SWITCH_BOARD_STYLE_MID_GAME', 200);
+    } else {
+      triggerTaunt('BOARD_STYLE_CHANGE', 200);
+    }
   }
 
   /**

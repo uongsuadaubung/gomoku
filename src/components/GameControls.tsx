@@ -31,6 +31,20 @@ export const GameControls: Component<GameControlsProps> = props => {
   const nextSideText = () =>
     store.nextSeriesPlayerSide() ? 'Bạn Đi Trước (Quân Đen)' : 'Bot Đi Trước (Quân Đen)';
 
+  let undoHoverStartTime = 0;
+
+  const handleUndoMouseEnter = () => {
+    if (!canUndo()) return;
+    undoHoverStartTime = Date.now();
+  };
+
+  const handleUndoMouseLeave = () => {
+    if (undoHoverStartTime > 0 && Date.now() - undoHoverStartTime >= 2000 && isMatchActive()) {
+      store.triggerTaunt('HOVER_UNDO_HESITATION', 200);
+    }
+    undoHoverStartTime = 0;
+  };
+
   return (
     <div class="w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3 transition-all">
       {/* 1. TRẠNG THÁI TRẬN ĐẤU ĐANG DIỄN RA */}
@@ -39,8 +53,7 @@ export const GameControls: Component<GameControlsProps> = props => {
           {/* Nút Nhận Thua */}
           <button
             onClick={() => store.resignGame()}
-            disabled={store.isAiThinking()}
-            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-sm shadow-md shadow-rose-950/40 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-sm shadow-md shadow-rose-950/40 active:scale-95 transition-all"
             title="Đầu hàng và nhận thua ván đấu"
           >
             <Flag size={16} />
@@ -49,7 +62,12 @@ export const GameControls: Component<GameControlsProps> = props => {
 
           {/* Nút Đi Lại (Undo) */}
           <button
-            onClick={() => store.undoMove()}
+            onClick={() => {
+              undoHoverStartTime = 0;
+              store.undoMove();
+            }}
+            onMouseEnter={handleUndoMouseEnter}
+            onMouseLeave={handleUndoMouseLeave}
             disabled={!canUndo()}
             class={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all border ${
               canUndo()
