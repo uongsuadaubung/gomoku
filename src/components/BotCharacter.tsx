@@ -67,6 +67,10 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
   // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại (17 sắc thái cà khịa & gáy bẩn)
   const moodEmoji = () => {
+    // Nếu người chơi tắt cà khịa trong Cài đặt -> Hiển thị icon bịt miệng cấm nói
+    if (!store.enableTaunts()) {
+      return '🤐';
+    }
     if (!taunt().visible) return config().avatar;
     const m: BotMood = taunt().mood;
     switch (m) {
@@ -111,6 +115,9 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
   // Hiệu ứng chuyển động Avatar theo tâm trạng
   const moodAnimation = () => {
+    if (!store.enableTaunts()) {
+      return taunt().visible ? 'scale-105 animate-bubble-shake' : 'group-hover:scale-105 opacity-80';
+    }
     if (!taunt().visible) return 'group-hover:scale-105';
     const m: BotMood = taunt().mood;
     switch (m) {
@@ -140,6 +147,14 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
   // Phong cách & Màu sắc Bong bóng thoại thích ứng theo Mood
   const bubbleTheme = () => {
+    // Phong cách đặc biệt khi Bot bị bịt miệng (Censored Theme)
+    if (!store.enableTaunts()) {
+      return {
+        box: 'bg-gradient-to-r from-slate-950 via-zinc-900 to-slate-950 text-rose-400 border-2 border-rose-500/70 shadow-rose-950/60 font-mono tracking-wider',
+        arrow: 'bg-slate-950 border-l-2 border-b-2 border-rose-500/70',
+      };
+    }
+
     const m: BotMood = taunt().mood;
     switch (m) {
       case 'rage':
@@ -195,13 +210,13 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
   return (
     <div class="w-full max-w-[min(96vw,560px)] md:max-w-[600px] flex items-center justify-start gap-2.5 sm:gap-3.5 relative select-none min-h-[52px]">
-      {/* 🤖 ICON BOT TƯƠNG TÁC (Lệch trái, giữ trọn 18 biểu cảm) */}
+      {/* 🤖 ICON BOT TƯƠNG TÁC (Lệch trái, hỗ trợ chế độ Bịt miệng 🤐) */}
       <button
         onClick={handlePoke}
         class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-lg transition-all duration-300 active:scale-90 cursor-pointer select-none shrink-0 ${
           taunt().visible ? 'ring-2 ring-amber-400 shadow-amber-500/30' : ''
         }`}
-        title="Chọc đối thủ để nghe cà khịa"
+        title={store.enableTaunts() ? 'Chọc đối thủ để nghe cà khịa' : 'Bot đang bị bịt miệng (Cà khịa đang TẮT)'}
       >
         {/* Avatar Icon */}
         <div

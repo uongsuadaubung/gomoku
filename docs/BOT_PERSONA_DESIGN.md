@@ -119,6 +119,13 @@ Toàn bộ 132 sự kiện được phân bổ vào **17 sắc thái cảm xúc*
 - **`bored` / `sleepy`**: Gradient Đêm Trầm Lặng (`from-slate-800 via-slate-700 to-slate-800 text-slate-100`).
 - **`chill`**: Gradient Xanh Ngọc Thư Thái (`from-emerald-600 via-teal-500 to-cyan-600 text-white`).
 
+### 4.3. Chế độ Bịt miệng Kiểm duyệt (Censored / Grawlix Mode)
+- Khi người chơi tắt tính năng cà khịa trong Cài đặt (`enableTaunts = false`):
+  - **Sự kiện & Trí nhớ vẫn chạy ngầm 100%**: Bot vẫn theo dõi mọi hành vi và kích hoạt sự kiện đúng thời điểm.
+  - **Biểu tượng Avatar**: Tự động chuyển thành **Icon Kéo Khóa Miệng `🤐`** kèm hiệu ứng rung lắc bực tức vì bị cấm khẩu (`scale-105 animate-bubble-shake`).
+  - **Mã hóa câu thoại (Grawlix Censor)**: Thuật toán `TauntService.censorToGrawlix()` chuyển đổi toàn bộ từ ngữ thành các ký tự `!@#$#%$&%*` nhưng vẫn giữ nguyên dấu câu và nhịp điệu phát ngôn.
+  - **Giao diện Bong bóng thoại**: Tông màu đen - đỏ than kiểm duyệt (`bg-slate-950 text-rose-400 border-rose-500 font-mono tracking-wider`).
+
 ---
 
 ## 📈 5. THÔNG SỐ KIỂM TOÁN CHẤT LƯỢNG (AUDIT METRICS)

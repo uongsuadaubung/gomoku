@@ -217,10 +217,9 @@ export function createGameStore() {
 
   /**
    * Kích hoạt một câu cà khịa từ đối thủ với cơ chế chống ghi đè ưu tiên
+   * (Nếu người chơi tắt cà khịa, câu thoại sẽ được chuyển đổi thành ký tự kiểm duyệt !@#$%^&*)
    */
   function triggerTaunt(event: TauntEvent, delayMs: number = 0) {
-    if (!enableTaunts()) return;
-
     if (delayMs > 0) {
       setTimeout(() => triggerTaunt(event, 0), delayMs);
       return;
@@ -252,8 +251,12 @@ export function createGameStore() {
       botWins: currentStats.losses,
       playerWins: currentStats.wins,
     });
+
+    const isSilenced = !enableTaunts();
+    const finalText = isSilenced ? TauntService.censorToGrawlix(item.text) : item.text;
+
     setTauntState({
-      text: item.text,
+      text: finalText,
       mood: item.mood,
       visible: true,
       id: Date.now(),
@@ -275,7 +278,6 @@ export function createGameStore() {
 
   function resetIdleTimer() {
     clearIdleTimer();
-    if (!enableTaunts()) return;
 
     // Vòng lặp liên tục khi người chơi AFK: ngẫu nhiên từ 25 đến 35 giây một câu
     const getRandomInterval = () => 25000 + Math.floor(Math.random() * 10000); // 25s - 35s

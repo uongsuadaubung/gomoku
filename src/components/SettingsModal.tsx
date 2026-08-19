@@ -220,7 +220,7 @@ export const SettingsModal: Component<SettingsModalProps> = props => {
                   <MessageSquareQuote size={18} class="text-rose-400" />
                   <div>
                     <span class="text-xs font-bold text-white block">Lời thoại cà khịa của Bot</span>
-                    <span class="text-[11px] text-slate-400">Bong bóng chat trêu chọc và khiêu khích trong trận</span>
+                    <span class="text-[11px] text-slate-400">BẬT để nghe gáy bẩn (TẮT sẽ bịt miệng Bot thành ký tự !@#$#%$&%*)</span>
                   </div>
                 </div>
 

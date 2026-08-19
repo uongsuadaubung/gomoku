@@ -90,6 +90,34 @@ export class TauntService {
     };
   }
 
+  /**
+   * Chuyển đổi một câu thoại thành chuỗi ký tự kiểm duyệt (!@#$%^&*) khi người chơi tắt cà khịa
+   */
+  static censorToGrawlix(text: string): string {
+    const GRAWLIX_CHARS = ['!', '@', '#', '$', '%', '^', '&', '*'];
+    return text
+      .split(' ')
+      .map(word => {
+        let endingPunctuation = '';
+        let cleanWord = word;
+        while (cleanWord.length > 0 && /[.?!,;:~]/.test(cleanWord[cleanWord.length - 1])) {
+          endingPunctuation = cleanWord[cleanWord.length - 1] + endingPunctuation;
+          cleanWord = cleanWord.slice(0, -1);
+        }
+
+        if (cleanWord.length === 0) return endingPunctuation;
+
+        let grawlix = '';
+        for (let i = 0; i < cleanWord.length; i++) {
+          const charCode = cleanWord.charCodeAt(i);
+          const charIdx = (charCode + i * 3) % GRAWLIX_CHARS.length;
+          grawlix += GRAWLIX_CHARS[charIdx];
+        }
+        return grawlix + endingPunctuation;
+      })
+      .join(' ');
+  }
+
 
   /**
    * Kiểm tra xem người chơi vừa đi một nước ngáo (bỏ sót nước 4 hoặc 3 mở của Bot) không
