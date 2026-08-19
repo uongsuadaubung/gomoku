@@ -1,12 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const projectSrc = path.resolve(__dirname, '../src/data/taunts');
-const files = ['idleTaunts.ts', 'gameplayTaunts.ts', 'interactionTaunts.ts', 'systemTaunts.ts'];
+import { TAUNT_DATABASE } from '../src/data/taunts';
 
 function normalizeText(s: string): string {
   return s
@@ -39,66 +31,46 @@ let nearDuplicatesCount = 0;
 let botKeywordCount = 0;
 const duplicateReport: string[] = [];
 
-for (const fileName of files) {
-  const filePath = path.join(projectSrc, fileName);
-  if (!fs.existsSync(filePath)) {
-    console.error(`Không tìm thấy file: ${filePath}`);
-    continue;
+for (const [categoryName, lines] of Object.entries(TAUNT_DATABASE)) {
+  totalSentences += lines.length;
+
+  // 1. Kiểm tra trùng lặp chính xác
+  const exactSet = new Set<string>();
+  for (const line of lines) {
+    if (exactSet.has(line)) {
+      exactDuplicatesCount++;
+      duplicateReport.push(`[Trùng chính xác] [${categoryName}] ${line}`);
+    }
+    exactSet.add(line);
+
+    // Kiểm tra từ khóa bot/gomoku ai (tránh bắt nhầm từ 'ai' tiếng Việt)
+    if (/\b(bot|gomoku ai)\b/i.test(line) || /\bAI\b/.test(line)) {
+      botKeywordCount++;
+      duplicateReport.push(`[Từ khóa Bot/AI] [${categoryName}] ${line}`);
+    }
   }
 
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const categoryRegex = /([A-Z0-9_]+):\s*\[([\s\S]*?)\]/g;
-  let match;
-
-  while ((match = categoryRegex.exec(content)) !== null) {
-    const categoryName = match[1];
-    const body = match[2];
-
-    const lines = body
-      .split('\n')
-      .map((l: string) => l.trim())
-      .filter((l: string) => l.startsWith("'") || l.startsWith('"'))
-      .map((l: string) => l.replace(/^['"]|['"],?$/g, '').replace(/\\'/g, "'"));
-
-    totalSentences += lines.length;
-
-    // 1. Kiểm tra trùng lặp chính xác
-    const exactSet = new Set<string>();
-    for (const line of lines) {
-      if (exactSet.has(line)) {
-        exactDuplicatesCount++;
-        duplicateReport.push(`[Trùng chính xác] [${categoryName}] ${line}`);
-      }
-      exactSet.add(line);
-
-      // Kiểm tra từ khóa bot/gomoku ai (tránh bắt nhầm từ 'ai' tiếng Việt)
-      if (/\b(bot|gomoku ai)\b/i.test(line) || /\bAI\b/.test(line)) {
-        botKeywordCount++;
-        duplicateReport.push(`[Từ khóa Bot/AI] [${categoryName}] ${line}`);
+  // 2. Kiểm tra trùng lặp na ná (> 75% tương đồng từ vựng)
+  const wordSets: { raw: string; set: Set<string> }[] = [];
+  for (const line of lines) {
+    const set = normalizeWords(line);
+    for (const existing of wordSets) {
+      const sim = jaccardSimilarity(set, existing.set);
+      if (sim >= 0.75) {
+        nearDuplicatesCount++;
+        duplicateReport.push(
+          `[Trùng na ná (${Math.round(sim * 100)}%)] [${categoryName}]\n  1: "${line}"\n  2: "${existing.raw}"`
+        );
+        break;
       }
     }
-
-    // 2. Kiểm tra trùng lặp na ná (> 75% tương đồng từ vựng)
-    const wordSets: { raw: string; set: Set<string> }[] = [];
-    for (const line of lines) {
-      const set = normalizeWords(line);
-      for (const existing of wordSets) {
-        const sim = jaccardSimilarity(set, existing.set);
-        if (sim >= 0.75) {
-          nearDuplicatesCount++;
-          duplicateReport.push(
-            `[Trùng na ná (${Math.round(sim * 100)}%)] [${categoryName}]\n  1: "${line}"\n  2: "${existing.raw}"`
-          );
-          break;
-        }
-      }
-      wordSets.push({ raw: line, set });
-    }
+    wordSets.push({ raw: line, set });
   }
 }
 
 console.log('==============================================');
 console.log('📊 KẾT QUẢ KIỂM TOÁN DỮ LIỆU KHO THOẠI:');
+console.log(`- Tổng số sự kiện đã quét: ${Object.keys(TAUNT_DATABASE).length}`);
 console.log(`- Tổng số câu thoại đã quét: ${totalSentences}`);
 console.log(`- Số câu trùng lặp chính xác (100%): ${exactDuplicatesCount}`);
 console.log(`- Số câu trùng lặp na ná (>= 75%): ${nearDuplicatesCount}`);
