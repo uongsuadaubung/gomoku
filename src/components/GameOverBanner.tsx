@@ -128,7 +128,7 @@ export const GameOverBanner: Component<GameOverBannerProps> = props => {
             {/* Nút Ván Tiếp Theo */}
             <button
               onClick={handleNextGame}
-              class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
+              class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
             >
               <Play size={18} fill="currentColor" />
               <span>Ván Tiếp Theo</span>

@@ -21,12 +21,45 @@ export const Header: Component<HeaderProps> = props => {
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
         {/* Logo & Title */}
         <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-          <div class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-md shadow-amber-500/20">
-            <span class="text-base sm:text-lg font-black text-slate-950">G</span>
+          <div class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-md shadow-amber-500/20 p-1">
+            <svg viewBox="0 0 512 512" class="w-full h-full drop-shadow">
+              <defs>
+                <radialGradient id="headerBlackStone" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#64748b"/>
+                  <stop offset="30%" stop-color="#334155"/>
+                  <stop offset="70%" stop-color="#0f172a"/>
+                  <stop offset="100%" stop-color="#020617"/>
+                </radialGradient>
+                <radialGradient id="headerWhiteStone" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="50%" stop-color="#f8fafc"/>
+                  <stop offset="80%" stop-color="#cbd5e1"/>
+                  <stop offset="100%" stop-color="#94a3b8"/>
+                </radialGradient>
+              </defs>
+              {/* Mini Grid */}
+              <g stroke="#451a03" stroke-width="12" opacity="0.6">
+                <line x1="120" y1="170" x2="392" y2="170"/>
+                <line x1="120" y1="256" x2="392" y2="256"/>
+                <line x1="120" y1="342" x2="392" y2="342"/>
+                <line x1="170" y1="120" x2="170" y2="392"/>
+                <line x1="256" y1="120" x2="256" y2="392"/>
+                <line x1="342" y1="120" x2="342" y2="392"/>
+              </g>
+              {/* Black Stone */}
+              <circle cx="190" cy="320" r="75" fill="url(#headerBlackStone)"/>
+              <ellipse cx="170" cy="295" rx="28" ry="16" fill="#ffffff" opacity="0.3" transform="rotate(-30 170 295)"/>
+              {/* White Stone */}
+              <circle cx="320" cy="190" r="75" fill="url(#headerWhiteStone)"/>
+              <ellipse cx="300" cy="165" rx="30" ry="19" fill="#ffffff" opacity="0.8" transform="rotate(-30 300 165)"/>
+              {/* Star Sparkle */}
+              <path d="M256 210 Q260 245 295 256 Q260 267 256 302 Q252 267 217 256 Q252 245 256 210Z" fill="#fbbf24"/>
+              <circle cx="256" cy="256" r="7" fill="#ffffff"/>
+            </svg>
           </div>
-          <h1 class="hidden sm:flex text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-white items-center gap-1">
-            <span>Gomoku</span>
-            <span class="text-amber-400">Master</span>
+          <h1 class="hidden sm:flex text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-white items-center gap-0.5">
+            <span class="tracking-tight">GoMock</span>
+            <span class="text-amber-400 font-black">U</span>
           </h1>
         </div>
 

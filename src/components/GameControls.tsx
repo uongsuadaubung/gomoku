@@ -98,7 +98,7 @@ export const GameControls: Component<GameControlsProps> = props => {
           {/* Nút Ván Tiếp Theo (Tự động đảo bên) */}
           <button
             onClick={() => store.startNextGame()}
-            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer animate-start-pulse"
           >
             <Play size={16} fill="currentColor" />
             <span>Ván Tiếp Theo</span>
@@ -126,7 +126,7 @@ export const GameControls: Component<GameControlsProps> = props => {
 
       {/* 3. TRẠNG THÁI BẮT ĐẦU (Lần đầu vào game hoặc sau khi đầu hàng) */}
       <Show when={!isMatchActive() && (!store.isSeriesActive() || store.lastResigned())}>
-        <div class="flex flex-col gap-2.5 animate-fade-in">
+        <div class="flex flex-col gap-2.5 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80 shadow-lg animate-fade-in">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
               <Sparkles size={14} class="text-amber-400" />
@@ -137,10 +137,10 @@ export const GameControls: Component<GameControlsProps> = props => {
           <div class="grid grid-cols-2 gap-2.5">
             <button
               onClick={() => store.startNewSeries(true)}
-              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-amber-500 hover:text-slate-950 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-bold shadow-md active:scale-95 transition-all group"
+              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-emerald cursor-pointer"
             >
               <div class="flex items-center gap-1.5">
-                <User size={15} class="group-hover:scale-110 transition-transform" />
+                <User size={15} class="group-hover:scale-110 transition-transform text-emerald-400 group-hover:text-slate-950" />
                 <span>Bạn Đi Trước</span>
               </div>
               <span class="text-[10px] opacity-75 font-normal">Bạn cầm quân Đen (●)</span>
@@ -148,10 +148,10 @@ export const GameControls: Component<GameControlsProps> = props => {
 
             <button
               onClick={() => store.startNewSeries(false)}
-              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-amber-500 hover:text-slate-950 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-bold shadow-md active:scale-95 transition-all group"
+              class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-slate-800/90 hover:bg-indigo-500 hover:text-slate-950 text-slate-200 border border-indigo-500/50 hover:border-indigo-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-indigo cursor-pointer"
             >
               <div class="flex items-center gap-1.5">
-                <Bot size={15} class="group-hover:scale-110 transition-transform" />
+                <Bot size={15} class="group-hover:scale-110 transition-transform text-indigo-400 group-hover:text-slate-950" />
                 <span>Bot Đi Trước</span>
               </div>
               <span class="text-[10px] opacity-75 font-normal">Bot cầm quân Đen (●)</span>

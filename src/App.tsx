@@ -86,7 +86,7 @@ export const App: Component = () => {
 
       {/* Footer */}
       <footer class="w-full border-t border-slate-900 py-3 text-center text-xs text-slate-500">
-        <p>Gomoku Master • Game Cờ Carô 15x15</p>
+        <p>GoMockU • Game Cờ Carô</p>
       </footer>
     </div>
   );
