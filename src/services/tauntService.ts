@@ -861,6 +861,114 @@ export class TauntService {
     // Cả 2 đường chéo đều có ít nhất 3 quân giao nhau tại (row, col)
     return mainDiagCount >= 3 && antiDiagCount >= 3;
   }
+
+  /**
+   * Kiểm tra thế cờ hình chữ T vuông góc (T-junction)
+   */
+  static isTShapeFormation(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+
+    // Đếm quân ngang [0, 1]
+    let leftCount = 0, rightCount = 0;
+    let c = col - 1;
+    while (c >= 0 && board[row][c] === playerColor) { leftCount++; c--; }
+    c = col + 1;
+    while (c < size && board[row][c] === playerColor) { rightCount++; c++; }
+    const horizTotal = leftCount + rightCount + 1;
+
+    // Đếm quân dọc [1, 0]
+    let upCount = 0, downCount = 0;
+    let r = row - 1;
+    while (r >= 0 && board[r][col] === playerColor) { upCount++; r--; }
+    r = row + 1;
+    while (r < size && board[r][col] === playerColor) { downCount++; r++; }
+    const vertTotal = upCount + downCount + 1;
+
+    // Hình chữ T: Một nhánh là thanh ngang/dọc (>= 3 quân cả 2 phía), nhánh vuông góc bắt đầu từ điểm giao (1 phía >= 2 quân, phía kia = 0)
+    const isHorizT = horizTotal >= 3 && leftCount >= 1 && rightCount >= 1 && ((upCount >= 2 && downCount === 0) || (downCount >= 2 && upCount === 0));
+    const isVertT = vertTotal >= 3 && upCount >= 1 && downCount >= 1 && ((leftCount >= 2 && rightCount === 0) || (rightCount >= 2 && leftCount === 0));
+
+    return isHorizT || isVertT;
+  }
+
+  /**
+   * Kiểm tra chuỗi nước đi hình zic-zắc tia chớp
+   */
+  static isZigzagLightning(history: Array<{ row: number; col: number; player: ActivePlayer }>, playerColor: ActivePlayer): boolean {
+    const playerMoves = history.filter(h => h.player === playerColor);
+    if (playerMoves.length < 4) return false;
+
+    const last4 = playerMoves.slice(-4);
+    // Tính vector giữa các nước đi liên tiếp
+    const v1 = { dr: last4[1].row - last4[0].row, dc: last4[1].col - last4[0].col };
+    const v2 = { dr: last4[2].row - last4[1].row, dc: last4[2].col - last4[1].col };
+    const v3 = { dr: last4[3].row - last4[2].row, dc: last4[3].col - last4[2].col };
+
+    // Kiểm tra tính zic-zắc: đổi hướng liên tục qua các vector
+    const isZic1 = (v1.dr * v2.dr < 0 && v2.dr * v3.dr < 0) || (v1.dc * v2.dc < 0 && v2.dc * v3.dc < 0);
+    const isNearby = Math.abs(v1.dr) <= 2 && Math.abs(v1.dc) <= 2 && Math.abs(v2.dr) <= 2 && Math.abs(v2.dc) <= 2;
+
+    return isZic1 && isNearby;
+  }
+
+  /**
+   * Kiểm tra thế song tứ tử (tạo 2 hàng 4 quân nhưng CẢ HAI đều bị chặn kín 2 đầu)
+   */
+  static isDoubleDeadFour(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+    const directions = [
+      [0, 1],   // Ngang
+      [1, 0],   // Dọc
+      [1, 1],   // Chéo chính
+      [1, -1],  // Chéo phụ
+    ];
+
+    let deadFourCount = 0;
+
+    for (const [dr, dc] of directions) {
+      let count = 1;
+      let r = row + dr, c = col + dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) { count++; r += dr; c += dc; }
+      const end1Blocked = r < 0 || r >= size || c < 0 || c >= size || board[r][c] !== EMPTY;
+
+      r = row - dr; c = col - dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) { count++; r -= dr; c -= dc; }
+      const end2Blocked = r < 0 || r >= size || c < 0 || c >= size || board[r][c] !== EMPTY;
+
+      if (count === 4 && end1Blocked && end2Blocked) {
+        deadFourCount++;
+      }
+    }
+
+    return deadFourCount >= 2;
+  }
+
+  /**
+   * Kiểm tra góc chết 3x3 ở 4 góc bàn cờ (Corner Death Trap)
+   */
+  static isCornerDeathTrap(row: number, col: number): boolean {
+    const isTopCorner = row <= 2;
+    const isBottomCorner = row >= 12;
+    const isLeftCorner = col <= 2;
+    const isRightCorner = col >= 12;
+
+    return (isTopCorner || isBottomCorner) && (isLeftCorner || isRightCorner);
+  }
+
+  /**
+   * Kiểm tra đánh so le xen kẽ kiểu bàn cờ vua liên tiếp (Checkerboard Weave)
+   */
+  static isCheckerboardWeave(history: Array<{ row: number; col: number; player: ActivePlayer }>): boolean {
+    if (history.length < 6) return false;
+    const last6 = history.slice(-6);
+
+    // Kiểm tra tính kề cạnh hoặc so le parity
+    for (let i = 1; i < last6.length; i++) {
+      const dist = Math.abs(last6[i].row - last6[i - 1].row) + Math.abs(last6[i].col - last6[i - 1].col);
+      if (dist > 2 || dist === 0) return false;
+    }
+    return true;
+  }
 }
 
 

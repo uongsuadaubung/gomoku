@@ -143,6 +143,8 @@ export function createGameStore() {
   let removeEventListeners: (() => void) | null = null;
   let lastUndoneMove: { row: number; col: number; timestamp: number } | null = null;
   let consecutiveDrawsCount = 0;
+  let matchStartTime = Date.now();
+  let wasCurrentGameImmediateRevenge = false;
 
   // Khởi tạo Web Worker & Global Browser Listeners
   onMount(() => {
@@ -520,6 +522,8 @@ export function createGameStore() {
 
     const isImmediateRevenge =
       interactionTracker.getTimeSinceLast('GAME_OVER') < 600 && isPlayerLastGameLost();
+    matchStartTime = Date.now();
+    wasCurrentGameImmediateRevenge = isImmediateRevenge;
 
     const getOpeningGreeting = (): TauntEvent => {
       if (isImmediateRevenge) return 'IMMEDIATE_REVENGE_CLICK';
@@ -802,6 +806,7 @@ export function createGameStore() {
       player,
       ai: aiColor(),
       history: newHistory,
+      timeSinceLastMove,
     });
     if (moveTaunt) {
       triggerTaunt(moveTaunt, 150);
@@ -904,10 +909,16 @@ export function createGameStore() {
       consecutiveDrawsCount = 0;
 
       // Đánh giá kịch bản thắng của Bot
+      const durationMs = Date.now() - matchStartTime;
+      const lastMoveCoord = lastMove();
       const botWinTaunt = TauntEvaluator.evaluateBotWin({
         moveCount,
         wasLastGameSpeedLoss,
         isHeavyLossStreak: isPlayerInHeavyLossStreak(),
+        isImmediateRevenge: wasCurrentGameImmediateRevenge,
+        durationMs,
+        winningMoveRow: lastMoveCoord?.row,
+        winningMoveCol: lastMoveCoord?.col,
       });
       wasLastGameSpeedLoss = moveCount <= 12;
       triggerTaunt(botWinTaunt, 400);

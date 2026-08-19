@@ -9,6 +9,7 @@ import { BOT_WIN } from './botWin';
 import { BOT_WIN_LEADING_SCORE } from './botWinLeadingScore';
 import { BOX_SURROUND_CENTER } from './boxSurroundCenter';
 import { CENTER_MOVE } from './centerMove';
+import { CHECKERBOARD_WEAVE } from './checkerboardWeave';
 import { CLEAN_SWEEP_DOMINATION } from './cleanSweepDomination';
 import { CLOSE_COMBAT_HUG } from './closeCombatHug';
 import { CLUTCH_100_STONES } from './clutch100Stones';
@@ -16,9 +17,11 @@ import { COMEBACK_WIN } from './comebackWin';
 import { CONSECUTIVE_DRAWS } from './consecutiveDraws';
 import { CONSECUTIVE_SPEED_LOSSES } from './consecutiveSpeedLosses';
 import { COPYCAT_MOVE } from './copycatMove';
+import { CORNER_DEATH_TRAP } from './cornerDeathTrap';
 import { CORNER_MOVE } from './cornerMove';
 import { DEAD_FOUR_BLOCKED } from './deadFourBlocked';
 import { DIAGONAL_CROSS_FORMATION } from './diagonalCrossFormation';
+import { DOUBLE_DEAD_FOUR } from './doubleDeadFour';
 import { DOUBLE_THREE_TRAP } from './doubleThreeTrap';
 import { EDGE_WALK_MOVE } from './edgeWalkMove';
 import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
@@ -33,8 +36,10 @@ import { JUMP_THREE_TRAP } from './jumpThreeTrap';
 import { LONG_GAME } from './longGame';
 import { MISSED_WINNING_MOVE } from './missedWinningMove';
 import { NO_UNDO_WIN } from './noUndoWin';
+import { ONE_MINUTE_BULLET_WIN } from './oneMinuteBulletWin';
 import { OPEN_FOUR_BLUNDER } from './openFourBlunder';
 import { OVERCONFIDENT_BLIND_ATTACK } from './overconfidentBlindAttack';
+import { OVERTHINKING_BLUNDER } from './overthinkingBlunder';
 import { PLAYER_RESIGN } from './playerResign';
 import { PLAYER_STREAK_WIN } from './playerStreakWin';
 import { PLAYER_UNDO } from './playerUndo';
@@ -43,15 +48,19 @@ import { PLAYER_WIN_WITH_UNDO } from './playerWinWithUndo';
 import { REPEATED_UNDO_SAME_MOVE } from './repeatedUndoSameMove';
 import { REVENGE_WIN_AFTER_LOSS_STREAK } from './revengeWinAfterLossStreak';
 import { RUSH_MOVE } from './rushMove';
+import { SPEED_REVENGE_FAIL } from './speedRevengeFail';
 import { SPEED_WIN_QUICK } from './speedWinQuick';
 import { SPLIT_BOARD_EXPEDITION } from './splitBoardExpedition';
 import { SURRENDER_AFTER_LONG_THINKING } from './surrenderAfterLongThinking';
 import { SURRENDER_ON_THREAT } from './surrenderOnThreat';
 import { SYMMETRY_BREAK_SURPRISE } from './symmetryBreakSurprise';
+import { T_SHAPE_FORMATION } from './tShapeFormation';
 import { TIT_FOR_TAT_DRAWS } from './titForTatDraws';
 import { TRIANGLE_FORMATION } from './triangleFormation';
 import { TURTLE_DEFENSE } from './turtleDefense';
+import { UNLUCKY_THIRTEEN_MOVES } from './unluckyThirteenMoves';
 import { WIN_RIGHT_AFTER_UNDO } from './winRightAfterUndo';
+import { ZIGZAG_LIGHTNING } from './zigzagLightning';
 
 export * from './accidentalSelfBlock';
 export * from './blockAndCounterFour';
@@ -63,6 +72,7 @@ export * from './botWin';
 export * from './botWinLeadingScore';
 export * from './boxSurroundCenter';
 export * from './centerMove';
+export * from './checkerboardWeave';
 export * from './cleanSweepDomination';
 export * from './closeCombatHug';
 export * from './clutch100Stones';
@@ -70,9 +80,11 @@ export * from './comebackWin';
 export * from './consecutiveDraws';
 export * from './consecutiveSpeedLosses';
 export * from './copycatMove';
+export * from './cornerDeathTrap';
 export * from './cornerMove';
 export * from './deadFourBlocked';
 export * from './diagonalCrossFormation';
+export * from './doubleDeadFour';
 export * from './doubleThreeTrap';
 export * from './edgeWalkMove';
 export * from './fastMoveTaunt';
@@ -87,8 +99,10 @@ export * from './jumpThreeTrap';
 export * from './longGame';
 export * from './missedWinningMove';
 export * from './noUndoWin';
+export * from './oneMinuteBulletWin';
 export * from './openFourBlunder';
 export * from './overconfidentBlindAttack';
+export * from './overthinkingBlunder';
 export * from './playerResign';
 export * from './playerStreakWin';
 export * from './playerUndo';
@@ -97,15 +111,19 @@ export * from './playerWinWithUndo';
 export * from './repeatedUndoSameMove';
 export * from './revengeWinAfterLossStreak';
 export * from './rushMove';
+export * from './speedRevengeFail';
 export * from './speedWinQuick';
 export * from './splitBoardExpedition';
 export * from './surrenderAfterLongThinking';
 export * from './surrenderOnThreat';
 export * from './symmetryBreakSurprise';
+export * from './tShapeFormation';
 export * from './titForTatDraws';
 export * from './triangleFormation';
 export * from './turtleDefense';
+export * from './unluckyThirteenMoves';
 export * from './winRightAfterUndo';
+export * from './zigzagLightning';
 
 export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   ACCIDENTAL_SELF_BLOCK,
@@ -118,6 +136,7 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   BOT_WIN_LEADING_SCORE,
   BOX_SURROUND_CENTER,
   CENTER_MOVE,
+  CHECKERBOARD_WEAVE,
   CLEAN_SWEEP_DOMINATION,
   CLOSE_COMBAT_HUG,
   CLUTCH_100_STONES,
@@ -125,9 +144,11 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   CONSECUTIVE_DRAWS,
   CONSECUTIVE_SPEED_LOSSES,
   COPYCAT_MOVE,
+  CORNER_DEATH_TRAP,
   CORNER_MOVE,
   DEAD_FOUR_BLOCKED,
   DIAGONAL_CROSS_FORMATION,
+  DOUBLE_DEAD_FOUR,
   DOUBLE_THREE_TRAP,
   EDGE_WALK_MOVE,
   FAST_MOVE_TAUNT,
@@ -142,8 +163,10 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   LONG_GAME,
   MISSED_WINNING_MOVE,
   NO_UNDO_WIN,
+  ONE_MINUTE_BULLET_WIN,
   OPEN_FOUR_BLUNDER,
   OVERCONFIDENT_BLIND_ATTACK,
+  OVERTHINKING_BLUNDER,
   PLAYER_RESIGN,
   PLAYER_STREAK_WIN,
   PLAYER_UNDO,
@@ -152,13 +175,17 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   REPEATED_UNDO_SAME_MOVE,
   REVENGE_WIN_AFTER_LOSS_STREAK,
   RUSH_MOVE,
+  SPEED_REVENGE_FAIL,
   SPEED_WIN_QUICK,
   SPLIT_BOARD_EXPEDITION,
   SURRENDER_AFTER_LONG_THINKING,
   SURRENDER_ON_THREAT,
   SYMMETRY_BREAK_SURPRISE,
+  T_SHAPE_FORMATION,
   TIT_FOR_TAT_DRAWS,
   TRIANGLE_FORMATION,
   TURTLE_DEFENSE,
+  UNLUCKY_THIRTEEN_MOVES,
   WIN_RIGHT_AFTER_UNDO,
+  ZIGZAG_LIGHTNING,
 };

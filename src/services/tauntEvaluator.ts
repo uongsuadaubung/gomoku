@@ -18,6 +18,7 @@ export interface PlayerMoveContext {
   player: ActivePlayer;
   ai: ActivePlayer;
   history: MoveHistoryItem[];
+  timeSinceLastMove?: number;
 }
 
 export interface PreMoveContext {
@@ -43,6 +44,10 @@ export interface BotWinContext {
   moveCount: number;
   wasLastGameSpeedLoss: boolean;
   isHeavyLossStreak: boolean;
+  isImmediateRevenge?: boolean;
+  durationMs?: number;
+  winningMoveRow?: number;
+  winningMoveCol?: number;
 }
 
 export interface UndoContext {
@@ -122,10 +127,22 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'FORK_ATTACK_DEFENSE_FAIL',
   },
   {
+    id: 'overthinking_blunder',
+    priority: 83,
+    match: ctx => (ctx.timeSinceLastMove !== undefined && ctx.timeSinceLastMove > 20000) && TauntService.isPlayerBlunder(ctx.nextBoard, ctx.ai, ctx.row, ctx.col),
+    taunt: 'OVERTHINKING_BLUNDER',
+  },
+  {
     id: 'blunder_move',
     priority: 82,
     match: ctx => TauntService.isPlayerBlunder(ctx.nextBoard, ctx.ai, ctx.row, ctx.col),
     taunt: 'BLUNDER_MOVE',
+  },
+  {
+    id: 'double_dead_four',
+    priority: 81,
+    match: ctx => TauntService.isDoubleDeadFour(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'DOUBLE_DEAD_FOUR',
   },
   {
     id: 'dead_four_blocked',
@@ -156,6 +173,12 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'BOX_SURROUND_CENTER',
   },
   {
+    id: 't_shape_formation',
+    priority: 67,
+    match: ctx => TauntService.isTShapeFormation(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'T_SHAPE_FORMATION',
+  },
+  {
     id: 'triangle_formation',
     priority: 66,
     match: ctx => TauntService.isTriangleFormation(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
@@ -174,10 +197,22 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'TURTLE_DEFENSE',
   },
   {
+    id: 'zigzag_lightning',
+    priority: 63,
+    match: ctx => TauntService.isZigzagLightning(ctx.history, ctx.player),
+    taunt: 'ZIGZAG_LIGHTNING',
+  },
+  {
     id: 'full_diagonal_highway',
     priority: 62,
     match: ctx => TauntService.isFullDiagonalHighway(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
     taunt: 'FULL_DIAGONAL_HIGHWAY',
+  },
+  {
+    id: 'checkerboard_weave',
+    priority: 61,
+    match: ctx => TauntService.isCheckerboardWeave(ctx.history),
+    taunt: 'CHECKERBOARD_WEAVE',
   },
   {
     id: 'isolated_far_move',
@@ -331,10 +366,34 @@ const PLAYER_WIN_RULES: Rule<PlayerWinContext>[] = [
 // -------------------------------------------------------------
 const BOT_WIN_RULES: Rule<BotWinContext>[] = [
   {
+    id: 'unlucky_thirteen_moves',
+    priority: 110,
+    match: ctx => ctx.moveCount === 13,
+    taunt: 'UNLUCKY_THIRTEEN_MOVES',
+  },
+  {
+    id: 'speed_revenge_fail',
+    priority: 105,
+    match: ctx => !!ctx.isImmediateRevenge && ctx.moveCount <= 10,
+    taunt: 'SPEED_REVENGE_FAIL',
+  },
+  {
     id: 'consecutive_speed_losses',
     priority: 100,
     match: ctx => ctx.moveCount <= 12 && ctx.wasLastGameSpeedLoss,
     taunt: 'CONSECUTIVE_SPEED_LOSSES',
+  },
+  {
+    id: 'corner_death_trap',
+    priority: 95,
+    match: ctx => ctx.winningMoveRow !== undefined && ctx.winningMoveCol !== undefined && TauntService.isCornerDeathTrap(ctx.winningMoveRow, ctx.winningMoveCol),
+    taunt: 'CORNER_DEATH_TRAP',
+  },
+  {
+    id: 'one_minute_bullet_win',
+    priority: 85,
+    match: ctx => (ctx.durationMs !== undefined && ctx.durationMs <= 60000) || ctx.moveCount <= 8,
+    taunt: 'ONE_MINUTE_BULLET_WIN',
   },
   {
     id: 'speed_win_quick',
