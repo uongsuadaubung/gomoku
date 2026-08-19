@@ -36,6 +36,7 @@ export interface PlayerWinContext {
   wasUndoJustUsed: boolean;
   botEverHadOpenThreat: boolean;
   prevStats: UserStats;
+  currentLevelId?: number;
 }
 
 export interface BotWinContext {
@@ -61,6 +62,12 @@ export interface IdleContext {
 // -------------------------------------------------------------
 const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
   {
+    id: 'overconfident_blind_attack',
+    priority: 105,
+    match: ctx => TauntService.isOverconfidentBlindAttack(ctx.prevBoard, ctx.nextBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
+    taunt: 'OVERCONFIDENT_BLIND_ATTACK',
+  },
+  {
     id: 'block_and_counter_four',
     priority: 100,
     match: ctx => TauntService.isBlockAndCounterFour(ctx.prevBoard, ctx.nextBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
@@ -71,6 +78,12 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     priority: 95,
     match: ctx => TauntService.isSymmetryBreakSurprise(ctx.history, ctx.row, ctx.col, ctx.player, ctx.ai),
     taunt: 'SYMMETRY_BREAK_SURPRISE',
+  },
+  {
+    id: 'jump_three_trap',
+    priority: 92,
+    match: ctx => TauntService.isJumpThreeTrap(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'JUMP_THREE_TRAP',
   },
   {
     id: 'missed_winning_move',
@@ -107,10 +120,22 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'SPLIT_BOARD_EXPEDITION',
   },
   {
+    id: 'box_surround_center',
+    priority: 68,
+    match: ctx => TauntService.isBoxSurroundCenter(ctx.nextBoard, ctx.player, ctx.history.length),
+    taunt: 'BOX_SURROUND_CENTER',
+  },
+  {
     id: 'triangle_formation',
     priority: 65,
     match: ctx => TauntService.isTriangleFormation(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
     taunt: 'TRIANGLE_FORMATION',
+  },
+  {
+    id: 'full_diagonal_highway',
+    priority: 62,
+    match: ctx => TauntService.isFullDiagonalHighway(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'FULL_DIAGONAL_HIGHWAY',
   },
   {
     id: 'isolated_far_move',
@@ -202,6 +227,12 @@ const PRE_MOVE_RULES: Rule<PreMoveContext>[] = [
 // 3. Pipeline đánh giá kết quả khi Người chơi thắng
 // -------------------------------------------------------------
 const PLAYER_WIN_RULES: Rule<PlayerWinContext>[] = [
+  {
+    id: 'god_level_victory',
+    priority: 110,
+    match: ctx => ctx.currentLevelId === 5,
+    taunt: 'GOD_LEVEL_VICTORY',
+  },
   {
     id: 'win_right_after_undo',
     priority: 100,
@@ -342,6 +373,14 @@ export class TauntEvaluator {
     if (ctx.isInstantUndo) return 'UNDO_BEFORE_AI_MOVES';
     if (ctx.recentUndoCount >= 3) return 'MULTI_UNDO';
     return 'PLAYER_UNDO';
+  }
+
+  /**
+   * Đánh giá kịch bản hòa cờ
+   */
+  static evaluateDraw(wasLastGameDraw: boolean): TauntEvent {
+    if (wasLastGameDraw) return 'CONSECUTIVE_DRAWS';
+    return 'GAME_DRAW';
   }
 
   /**

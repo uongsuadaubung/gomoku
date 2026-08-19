@@ -1,5 +1,5 @@
 export type TauntEvent =
-  // 1. Gameplay (42 sự kiện)
+  // 1. Gameplay (48 sự kiện)
   | 'BOT_WIN'
   | 'PLAYER_WIN'
   | 'PLAYER_WIN_WITH_UNDO'
@@ -42,6 +42,12 @@ export type TauntEvent =
   | 'SPEED_WIN_QUICK'
   | 'CLUTCH_100_STONES'
   | 'COPYCAT_MOVE'
+  | 'JUMP_THREE_TRAP'
+  | 'OVERCONFIDENT_BLIND_ATTACK'
+  | 'BOX_SURROUND_CENTER'
+  | 'FULL_DIAGONAL_HIGHWAY'
+  | 'CONSECUTIVE_DRAWS'
+  | 'GOD_LEVEL_VICTORY'
 
   // 2. Idle (6 sự kiện)
   | 'STARE_AT_WIN_LINE'
@@ -51,7 +57,7 @@ export type TauntEvent =
   | 'IDLE_AFTER_LOSS'
   | 'SUPER_SLOW_MOVE'
 
-  // 3. Interaction (26 sự kiện)
+  // 3. Interaction (31 sự kiện)
   | 'HOVER_UNDO_HESITATION'
   | 'RESIGN_WHILE_AI_THINKING'
   | 'CLICK_OWN_STONE'
@@ -78,8 +84,13 @@ export type TauntEvent =
   | 'CLICK_AFTER_GAME_OVER'
   | 'LONG_HOVER_CELL'
   | 'MARATHON_SERIES'
+  | 'MOUSE_JIGGLE_PANIC'
+  | 'CTRL_Z_SHORTCUT_ATTEMPT'
+  | 'DOUBLE_CLICK_STONE'
+  | 'DEVTOOLS_INSPECT_HACK'
+  | 'WHEEL_ZOOM_ATTEMPT'
 
-  // 4. System & UI (19 sự kiện)
+  // 4. System & UI (23 sự kiện)
   | 'RAPID_THEME_CYCLING'
   | 'SWITCH_BOARD_STYLE_MID_GAME'
   | 'SOUND_SPAM_TOGGLE'
@@ -98,7 +109,11 @@ export type TauntEvent =
   | 'CLICK_OCCUPIED_CELL'
   | 'RESET_STATS'
   | 'OPEN_BOT_MODAL'
-  | 'LATE_NIGHT_PLAY';
+  | 'LATE_NIGHT_PLAY'
+  | 'EARLY_MORNING_COFFEE'
+  | 'LUNCH_BREAK_RUSH'
+  | 'WEEKEND_CHILL'
+  | 'RAGE_QUIT_F5_RELOAD';
 
 export type BotMood =
   | 'smug'        // 😏 Cười khẩy đắc thắng

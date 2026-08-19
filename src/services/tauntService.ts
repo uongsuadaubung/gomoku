@@ -1,4 +1,4 @@
-import { BoardMatrix, ActivePlayer, EMPTY } from '../game/types';
+import { BoardMatrix, ActivePlayer, Player, EMPTY } from '../game/types';
 import { checkWin } from '../game/board';
 import {
   type TauntEvent,
@@ -499,6 +499,149 @@ export class TauntService {
     const lastBotMove = botMoves[botMoves.length - 1];
     const isStillMirror = this.isMirrorMove(lastBotMove.row, lastBotMove.col, row, col);
     return !isStillMirror;
+  }
+
+  /**
+   * Kiểm tra xem nước cờ vừa đánh có tạo thành bẫy ba nhảy cách (tam tử cách ô: X_XX hoặc XX_X thoáng 2 đầu)
+   */
+  static isJumpThreeTrap(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+    const directions = [
+      [0, 1],   // Ngang
+      [1, 0],   // Dọc
+      [1, 1],   // Chéo chính
+      [1, -1],  // Chéo phụ
+    ];
+
+    for (const [dr, dc] of directions) {
+      // Quét chuỗi 6 ô liên tiếp chứa (row, col)
+      for (let offset = -4; offset <= 0; offset++) {
+        const pattern: (Player | 'OUT')[] = [];
+        let containsCurrent = false;
+
+        for (let i = 0; i < 6; i++) {
+          const r = row + (offset + i) * dr;
+          const c = col + (offset + i) * dc;
+          if (r === row && c === col) containsCurrent = true;
+          if (r < 0 || r >= size || c < 0 || c >= size) {
+            pattern.push('OUT');
+          } else {
+            pattern.push(board[r][c]);
+          }
+        }
+
+        if (!containsCurrent) continue;
+
+        // Mẫu 1: _ X _ X X _
+        const isPattern1 =
+          pattern[0] === EMPTY &&
+          pattern[1] === playerColor &&
+          pattern[2] === EMPTY &&
+          pattern[3] === playerColor &&
+          pattern[4] === playerColor &&
+          pattern[5] === EMPTY;
+
+        // Mẫu 2: _ X X _ X _
+        const isPattern2 =
+          pattern[0] === EMPTY &&
+          pattern[1] === playerColor &&
+          pattern[2] === playerColor &&
+          pattern[3] === EMPTY &&
+          pattern[4] === playerColor &&
+          pattern[5] === EMPTY;
+
+        if (isPattern1 || isPattern2) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Kiểm tra xem người chơi có mải mê tấn công (tạo nước 3 hoặc 4) khi Bot đã có nước 4 sát cục mười mươi không
+   */
+  static isOverconfidentBlindAttack(
+    previousBoard: BoardMatrix,
+    currentBoard: BoardMatrix,
+    botColor: ActivePlayer,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    // 1. Kiểm tra xem Bot ở thế cờ trước có điểm thắng sát cục mà KHÔNG PHẢI ô (row, col) không
+    const size = previousBoard.length;
+    let botHadWinningMove = false;
+
+    for (let r = 0; r < size && !botHadWinningMove; r++) {
+      for (let c = 0; c < size; c++) {
+        if (previousBoard[r][c] === EMPTY) {
+          previousBoard[r][c] = botColor;
+          const win = checkWin(previousBoard);
+          previousBoard[r][c] = EMPTY;
+          if (win && win.winner === botColor && (r !== row || c !== col)) {
+            botHadWinningMove = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!botHadWinningMove) return false;
+
+    // 2. Người chơi không chặn điểm thắng của Bot mà lại đánh nước tấn công (tạo nước 3 hoặc 4 của mình)
+    return this.isPlayerThreatMove(currentBoard, playerColor);
+  }
+
+  /**
+   * Kiểm tra xem người chơi có chiếm từ 4 ô trở lên trong 8 ô bao quanh tâm Thiên Nguyên (7,7) khi ván còn sớm không
+   */
+  static isBoxSurroundCenter(board: BoardMatrix, playerColor: ActivePlayer, totalMoves: number): boolean {
+    if (totalMoves > 20) return false;
+    const centerNeighbors = [
+      [6, 6], [6, 7], [6, 8],
+      [7, 6],         [7, 8],
+      [8, 6], [8, 7], [8, 8],
+    ];
+    let count = 0;
+    for (const [r, c] of centerNeighbors) {
+      if (board[r][c] === playerColor) count++;
+    }
+    return count >= 4;
+  }
+
+  /**
+   * Kiểm tra xem người chơi có liên tiếp xếp từ 4 quân trở lên nối dài trên cùng 1 đường chéo lớn không
+   */
+  static isFullDiagonalHighway(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+    const diagDirs = [
+      [1, 1],   // Chéo chính
+      [1, -1],  // Chéo phụ
+    ];
+
+    for (const [dr, dc] of diagDirs) {
+      let count = 1;
+      // Đếm về 1 phía
+      let r = row + dr;
+      let c = col + dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) {
+        count++;
+        r += dr;
+        c += dc;
+      }
+      // Đếm về phía ngược lại
+      r = row - dr;
+      c = col - dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) {
+        count++;
+        r -= dr;
+        c -= dc;
+      }
+
+      if (count >= 4) return true;
+    }
+    return false;
   }
 }
 

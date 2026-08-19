@@ -88,7 +88,7 @@ export const COMEBACK_WIN: TauntDefinition = {
     "Một ván cờ nghẹt thở với chiến thắng lội ngược dòng không tưởng, xin chúc mừng bạn!",
     "Bạn đã cho tôi thấy thế nào là sức mạnh của sự kiên cường trong từng nước cờ lật kèo!",
     "Màn ngược dòng kỳ vĩ này sẽ là cột mốc đáng nhớ trong hành trình kỳ nghệ của bạn!",
-    "Tôi xin dành trọn sự kính nể cho pha lật kèo thần thánh này của bạn, quá tuyệt vời!",
+    "Tôi xin dành trọn sự tán thưởng cho pha lật kèo thần thánh này của bạn, quá tuyệt vời!",
     "Xoay chuyển cờ tàn đỉnh đấy, nhưng lần sau tôi sẽ không cho bạn có cơ hội lật kèo nữa đâu!",
     "Một chiến thắng lội ngược dòng quá đỗi ngọt ngào, bạn xứng đáng là ngôi sao của trận đấu!",
     "Màn trình diễn xuất thần này đã biến bạn thành huyền thoại lật kèo trên bàn cờ gomoku!",

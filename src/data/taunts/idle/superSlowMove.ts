@@ -15,7 +15,7 @@ export const SUPER_SLOW_MOVE: TauntDefinition = {
     "Có cần tôi bấm giờ đếm ngược 10 giây không? Câu giờ vừa thôi chứ!",
     "Nghĩ nát cả óc rồi mà vẫn chưa biết đặt quân cờ vào đâu à? Tội nghiệp ghê!",
     "Bạn đang triệu hồi năng lượng vũ trụ để tìm nước đi hay sao mà lâu thế?",
-    "Đừng bảo là đang lén mở ứng dụng khác lên tra cứu cách giải cờ nhé!",
+    "Đừng bảo là đang lén mở tài liệu lên tra cứu cách giải cờ nhé!",
     "Tôi chờ bạn đi cờ mà sắp già đi vài tuổi rồi đấy, khẩn trương lên nào!",
     "Ngồi bất động như tượng đài thế? Có cần tôi kiểm tra xem bạn còn thở không?",
     "Tính kỹ vào bạn nhé, nghĩ lâu thế này mà lát thua là không có chỗ giấu mặt đâu!",

@@ -348,10 +348,11 @@ for (const [categoryName, lines] of Object.entries(TAUNT_DATABASE)) {
   totalSentences += lines.length;
 
   // A. Kiểm tra số lượng tối thiểu >= 100 câu
-  if (lines.length < MIN_SENTENCES_REQUIRED) {
+  if (!lines || lines.length < MIN_SENTENCES_REQUIRED) {
     underThresholdCount++;
+    const currentCount = lines ? lines.length : 0;
     issuesReport.push(
-      `🔴 [Dưới định mức tối thiểu] [${eventName}]: Hiện chỉ có ${lines.length} câu (Yêu cầu tối thiểu ${MIN_SENTENCES_REQUIRED} câu)`
+      `🔴 [DƯỚI ĐỊNH MỨC TỐI THIỂU] [${eventName}]: Hiện chỉ có ${currentCount} câu (Yêu cầu tối thiểu ${MIN_SENTENCES_REQUIRED} câu, thiếu ${MIN_SENTENCES_REQUIRED - currentCount} câu)`
     );
   }
 

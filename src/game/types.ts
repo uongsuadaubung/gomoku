@@ -14,7 +14,7 @@ export interface Move {
   score?: number;
 }
 
-export type BoardMatrix = number[][];
+export type BoardMatrix = Player[][];
 
 export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw';
 

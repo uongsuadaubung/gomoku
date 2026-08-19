@@ -72,6 +72,7 @@ export function createGameStore() {
   let botEverHadOpenThreat: boolean = false;
   let wasLastGameSpeedLoss: boolean = false;
   let wasUndoJustUsed: boolean = false;
+  let wasLastGameDraw: boolean = false;
   let mouseLeaveTimer: number | null = null;
   let undoCountInMatch: number = 0;
   let sessionGamesCount: number = 0;
@@ -176,8 +177,34 @@ export function createGameStore() {
       console.error('Không thể khởi tạo Web Worker:', err);
     }
 
-    // 1. Bắt tương tác spam gõ phím khi chơi cờ (KEYBOARD_SMASH_SPAM)
+    // Kiểm tra nếu vừa F5 reload trang khi trận đấu cũ đang dở dang (RAGE_QUIT_F5_RELOAD)
+    try {
+      if (sessionStorage.getItem('gomoku_active_game')) {
+        sessionStorage.removeItem('gomoku_active_game');
+        setTimeout(() => {
+          triggerTaunt('RAGE_QUIT_F5_RELOAD', 300);
+        }, 500);
+      }
+    } catch {
+      // Bỏ qua lỗi truy cập sessionStorage
+    }
+
+    // 1. Bắt phím tắt và spam gõ phím khi chơi cờ (CTRL_Z, DEVTOOLS, KEYBOARD_SMASH)
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Bắt phím tắt DevTools (F12, Ctrl+Shift+I/J/C, Ctrl+U)
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U'))
+      ) {
+        triggerTaunt('DEVTOOLS_INSPECT_HACK', 100);
+      }
+
+      // Bắt phím tắt Ctrl+Z (Undo)
+      if (e.ctrlKey && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        triggerTaunt('CTRL_Z_SHORTCUT_ATTEMPT', 100);
+      }
+
       if (gameStatus() !== 'playing') return;
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
@@ -228,8 +255,44 @@ export function createGameStore() {
       }
     };
 
+    // 5. Bắt tương tác lắc chuột điên cuồng khi bí nước (MOUSE_JIGGLE_PANIC)
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let lastDir = 0;
+    let dirChanges = 0;
+    let lastJiggleTime = Date.now();
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (gameStatus() !== 'playing' || currentTurn() !== playerColor()) return;
+      const now = Date.now();
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 20) {
+        const dir = Math.atan2(dy, dx);
+        if (Math.abs(dir - lastDir) > 1.4) {
+          dirChanges++;
+          if (dirChanges >= 7 && now - lastJiggleTime < 800) {
+            dirChanges = 0;
+            lastJiggleTime = now;
+            triggerTaunt('MOUSE_JIGGLE_PANIC', 150);
+          }
+        }
+        lastDir = dir;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      }
+
+      if (now - lastJiggleTime > 1000) {
+        dirChanges = 0;
+        lastJiggleTime = now;
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('selectionchange', handleSelectionChange);
     document.documentElement.addEventListener('mouseleave', handleMouseLeave);
     document.documentElement.addEventListener('mouseenter', handleMouseEnter);
@@ -237,6 +300,7 @@ export function createGameStore() {
     removeEventListeners = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('selectionchange', handleSelectionChange);
       document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
       document.documentElement.removeEventListener('mouseenter', handleMouseEnter);
@@ -414,10 +478,34 @@ export function createGameStore() {
     undoCountInMatch = 0;
     interactionTracker.setFlag('STARE_AT_WIN_LINE', false);
 
-    const currentHour = new Date().getHours();
+    try {
+      sessionStorage.setItem('gomoku_active_game', '1');
+    } catch {
+      // Bỏ qua lỗi sessionStorage
+    }
+
+    const nowDate = new Date();
+    const currentHour = nowDate.getHours();
+    const currentMinutes = nowDate.getMinutes();
+    const timeVal = currentHour + currentMinutes / 60;
+    const dayOfWeek = nowDate.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
     const isLateNight = currentHour >= 0 && currentHour < 5;
+    const isEarlyMorning = currentHour >= 5 && currentHour < 8;
+    const isLunchBreak = timeVal >= 11.5 && timeVal <= 13.2;
+
     const isImmediateRevenge =
       interactionTracker.getTimeSinceLast('GAME_OVER') < 600 && isPlayerLastGameLost();
+
+    const getOpeningGreeting = (): TauntEvent => {
+      if (isImmediateRevenge) return 'IMMEDIATE_REVENGE_CLICK';
+      if (isLateNight && Math.random() < 0.6) return 'LATE_NIGHT_PLAY';
+      if (isEarlyMorning && Math.random() < 0.6) return 'EARLY_MORNING_COFFEE';
+      if (isLunchBreak && Math.random() < 0.6) return 'LUNCH_BREAK_RUSH';
+      if (isWeekend && Math.random() < 0.45) return 'WEEKEND_CHILL';
+      return 'GAME_START';
+    };
 
     if (!playAsBlack) {
       // Bot cầm quân Đen đi trước -> Hạ cờ ngay tại trung tâm Thiên Nguyên (7, 7)
@@ -438,13 +526,7 @@ export function createGameStore() {
       setCurrentTurn(WHITE);
       setGameStatus('playing');
       soundService.playStoneSound();
-      if (isImmediateRevenge) {
-        triggerTaunt('IMMEDIATE_REVENGE_CLICK', 200);
-      } else if (isLateNight && Math.random() < 0.6) {
-        triggerTaunt('LATE_NIGHT_PLAY', 350);
-      } else {
-        triggerTaunt('GAME_START', 200);
-      }
+      triggerTaunt(getOpeningGreeting(), 250);
       resetIdleTimer();
     } else {
       // Người chơi cầm quân Đen đi trước -> Bắt đầu ngay
@@ -453,13 +535,7 @@ export function createGameStore() {
       setLastMove(null);
       setCurrentTurn(BLACK);
       setGameStatus('playing');
-      if (isImmediateRevenge) {
-        triggerTaunt('IMMEDIATE_REVENGE_CLICK', 200);
-      } else if (isLateNight && Math.random() < 0.6) {
-        triggerTaunt('LATE_NIGHT_PLAY', 350);
-      } else {
-        triggerTaunt('GAME_START', 200);
-      }
+      triggerTaunt(getOpeningGreeting(), 250);
       resetIdleTimer();
     }
   }
@@ -736,6 +812,12 @@ export function createGameStore() {
       }, 700);
     }
 
+    try {
+      sessionStorage.removeItem('gomoku_active_game');
+    } catch {
+      // Bỏ qua lỗi sessionStorage
+    }
+
     if (winner === player) {
       // Người chơi thắng!
       soundService.playWinSound();
@@ -743,6 +825,7 @@ export function createGameStore() {
       const newStats = StorageService.recordGame('win');
       setStats(newStats);
       wasLastGameSpeedLoss = false;
+      wasLastGameDraw = false;
 
       // Đánh giá kịch bản thắng của Người chơi
       const winTaunt = TauntEvaluator.evaluatePlayerWin({
@@ -752,6 +835,7 @@ export function createGameStore() {
         wasUndoJustUsed,
         botEverHadOpenThreat,
         prevStats,
+        currentLevelId: oldLevel,
       });
       triggerTaunt(winTaunt, 500);
 
@@ -769,6 +853,7 @@ export function createGameStore() {
       soundService.playLossSound();
       const newStats = StorageService.recordGame('loss');
       setStats(newStats);
+      wasLastGameDraw = false;
 
       // Đánh giá kịch bản thắng của Bot
       const botWinTaunt = TauntEvaluator.evaluateBotWin({
@@ -783,7 +868,9 @@ export function createGameStore() {
       wasLastGameSpeedLoss = false;
       const newStats = StorageService.recordGame('draw');
       setStats(newStats);
-      triggerTaunt('GAME_DRAW', 400);
+      const drawTaunt = TauntEvaluator.evaluateDraw(wasLastGameDraw);
+      wasLastGameDraw = true;
+      triggerTaunt(drawTaunt, 400);
     }
 
     // Sau khi hết trận, nếu người chơi không bấm ván mới thì bắt đầu kích hoạt IDLE_PRE_GAME / IDLE_AFTER_LOSS

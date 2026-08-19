@@ -113,6 +113,6 @@ export const DOUBLE_THREE_TRAP: TauntDefinition = {
     "Một pha gài bẫy đôi kinh điển, chiến thắng đã nằm chắc trong tầm tay bạn rồi!",
     "Nước cờ tạo thế công đôi này chứng tỏ bạn đã đạt đến cảnh giới cao thủ gomoku!",
     "Đòn đánh kép này thực sự làm tôi phải rùng mình trước sự chuẩn xác của bạn!",
-    "Một kiệt tác bẫy đôi trên bàn cờ, xin dành trọn sự kính nể cho nước cờ thông minh này!",
+    "Một kiệt tác bẫy đôi trên bàn cờ, xin dành trọn lời khen cho nước cờ thông minh này!",
   ],
 };
