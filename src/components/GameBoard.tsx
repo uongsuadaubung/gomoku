@@ -2,6 +2,7 @@ import { type Component, For, Show, createSignal, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
 import { BOARD_SIZE, EMPTY, BLACK, WHITE } from '../game/types';
 import { STAR_POINTS } from '../game/constants';
+import { interactionTracker } from '../services/interactionTracker';
 
 interface GameBoardProps {
   store: GameStore;
@@ -114,15 +115,7 @@ export const GameBoard: Component<GameBoardProps> = props => {
     }
 
     // Kiểm tra thao tác click loạn xạ vào nhiều ô khác nhau trong lúc bối rối (QUICK_MULTI_CELL_CLICKS)
-    const now = Date.now();
-    const recentClicks = (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks || [];
-    const filteredClicks = recentClicks.filter(item => now - item.time < 1200);
-    filteredClicks.push({ r, c, time: now });
-    (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks = filteredClicks;
-
-    const distinctCells = new Set(filteredClicks.map(item => `${item.r},${item.c}`));
-    if (distinctCells.size >= 3) {
-      (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks = [];
+    if (interactionTracker.recordCellClick(r, c) >= 3) {
       store.triggerTaunt('QUICK_MULTI_CELL_CLICKS', 100);
     }
 

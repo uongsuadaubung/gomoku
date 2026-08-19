@@ -77,12 +77,31 @@ export class InteractionTracker {
     return false;
   }
 
+  private recentCellClicks: Array<{ r: number; c: number; time: number }> = [];
+
+  /**
+   * Ghi nhận thao tác click vào ô bàn cờ và trả về số ô phân biệt được click trong windowMs
+   */
+  recordCellClick(r: number, c: number, windowMs: number = 1200): number {
+    const now = Date.now();
+    this.recentCellClicks = this.recentCellClicks.filter(item => now - item.time < windowMs);
+    this.recentCellClicks.push({ r, c, time: now });
+
+    const distinct = new Set(this.recentCellClicks.map(item => `${item.r},${item.c}`));
+    if (distinct.size >= 3) {
+      this.recentCellClicks = [];
+      return distinct.size;
+    }
+    return distinct.size;
+  }
+
   /**
    * Reset toàn bộ trạng thái và lịch sử theo dõi
    */
   resetAll(): void {
     this.timestamps.clear();
     this.flags.clear();
+    this.recentCellClicks = [];
   }
 }
 

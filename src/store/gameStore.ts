@@ -25,6 +25,7 @@ import { StorageService } from '../services/storageService';
 import { TauntService, TauntEvent, BotMood } from '../services/tauntService';
 import { interactionTracker } from '../services/interactionTracker';
 import { TauntEvaluator } from '../services/tauntEvaluator';
+import { BrowserListenerService } from '../services/browserListenerService';
 
 export function createGameStore() {
   // Trạng thái bàn cờ
@@ -141,10 +142,20 @@ export function createGameStore() {
 
   let worker: Worker | null = null;
   let removeEventListeners: (() => void) | null = null;
-  let lastUndoneMove: { row: number; col: number; timestamp: number } | null = null;
-  let consecutiveDrawsCount = 0;
-  let matchStartTime = Date.now();
-  let wasCurrentGameImmediateRevenge = false;
+
+  // Ngữ cảnh & trạng thái biến thiên của trận đấu (Match Context)
+  const matchCtx = {
+    startTime: Date.now(),
+    lastUndoneMove: null as { row: number; col: number; timestamp: number } | null,
+    consecutiveDrawsCount: 0,
+    wasImmediateRevenge: false,
+    hadHighAiAdvantage: false,
+    botEverHadOpenThreat: false,
+    wasUndoJustUsed: false,
+    undoCount: 0,
+    wasLastGameSpeedLoss: false,
+    wasLastGameDraw: false,
+  };
 
   // Khởi tạo Web Worker & Global Browser Listeners
   onMount(() => {
@@ -162,7 +173,7 @@ export function createGameStore() {
             setAiStats(prev => (prev ? { ...prev, bestScore: data.score || 0 } : null));
           }
           if ((data.score || 0) >= SCORES.OPEN_FOUR) {
-            hadHighAiAdvantage = true;
+            matchCtx.hadHighAiAdvantage = true;
           }
           return;
         }
@@ -171,7 +182,7 @@ export function createGameStore() {
           setIsAiThinking(false);
           setAiStats(data.stats);
           if (data.stats.winProbability >= 80 || (data.stats.bestScore || 0) >= SCORES.OPEN_FOUR) {
-            hadHighAiAdvantage = true;
+            matchCtx.hadHighAiAdvantage = true;
           }
           executeAiMove(data.move);
           return;
@@ -181,151 +192,12 @@ export function createGameStore() {
       console.error('Không thể khởi tạo Web Worker:', err);
     }
 
-    // Kiểm tra nếu vừa F5 reload trang khi trận đấu cũ đang dở dang (RAGE_QUIT_F5_RELOAD)
-    try {
-      if (sessionStorage.getItem('gomoku_active_game')) {
-        sessionStorage.removeItem('gomoku_active_game');
-        setTimeout(() => {
-          triggerTaunt('RAGE_QUIT_F5_RELOAD', 300);
-        }, 500);
-      }
-    } catch {
-      // Bỏ qua lỗi truy cập sessionStorage
-    }
-
-    // 1. Bắt phím tắt và spam gõ phím khi chơi cờ (CTRL_Z, DEVTOOLS, KEYBOARD_SMASH)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Bắt phím tắt DevTools (F12, Ctrl+Shift+I/J/C, Ctrl+U)
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
-        (e.ctrlKey && (e.key === 'u' || e.key === 'U'))
-      ) {
-        triggerTaunt('DEVTOOLS_INSPECT_HACK', 100);
-      }
-
-      // Bắt phím tắt Ctrl+Z (Undo)
-      if (e.ctrlKey && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
-        triggerTaunt('CTRL_Z_SHORTCUT_ATTEMPT', 100);
-      }
-
-      // Bắt phím tắt chụp màn hình (SCREENSHOT_ATTEMPT: PrintScreen, Win+Shift+S / Cmd+Shift+4)
-      if (
-        e.key === 'PrintScreen' ||
-        e.code === 'PrintScreen' ||
-        ((e.key === 's' || e.key === 'S') && e.shiftKey && (e.metaKey || e.ctrlKey))
-      ) {
-        triggerTaunt('SCREENSHOT_ATTEMPT', 100);
-      }
-
-      // Bắt phím Spacebar đập liên hồi khi sốt ruột (SPACEBAR_SMASH)
-      if (e.code === 'Space' || e.key === ' ') {
-        if (interactionTracker.record('SPACEBAR_PRESS', 1500) >= 3) {
-          interactionTracker.clearAction('SPACEBAR_PRESS');
-          triggerTaunt('SPACEBAR_SMASH', 100);
-        }
-      }
-
-      if (gameStatus() !== 'playing') return;
-      const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
-      if (interactionTracker.record('KEYBOARD_PRESS', 2000) >= 6) {
-        interactionTracker.clearAction('KEYBOARD_PRESS');
-        triggerTaunt('KEYBOARD_SMASH_SPAM', 100);
-      }
-    };
-
-    // 2. Bắt tương tác co giãn cửa sổ trình duyệt khi đang trong trận (WINDOW_RESIZE_PANIC)
-    let resizeDebounceTimer: number | null = null;
-    const handleResize = () => {
-      if (gameStatus() !== 'playing') return;
-      if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
-      resizeDebounceTimer = window.setTimeout(() => {
-        triggerTaunt('WINDOW_RESIZE_PANIC', 200);
-      }, 400);
-    };
-
-    // 3. Bắt tương tác bôi đen chọn văn bản xung quanh bàn cờ (DRAG_SELECT_PANIC)
-    let selectionDebounceTimer: number | null = null;
-    const handleSelectionChange = () => {
-      if (gameStatus() !== 'playing') return;
-      const sel = window.getSelection()?.toString() || '';
-      if (sel.trim().length >= 8) {
-        if (selectionDebounceTimer) clearTimeout(selectionDebounceTimer);
-        selectionDebounceTimer = window.setTimeout(() => {
-          triggerTaunt('DRAG_SELECT_PANIC', 200);
-        }, 500);
-      }
-    };
-
-    // 4. Bắt tương tác chuột rời màn hình quá 15s (MOUSE_LEAVE_VIEWPORT)
-    const handleMouseLeave = () => {
-      if (gameStatus() !== 'playing' || currentTurn() !== playerColor()) return;
-      if (mouseLeaveTimer) clearTimeout(mouseLeaveTimer);
-      mouseLeaveTimer = window.setTimeout(() => {
-        if (gameStatus() === 'playing' && currentTurn() === playerColor()) {
-          triggerTaunt('MOUSE_LEAVE_VIEWPORT', 200);
-        }
-      }, 15000);
-    };
-
-    const handleMouseEnter = () => {
-      if (mouseLeaveTimer) {
-        clearTimeout(mouseLeaveTimer);
-        mouseLeaveTimer = null;
-      }
-    };
-
-    // 5. Bắt tương tác lắc chuột điên cuồng khi bí nước (MOUSE_JIGGLE_PANIC)
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-    let lastDir = 0;
-    let dirChanges = 0;
-    let lastJiggleTime = Date.now();
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (gameStatus() !== 'playing' || currentTurn() !== playerColor()) return;
-      const now = Date.now();
-      const dx = e.clientX - lastMouseX;
-      const dy = e.clientY - lastMouseY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > 20) {
-        const dir = Math.atan2(dy, dx);
-        if (Math.abs(dir - lastDir) > 1.4) {
-          dirChanges++;
-          if (dirChanges >= 7 && now - lastJiggleTime < 800) {
-            dirChanges = 0;
-            lastJiggleTime = now;
-            triggerTaunt('MOUSE_JIGGLE_PANIC', 150);
-          }
-        }
-        lastDir = dir;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-      }
-
-      if (now - lastJiggleTime > 1000) {
-        dirChanges = 0;
-        lastJiggleTime = now;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('selectionchange', handleSelectionChange);
-    document.documentElement.addEventListener('mouseleave', handleMouseLeave);
-    document.documentElement.addEventListener('mouseenter', handleMouseEnter);
-
-    removeEventListeners = () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('selectionchange', handleSelectionChange);
-      document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
-      document.documentElement.removeEventListener('mouseenter', handleMouseEnter);
-    };
+    // Đăng ký toàn bộ event listeners của trình duyệt thông qua BrowserListenerService
+    removeEventListeners = BrowserListenerService.setup({
+      isGamePlaying: () => gameStatus() === 'playing',
+      isPlayerTurn: () => currentTurn() === playerColor(),
+      triggerTaunt,
+    });
 
     resetIdleTimer();
   });
@@ -493,10 +365,12 @@ export function createGameStore() {
     setIsAiThinking(false);
     setAiThinkingProgress({ depth: 0, nodes: 0 });
     soundService.playClickSound();
-    hadHighAiAdvantage = false;
-    botEverHadOpenThreat = false;
-    wasUndoJustUsed = false;
-    undoCountInMatch = 0;
+
+    // Reset ngữ cảnh ván đấu mới
+    matchCtx.hadHighAiAdvantage = false;
+    matchCtx.botEverHadOpenThreat = false;
+    matchCtx.wasUndoJustUsed = false;
+    matchCtx.undoCount = 0;
     interactionTracker.setFlag('STARE_AT_WIN_LINE', false);
 
     try {
@@ -522,8 +396,8 @@ export function createGameStore() {
 
     const isImmediateRevenge =
       interactionTracker.getTimeSinceLast('GAME_OVER') < 600 && isPlayerLastGameLost();
-    matchStartTime = Date.now();
-    wasCurrentGameImmediateRevenge = isImmediateRevenge;
+    matchCtx.startTime = Date.now();
+    matchCtx.wasImmediateRevenge = isImmediateRevenge;
 
     const getOpeningGreeting = (): TauntEvent => {
       if (isImmediateRevenge) return 'IMMEDIATE_REVENGE_CLICK';
@@ -702,7 +576,7 @@ export function createGameStore() {
 
     // Kiểm tra nếu Bot vừa tạo bẫy / sát cục VCF hoặc đe dọa mở
     if (TauntService.isPlayerThreatMove(currentBoard, ai)) {
-      botEverHadOpenThreat = true;
+      matchCtx.botEverHadOpenThreat = true;
     }
     const statsObj = aiStats();
     if (statsObj?.vcfFound || (statsObj?.bestScore || 0) >= SCORES.OPEN_FOUR) {
@@ -734,15 +608,15 @@ export function createGameStore() {
 
     // Kiểm tra nếu người chơi Undo xong lại đánh đúng vào ô vừa xóa (REPEATED_UNDO_SAME_MOVE)
     if (
-      lastUndoneMove &&
-      lastUndoneMove.row === row &&
-      lastUndoneMove.col === col &&
-      Date.now() - lastUndoneMove.timestamp < 15000
+      matchCtx.lastUndoneMove &&
+      matchCtx.lastUndoneMove.row === row &&
+      matchCtx.lastUndoneMove.col === col &&
+      Date.now() - matchCtx.lastUndoneMove.timestamp < 15000
     ) {
       triggerTaunt('REPEATED_UNDO_SAME_MOVE', 150);
-      lastUndoneMove = null;
+      matchCtx.lastUndoneMove = null;
     } else {
-      lastUndoneMove = null;
+      matchCtx.lastUndoneMove = null;
     }
 
     // 1. Đánh giá mở cờ / vị trí đặc biệt / tốc độ đánh (Pre-Move Pipeline)
@@ -869,17 +743,17 @@ export function createGameStore() {
       triggerConfetti();
       const newStats = StorageService.recordGame('win');
       setStats(newStats);
-      wasLastGameSpeedLoss = false;
-      wasLastGameDraw = false;
-      consecutiveDrawsCount = 0;
+      matchCtx.wasLastGameSpeedLoss = false;
+      matchCtx.wasLastGameDraw = false;
+      matchCtx.consecutiveDrawsCount = 0;
 
       // Đánh giá kịch bản thắng của Người chơi
       const winTaunt = TauntEvaluator.evaluatePlayerWin({
         moveCount,
-        hadComeback: hadHighAiAdvantage,
-        undoCount: undoCountInMatch,
-        wasUndoJustUsed,
-        botEverHadOpenThreat,
+        hadComeback: matchCtx.hadHighAiAdvantage,
+        undoCount: matchCtx.undoCount,
+        wasUndoJustUsed: matchCtx.wasUndoJustUsed,
+        botEverHadOpenThreat: matchCtx.botEverHadOpenThreat,
         prevStats,
         currentLevelId: oldLevel,
       });
@@ -905,22 +779,22 @@ export function createGameStore() {
       soundService.playLossSound();
       const newStats = StorageService.recordGame('loss');
       setStats(newStats);
-      wasLastGameDraw = false;
-      consecutiveDrawsCount = 0;
+      matchCtx.wasLastGameDraw = false;
+      matchCtx.consecutiveDrawsCount = 0;
 
       // Đánh giá kịch bản thắng của Bot
-      const durationMs = Date.now() - matchStartTime;
+      const durationMs = Date.now() - matchCtx.startTime;
       const lastMoveCoord = lastMove();
       const botWinTaunt = TauntEvaluator.evaluateBotWin({
         moveCount,
-        wasLastGameSpeedLoss,
+        wasLastGameSpeedLoss: matchCtx.wasLastGameSpeedLoss,
         isHeavyLossStreak: isPlayerInHeavyLossStreak(),
-        isImmediateRevenge: wasCurrentGameImmediateRevenge,
+        isImmediateRevenge: matchCtx.wasImmediateRevenge,
         durationMs,
         winningMoveRow: lastMoveCoord?.row,
         winningMoveCol: lastMoveCoord?.col,
       });
-      wasLastGameSpeedLoss = moveCount <= 12;
+      matchCtx.wasLastGameSpeedLoss = moveCount <= 12;
       triggerTaunt(botWinTaunt, 400);
 
       // Kiểm tra mốc 100 ván hoặc tụt winrate dưới 50%
@@ -937,12 +811,12 @@ export function createGameStore() {
       }
     } else {
       // Hòa
-      wasLastGameSpeedLoss = false;
-      consecutiveDrawsCount++;
+      matchCtx.wasLastGameSpeedLoss = false;
+      matchCtx.consecutiveDrawsCount++;
       const newStats = StorageService.recordGame('draw');
       setStats(newStats);
-      const drawTaunt = TauntEvaluator.evaluateDraw(consecutiveDrawsCount);
-      wasLastGameDraw = true;
+      const drawTaunt = TauntEvaluator.evaluateDraw(matchCtx.consecutiveDrawsCount);
+      matchCtx.wasLastGameDraw = true;
       triggerTaunt(drawTaunt, 400);
 
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
@@ -1015,8 +889,8 @@ export function createGameStore() {
     clearIdleTimer();
     const history = moveHistory();
     if (history.length === 0) return;
-    undoCountInMatch++;
-    wasUndoJustUsed = true;
+    matchCtx.undoCount++;
+    matchCtx.wasUndoJustUsed = true;
 
     const currentBoard = createEmptyBoard();
     let stepsToUndo = 1;
@@ -1037,7 +911,7 @@ export function createGameStore() {
     // Ghi nhớ nước cờ người chơi vừa Undo để bắt đòn REPEATED_UNDO_SAME_MOVE nếu đánh lại đúng ô cũ
     const undoneMove = history[history.length - stepsToUndo];
     if (undoneMove && undoneMove.player === playerColor()) {
-      lastUndoneMove = { row: undoneMove.row, col: undoneMove.col, timestamp: Date.now() };
+      matchCtx.lastUndoneMove = { row: undoneMove.row, col: undoneMove.col, timestamp: Date.now() };
     }
 
     setBoard(currentBoard);
@@ -1055,7 +929,6 @@ export function createGameStore() {
     setCurrentTurn(playerColor());
 
     soundService.playClickSound();
-    undoCountInMatch++;
     const isInstantUndo = interactionTracker.getTimeSinceLast('PLAYER_MOVE') < 350;
     const recentUndoCount = interactionTracker.record('UNDO', 10000);
 
