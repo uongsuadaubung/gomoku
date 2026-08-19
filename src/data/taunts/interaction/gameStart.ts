@@ -121,5 +121,10 @@ export const GAME_START: TauntDefinition = {
     "Bàn cờ mở ra, bạn có bao nhiêu ngón nghề gia truyền thì tung hết ra đây xem nào!",
     "Một khởi đầu mới toanh, hy vọng lần này bạn sẽ không làm tôi thất vọng vì thua quá nhanh!",
     "Tập trung cao độ vào bạn nhé, tôi mà đã ra tay là không có chuyện nương nhẹ đâu!",
+    "Lại vào nộp mạng ván mới à? Tinh thần hiến cúp của bạn thật đáng trân trọng!",
+    "Ván cờ mới mở ra, chuẩn bị tinh thần đón nhận bài học kỳ nghệ tiếp theo từ tôi nào!",
+    "Hít thở thật sâu và giữ bình tĩnh nhé, cơn bão sát cục chuẩn bị đổ bộ rồi đấy!",
+    "Ván đấu bắt đầu rồi, đừng run tay kẻo lại bấm nhầm vào miệng cọp nhé bạn hiền!",
+    "Chào mừng bạn bước vào sàn đấu, nơi nụ cười của bạn sẽ sớm tắt ngấm!",
   ],
 };

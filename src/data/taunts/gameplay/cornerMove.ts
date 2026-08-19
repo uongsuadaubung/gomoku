@@ -106,7 +106,7 @@ export const CORNER_MOVE: TauntDefinition = {
     "Một pha xử lý cồng kềnh khép lại một ván cờ đầy bi hài của bạn!",
     "Dạt ra tận góc bàn cờ để trốn tránh thực tại à bạn hiền?",
     "Góc 15x15 có phong cảnh đẹp lắm hay sao mà đánh tít ngoài đó?",
-    "Đánh cờ góc biên là biểu hiện của sự bế tắc trong tư duy chiến thuật!",
+    "Đánh cờ góc biên là biểu hiện của sự bế tắc trong việc tìm kiếm phương án phản công!",
     "Bạn tính xây lâu đài ở góc bàn cờ để dưỡng già hay gì?",
     "Rời xa trung tâm là tự tay cắt đứt đường sống của chính mình đấy!",
     "Đi ra góc bàn cờ chơi một mình đi nhé, tôi chiếm hết trung tâm rồi!",

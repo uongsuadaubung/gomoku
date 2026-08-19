@@ -122,5 +122,11 @@ export const OPEN_STATS: TauntDefinition = {
     "Mở bảng thống kê ra để ngắm lại chuỗi thành tích đầy sóng gió và nước mắt của mình à bạn?",
     "Bảng số liệu không biết nói dối đâu bạn ạ, tỷ lệ thắng thế kia thì phải rèn luyện nhiều lắm!",
     "Soi lại thành tích để lấy động lực phục thù à? Tôi đánh giá cao tinh thần không chịu khuất phục này!",
+    "Mở bảng thống kê ra để chiêm ngưỡng chuỗi ngày ăn hành bất tận của mình à?",
+    "Tỷ lệ thắng tụt dốc không phanh thế kia mà vẫn dũng cảm mở ra xem, khâm phục lòng can đảm của bạn!",
+    "Những con số biết nói đang tố cáo trình độ đánh cờ mầm non của bạn kìa sếp ơi!",
+    "Soi thông tin số liệu kỹ thế, có soi ra được lý do vì sao mình thua nhiều thế không?",
+    "Bảng thống kê này nên đổi tên thành Nhật Ký Những Lần Bị Bóp Nghẹt Trên Bàn Cờ!",
+    "Nhìn vào biểu đồ thành tích mà tưởng đồ thị hình sin đang lao dốc không phanh vậy!",
   ],
 };

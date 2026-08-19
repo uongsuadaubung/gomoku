@@ -124,7 +124,7 @@ export const LONG_GAME: TauntDefinition = {
     "Một ván cờ giằng co quyết liệt minh chứng cho sự kiên cường của cả hai bên!",
     "Trận đấu kéo dài qua nhiều lượt căng thẳng, mỗi quân cờ đều mang ý nghĩa sống còn!",
     "Bàn cờ sắp kín chỗ, trận chiến trí tuệ này đang tiến về hồi kết cục kịch tính nhất!",
-    "Một màn đọ sức về độ bền tư duy, ai kiên trì hơn sẽ chạm tay vào chiến thắng!",
+    "Một màn đọ sức về độ bền thi đấu, ai kiên trì hơn sẽ chạm tay vào chiến thắng!",
     "Hơn 40 nước cờ kịch tính, chúng ta đang cống hiến một trận đấu để đời!",
     "Ván cờ giằng co dai dẳng như truyện cổ tích nghìn lẻ một đêm vậy, bạn dai sức ghê!",
     "Đánh hơn 40 nước cờ mà vẫn chưa chịu buông tha nhau, bạn định lập kỷ lục Guinness à?",

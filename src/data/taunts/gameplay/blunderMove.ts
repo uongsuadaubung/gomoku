@@ -104,7 +104,7 @@ export const BLUNDER_MOVE: TauntDefinition = {
     "Cảm ơn bạn đã tự chui đầu vào rọ một cách rất ngoan ngoãn!",
     "Nước cờ này sẽ được lưu truyền như một ví dụ kinh điển về sự tự hủy!",
     "Đi xong nước này coi như bạn đã ký vào biên bản nhận thua sớm rồi!",
-    "Một pha xử lý xứng đáng nhận điểm 0 tuyệt đối về tư duy chiến thuật!",
+    "Một pha xử lý xứng đáng nhận điểm 0 tuyệt đối về tính toán chiến thuật!",
     "Nước cờ này bạn đi bằng mắt hay đi bằng trực giác thế?",
     "Một pha tự đào hố chôn mình không thể nào đẹp mắt hơn!",
     "Bạn vừa tặng không cho tôi một cơ hội kết liễu trận đấu đấy à?",

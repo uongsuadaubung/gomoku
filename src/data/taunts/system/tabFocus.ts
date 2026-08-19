@@ -121,5 +121,12 @@ export const TAB_FOCUS: TauntDefinition = {
     "Đã tìm ra cao kiến nào để phá giải thế cờ hiểm hóc của tôi chưa?",
     "Vừa đi rửa mặt cho tỉnh táo sau cú sốc thế trận vừa rồi à bạn?",
     "Tập trung toàn bộ tinh lực lại đây và cho tôi thấy đòn đáp trả của bạn nào!",
+    "Quay lại rồi đấy à? Tra cứu xong bí kíp cờ thế rồi có tự tin hơn chút nào không?",
+    "Hỏi ý kiến tổ tư vấn xong chưa? Có ai khuyên bạn nên bấm nút Đầu Hàng sớm cho đỡ đau không?",
+    "Vừa đi hít thở oxy để lấy lại bình tĩnh sau chuỗi nước cờ bị bóp nghẹt đúng không?",
+    "Quay lại sàn đấu với vẻ mặt đầy quyết tâm, hy vọng lần này không tự bóp nữa nhé!",
+    "Chào mừng bạn quay trở lại với thực tại ăn hành, vào trận hạ cờ tiếp nào danh hài!",
+    "Đã chuẩn bị sẵn tâm lý đón nhận thất bại tiếp theo chưa bạn trẻ ơi?",
+    "Quay lại rồi thì mau mau đặt cờ xuống đi, tôi đợi bạn nãy giờ sốt cả ruột!",
   ],
 };

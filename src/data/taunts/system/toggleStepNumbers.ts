@@ -122,5 +122,12 @@ export const TOGGLE_STEP_NUMBERS: TauntDefinition = {
     "Đếm xem mình đã kiên cường chịu trận được bao nhiêu lượt rồi hả bạn?",
     "Ẩn số đi cho đỡ rối mắt, nhưng thế cờ của bạn thì vẫn đang rối như tơ vò đấy nhé!",
     "Hiện số nước cờ giúp bạn dễ dàng xem lại toàn bộ quá trình bị tôi bẻ gãy thế trận hơn đấy!",
+    "Hiện số lên bàn cờ để đếm xem mình đã tự bóp bao nhiêu nước rồi đúng không?",
+    "Bật số thứ tự lên để nhìn cho rõ từng bước chân dẫn bạn đến bờ vực thất bại kìa!",
+    "Thêm số vào bàn cờ nhìn như bài toán ma trận, hoa mắt chóng mặt thêm chứ ích gì!",
+    "Đếm từ nước 1 đến nước 20 toàn thấy dấu vết bị tôi dồn ép, nhìn mà xót xa ghê!",
+    "Bật số lên để học thuộc lòng từng nước đi của tôi về nghiên cứu đúng không? Cho phép đấy!",
+    "Hiện số nước đi giúp bạn dễ dàng làm báo cáo thống kê về sự non nớt của chính mình!",
+    "Số thứ tự hiện rõ mồn một, chứng minh bạn bị kết liễu nhanh hơn cả dự kiến!",
   ],
 };

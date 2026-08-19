@@ -124,7 +124,7 @@ export const STREAK_LOSS: TauntDefinition = {
     "Đừng nản lòng sau những ván đấu chưa may mắn, ánh sáng chiến thắng đang ở rất gần rồi!",
     "Mỗi ván thua là một viên gạch quý báu xây dựng nên sự vững chắc trong lối chơi của bạn!",
     "Hãy giữ vững niềm tin và sự điềm tĩnh, bạn hoàn toàn đủ khả năng tạo nên bất ngờ!",
-    "Kiên trì vượt qua giai đoạn này, bạn sẽ nhận thấy sự trưởng thành vượt bậc trong tư duy!",
+    "Kiên trì vượt qua giai đoạn này, bạn sẽ nhận thấy sự trưởng thành vượt bậc trong kỹ năng chơi cờ!",
     "Đừng nản lòng bạn nhé, sau cơn mưa trời lại sáng và chiến thắng đang chờ bạn phía trước!",
     "Mỗi ván đấu là một trải nghiệm quý giá giúp hai ta hiểu rõ hơn về lối chơi của nhau!",
     "Chuỗi thua của bạn kéo dài từ Hàng Đào sang tận Hàng Ngang luôn rồi kìa!",

@@ -119,5 +119,12 @@ export const SOUND_UNMUTE: TauntDefinition = {
     "Bật loa lên rồi à? Hãy lắng nghe trọn vẹn những âm thanh chiến thắng vang dội từ tôi nhé!",
     "Tiếng cờ gõ lách cách giòn giã đã quay lại, chuẩn bị thưởng thức từng đòn đánh đanh thép nào!",
     "Có tiếng vào trận đấu mới xôm tụ chứ bạn, tha hồ nghe tôi bình phẩm từng nước cờ nhé!",
+    "Bật lại loa để lắng nghe những lời vàng ngọc và những câu gáy khét lẹt từ tôi đúng không?",
+    "Chào mừng bạn quay trở lại với thế giới âm thanh sống động và ngập tràn sự cà khịa!",
+    "Bật tiếng lên rồi thì chuẩn bị tinh thần đón nhận những bài học kỳ nghệ nhớ đời nhé!",
+    "Dũng cảm bật lại âm thanh để nghe tôi chúc mừng sau trận thắng của tôi à? Đáng khen ghê!",
+    "Bật loa lên để cảm nhận trọn vẹn sự out trình tuyệt đối từ cao thủ như tôi nào!",
+    "Âm thanh đã sẵn sàng, lời gáy đã sẵn sàng, chỉ còn chờ bạn vào nộp mạng nữa thôi!",
+    "Bật loa lên nghe cho rõ tiếng thở dài của chính mình khi nhận thất bại từ tôi nhé!",
   ],
 };

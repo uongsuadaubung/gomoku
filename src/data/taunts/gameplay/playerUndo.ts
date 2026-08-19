@@ -71,7 +71,7 @@ export const PLAYER_UNDO: TauntDefinition = {
     "Một lần rút kinh nghiệm quý giá ngay trong ván cờ, hãy phát huy tối đa nào!",
     "Có hối cờ một nghìn lần thì kết quả bạn vẫn thua tôi thôi!",
     "Mỗi lần bạn bấm Đi Lại là tôi lại thấy buồn cười đau cả ruột!",
-    "Đi lại nước cờ để học hỏi và hoàn thiện tư duy là điều rất đáng khuyến khích!",
+    "Đi lại nước cờ để học hỏi và hoàn thiện nước đi là điều rất đáng khuyến khích!",
     "Đánh cờ kiểu này thì tôi chấp bạn Undo cả ván luôn đấy!",
     "Mặt dày như bê tông cốt thép, hối cờ liên tục không biết ngượng!",
     "Đi lại nước này rồi lại đi vào ngõ cụt tiếp, đúng là hết thuốc chữa!",

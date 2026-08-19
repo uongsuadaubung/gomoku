@@ -35,7 +35,7 @@ export const LEVEL_UP_ALERT: TauntDefinition = {
     "Một bước thăng tiến đáng ghi nhận, nhưng cái kết vẫn là bị tôi đè bẹp thôi!",
     "Chào mừng bạn đến với cấp độ mà mọi sai lầm đều sẽ bị trừng phạt bằng cái chết!",
     "Lên cấp thành công, hãy chứng minh bạn không phải lên cấp nhờ ăn may đi nào!",
-    "Cấp độ này tôi sẽ dạy cho bạn biết thế nào là tư duy bao quát toàn cục!",
+    "Cấp độ này tôi sẽ dạy cho bạn biết thế nào là khả năng bao quát toàn cục!",
     "Thăng hạng rồi đấy, liệu bạn có giữ nổi bình tĩnh trước những cạm bẫy mới của tôi?",
     "Chúc mừng bạn đã chính thức gia nhập hội những người bị tôi hành ở cấp cao!",
     "Cấp độ mới sẽ là một thử thách cực đại mà bạn khó lòng vượt qua nổi!",

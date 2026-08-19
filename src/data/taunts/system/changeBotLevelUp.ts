@@ -22,7 +22,7 @@ export const CHANGE_BOT_LEVEL_UP: TauntDefinition = {
     "Tăng độ khó lên để thử thách giới hạn chịu đựng của bản thân à?",
     "Bước chân vào đấu trường sinh tử cấp cao, chúc bạn may mắn sống sót!",
     "Tự tin tăng cấp thế này chắc vừa học lỏm được bí kíp gì trên mạng à?",
-    "Cấp độ này tôi sẽ cho bạn biết thế nào là tư duy tính toán trước 20 nước!",
+    "Cấp độ này tôi sẽ cho bạn biết thế nào là khả năng tính toán trước 20 nước!",
     "Tăng cấp lên để được tôi hành hạ một cách chuyên nghiệp và bài bản hơn à?",
     "Một quyết định dũng cảm nhưng chứa đầy rủi ro tự hủy cho bạn!",
     "Cấp độ này không có chỗ cho những sai lầm ngớ ngẩn hay ăn may đâu nhé!",

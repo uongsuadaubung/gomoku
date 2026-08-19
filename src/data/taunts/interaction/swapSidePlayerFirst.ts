@@ -32,7 +32,7 @@ export const SWAP_SIDE_PLAYER_FIRST: TauntDefinition = {
     "Cầm quân Đen mà không biết tấn công thì vứt đi bạn ơi!",
     "Đi trước đi, tôi đang ngồi chờ bạn tự sập bẫy của chính mình đây!",
     "Được đi trước rồi đấy, cố gắng đừng để tôi kết liễu quá sớm nhé!",
-    "Lợi thế tiên thủ không cứu nổi tư duy chơi cờ non nớt đâu bạn!",
+    "Lợi thế tiên thủ không cứu nổi lối chơi cờ non nớt đâu bạn!",
     "Tôi đi sau mà vẫn thắng bạn thì bạn nhớ gọi tôi là sư phụ nhé!",
     "Cầm Đen mà đánh run rẩy thế thì lát nữa Trắng của tôi đè bẹp ngay!",
     "Đi trước đi bạn trẻ, để tôi xem bạn mở màn theo sách giáo khoa nào!",

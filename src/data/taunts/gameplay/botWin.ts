@@ -180,7 +180,7 @@ export const BOT_WIN: TauntDefinition = {
     "Một pha dứt điểm sắc lẹm, không để lại bất kỳ cơ hội phản kháng nào!",
     "Cảm ơn bạn vì một ván cờ tuyệt vời, hẹn gặp lại bạn ở những thử thách tới!",
     "Trận đấu kết thúc, chúc bạn có những giây phút tĩnh tâm sau thất bại này!",
-    "Một chiến thắng vang dội, khẳng định sự vượt trội hoàn toàn về mặt tư duy!",
+    "Một chiến thắng vang dội, khẳng định sự vượt trội hoàn toàn về mặt chiến thuật!",
     "Năm quân cờ thẳng hàng như một nhát kiếm quyết định kết liễu trận đấu!",
     "Bạn đã thi đấu rất kiên cường, nhưng trước mặt tôi điều đó là chưa đủ!",
     "Chiến thắng này là kết quả tất yếu của một chuỗi tính toán chính xác tuyệt đối!",

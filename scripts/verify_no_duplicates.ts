@@ -39,6 +39,7 @@ const UNNATURAL_PATTERNS = [
   { regex: /\b(thuật toán|mã nguồn|database|source code|chương trình|phần mềm|ứng dụng|code|bug|cpu|ram)\b/i, desc: 'Dùng thuật ngữ máy tính khô khan' },
   { regex: /\b(bot|gomoku ai)\b/i, desc: 'Tự nhận mình là Bot' },
   { regex: /\bAI\b/, desc: 'Tự nhận mình là AI' },
+  { regex: /\b(tư duy)\b/i, desc: 'Dùng từ "tư duy" (mang tính phán xét cá nhân, cần đổi sang nước cờ / thế trận / toan tính)' },
 ];
 
 const OVERLY_FORMAL_PATTERNS = [
@@ -395,7 +396,7 @@ function checkPatternDiversity(lines: string[]): { prefix: string; percentage: n
 // =========================================================================
 // 7. TIẾN TRÌNH KIỂM TOÁN CHÍNH TOÀN BỘ KHO THOẠI
 // =========================================================================
-const MIN_SENTENCES_REQUIRED = 100;
+const MIN_SENTENCES_REQUIRED = 120;
 
 let totalSentences = 0;
 let exactDuplicatesCount = 0;

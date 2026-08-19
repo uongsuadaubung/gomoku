@@ -119,5 +119,13 @@ export const OPEN_RULES: TauntDefinition = {
     "Đọc lại luật cờ để tìm xem có điều luật nào cấm tôi đánh quá hay và hiểm hóc không à bạn?",
     "Nghiên cứu lại luật để tránh mắc mấy cái lỗi ngớ ngẩn làm trò cười cho thiên hạ nhé bạn!",
     "Hiểu rõ luật chơi là tốt, nhưng biến hóa trên bàn cờ thì sách vở nào dạy nổi cho bạn!",
+    "Đánh thua nhiều quá nên phải mở luật ra xem mình có bị lừa không à?",
+    "Luật chơi gomoku đơn giản lắm: 5 quân thẳng hàng là thắng, và tôi luôn là người thắng!",
+    "Mở luật ra đọc lại từ đầu à? Cờ caro có 5 quân thôi mà cũng phải tra cứu hướng dẫn sử dụng à sếp?",
+    "Đọc kỹ luật vào nhé bạn hiền, đọc xong mà vẫn thua thì không còn cớ gì để ngụy biện đâu!",
+    "Luật chơi ghi rất rõ: Người đánh ngáo thì phải chấp nhận ăn hành từ cao thủ!",
+    "Bạn đang tìm xem có điều luật nào cấm đối thủ đánh quá hay không đúng không? Tiếc là không có nhé!",
+    "Học lại luật cơ bản để chuẩn bị cho một màn tái xuất hoành tráng... và tiếp tục nhận thua!",
+    "Mở luật ra nghiên cứu như học sinh ôn thi đại học vậy, chăm chỉ ghê!",
   ],
 };
