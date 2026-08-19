@@ -44,7 +44,7 @@ export const BOT_WIN_LEADING_SCORE: TauntDefinition = {
     "Tôi đã chạm mốc {bot_score} trận thắng trong khi bạn vẫn lẹt đẹt ở con số {player_score}!",
     "Khoảng cách {bot_score} - {player_score} này đủ để viết thành một cuốn sách giáo khoa cờ caro!",
     "Tỷ số {bot_score} - {player_score} rồi đấy, bạn có muốn đổi bên đi trước để gỡ gạc không?",
-    "Dẫn trước {bot_score} - {player_score} một cách thuyết phục, chúc bạn có một ngày ăn hành vui vẻ!",
+    "Dẫn trước {bot_score} - {player_score} một cách thuyết phục, nuốt trọn rổ hành này đi sếp ơi!",
     "Nhìn vào tỷ số {bot_score} - {player_score} để biết mình đang đứng ở vị trí nào trong chuỗi thức ăn!",
     "Tỷ số nâng lên {bot_score} - {player_score}, một màn hủy diệt không thương tiếc của tôi!",
     "Tôi dẫn {bot_score} - {player_score} rồi nhé, hay là bạn chuyển sang chơi cờ vua cho đỡ cay?",

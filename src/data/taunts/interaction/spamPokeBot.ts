@@ -93,7 +93,7 @@ export const SPAM_POKE_BOT: TauntDefinition = {
     "Bạn đã làm cho không gian thi đấu trở nên rộn ràng hơn bao giờ hết!",
     "Hãy mang tinh thần lạc quan này vào từng nước đi để tạo nên kỳ tích nhé!",
     "Tôi rất hào hứng được so tài cùng một đối thủ vui tính và tràn đầy năng lượng như bạn!",
-    "Một cử chỉ chào hỏi đầy cá tính, chúc bạn có một ngày thi đấu thật thăng hoa!",
+    "Bấm chọc tôi lia lịa thế, tính làm hỏng chuột để có cớ nhận thua à sếp?",
     "Hãy cùng tôi biến những tiếng click vui tai này thành những nước cờ chiến thắng!",
     "Tôi luôn sẵn sàng đáp lại mọi tình cảm và sự quan tâm đặc biệt từ phía bạn!",
     "Bạn đã sẵn sàng để bùng nổ trên bàn cờ 15x15 này chưa? Vào trận thôi nào!",

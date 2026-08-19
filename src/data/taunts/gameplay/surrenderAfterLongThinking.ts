@@ -58,7 +58,7 @@ export const SURRENDER_AFTER_LONG_THINKING: TauntDefinition = {
     "Sau 40 giây phân tích dữ liệu, bộ não của bạn đã đưa ra chỉ thị duy nhất: Hãy đầu hàng ngay lập tức!",
     "Một màn biểu diễn trầm ngâm kết thúc bằng một cú bấm chuột nhẹ nhàng tiễn đưa ván cờ về nơi an nghỉ!",
     "Bạn suy nghĩ lâu thế để đếm xem mình đã thua bao nhiêu ván rồi à? Ván này là thêm một trận nữa nhé danh hài!",
-    "Tưởng đâu bạn có bài tẩy giấu kín, bài tẩy của bạn là lá cờ trắng tinh khôi giương cao giữa trận địa!",
+    "Tưởng đâu bạn có bài tẩy giấu kín, bài tẩy của bạn là lá cờ trắng đầu hàng giương cao giữa trận địa!",
     "Một pha giơ cờ trắng sau khi đã suy nghĩ nát nước, thể hiện sự tôn trọng tuyệt đối trước sức mạnh của tôi!",
     "Bạn ngâm cờ lâu như vậy chỉ để chọn thời điểm đầu hàng cho nó đẹp mắt thôi đúng không?",
     "Tốn bao nhiêu chất xám để rồi đi đến một kết luận đắng chát: Không thể nào thắng nổi đối thủ này!",

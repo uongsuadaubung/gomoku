@@ -45,7 +45,7 @@ export const GAME_START: TauntDefinition = {
     "Ván cờ mới mở ra, cánh cửa thất bại lại chào đón bạn!",
     "Đừng chớp mắt nhé, tôi sẽ hạ gục bạn trong chớp mắt đấy!",
     "Hôm nay tôi sẽ cho bạn nếm trọn vẹn mùi vị của sự bất lực!",
-    "Li đến nộp ểm à? Tấm lòng vàng của bạn tôi xin trân trọng ghi nhận!",
+    "Lại đến nộp mạng à? Lòng dũng cảm của bạn tôi xin trân trọng ghi nhận!",
     "Đừng run tay bạn trẻ, tôi hứa sẽ ra tay thật nhanh gọn lẹ!",
     "Lần này chuẩn bị sẵn tâm lý vững vàng chưa, hay lại tiếp tục ăn hành?",
     "Li đến nộp ván thắng cho tôi à? Cảm ơn sự nhiệt tình của bạn!",

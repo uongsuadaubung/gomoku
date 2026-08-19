@@ -30,7 +30,7 @@ function jaccardSimilarity(setA: Set<string>, setB: Set<string>): number {
 }
 
 // =========================================================================
-// 2. BỘ LỌC TỪ NGỮ MÁY MÓC & QUÁ TRỊNH TRỌNG
+// 2. BỘ LỌC TỪ NGỮ MÁY MÓC & QUÁ TRỊNH TRỌNG / XÃ GIAO HIỀN LÀNH
 // =========================================================================
 const UNNATURAL_PATTERNS = [
   { regex: /\b(người dùng)\b/i, desc: 'Dùng từ "người dùng" (cần xưng "bạn")' },
@@ -44,7 +44,10 @@ const UNNATURAL_PATTERNS = [
 const OVERLY_FORMAL_PATTERNS = [
   { regex: /\b(kính nể|kính trọng|bái phục|ngả mũ thán phục|cúi đầu thán phục)\b/i, desc: 'Quá cung kính / trịnh trọng, mất chất gáy bẩn' },
   { regex: /\b(thiên anh hùng ca|bậc đại trượng phu|phần thưởng cao quý|tấm gương sáng)\b/i, desc: 'Văn vở sách vở / sến súa, mất chất cà khịa' },
-  { regex: /\b(hạnh ngộ|thanh tao|thanh tịnh|tri kỷ cờ)\b/i, desc: 'Văn phong cổ trang / khách sáo quá mức' },
+  { regex: /\b(hạnh ngộ|thanh tao|thanh tịnh|tri kỷ cờ|an nhiên|tinh khôi)\b/i, desc: 'Văn phong cổ trang / khách sáo quá mức' },
+  { regex: /\b(chúc bạn có một ngày|chúc bạn một ngày|chúc bạn luôn giữ|hạnh phúc bên người thân)\b/i, desc: 'Lời chúc xã giao công sở hiền lành, thiếu chất khịa' },
+  { regex: /\b(dù thắng hay thua|thắng thua không quan trọng)\b/i, desc: 'An ủi hiền lành, làm mất độ khét của gáy bẩn' },
+  { regex: /\b(chia sẻ niềm vui|sẻ chia đam mê|tấm lòng vàng|lan tỏa niềm vui)\b/i, desc: 'Văn phong phong trào / sáo rỗng' },
 ];
 
 // =========================================================================
@@ -150,6 +153,14 @@ const GENERAL_BANTER_KEYWORDS = [
   'đứng hình', 'bóp', 'phế', 'uống trà', 'hoa mắt', 'trắng đêm', 'cú đêm',
   'thâu đêm', 'tập thể dục', 'kết liễu', 'dồn ép', 'hạ gục', 'mù quáng',
   'bế tắc', 'tuyệt vọng', 'phục thù', 'gỡ gạc', 'ngon thì', 'dám', 'cứ tự nhiên',
+  'ăn cơm', 'cơm trưa', 'chan nước mắt', 'nuốt không trôi', 'sáng sớm', 'cuối tuần',
+  'cà phê', 'ngủ gật', 'deadline', 'mất mặt', 'muối mặt', 'bẽ bàng', 'đỡ đạn',
+  'song tứ', 'tứ tử', 'ngã ba', 'chữ t', 'tia chớp', 'zic-zắc', 'góc chết',
+  'so le', 'đan len', '13', 'xui xẻo', 'bản án', 'nghĩ lâu', 'ngâm cờ', 'chớp nhoáng',
+  'đáy xã hội', 'bại trận', 'bại tướng', 'cửa thắng', 'buông xuôi', 'xả giận', 'thất bại',
+  'bất lực', 'cứu', 'phao', 'rời tab', 'đóng tab', 'chuồn', 'hoảng loạn', 'đau lòng',
+  'sát phạt', 'phá nát', 'cú sốc', 'quyết tâm', 'tiếc', 'ngầu', 'rối rắm', 'nghịch ngợm',
+  'vô nghĩa', 'bất an', 'nôn nóng', 'sụp đổ', 'bất phân',
 ];
 
 const EVENT_CONTEXT_KEYWORDS: Partial<Record<TauntEvent, string[]>> = {
@@ -185,17 +196,81 @@ const EVENT_CONTEXT_KEYWORDS: Partial<Record<TauntEvent, string[]>> = {
   SPLIT_BOARD_EXPEDITION: ['bán cầu', 'chi nhánh', 'xa xôi', 'thám hiểm', 'hai đầu', 'đối diện', 'du lịch', 'vũ trụ'],
   TRIANGLE_FORMATION: ['tam giác', 'cờ vây', 'vây đất', 'nhầm game', 'khoanh vùng', '3 quân', 'bo góc'],
   CLEAN_SWEEP_DOMINATION: ['nuốt trọn', 'áp đảo', 'không kịp thở', 'out trình', 'đỉnh', 'hack', 'bất khả chiến bại', 'sốc'],
-  IRON_CURTAIN_WIN: ['bê tông', 'cốt thép', 'lì đòn', 'tử thủ', 'phòng ngự', 'kiên trì', 'hết pin', 'dai'],
-  KEYBOARD_SMASH_SPAM: ['bàn phím', 'gõ phím', 'côm cốp', 'đập phím', 'audition', 'liên minh', 'spam', 'nát phím'],
-  RIGHT_CLICK_INSPECT: ['chuột phải', 'inspect', 'f12', 'cheat', 'sửa điểm', 'mã nguồn', 'hack'],
-  WINDOW_RESIZE_PANIC: ['thu nhỏ', 'phóng to', 'cửa sổ', 'màn hình', 'resize', 'sợ', 'thu hẹp'],
-  DRAG_SELECT_PANIC: ['bôi đen', 'quét chuột', 'chọn chữ', 'kéo rê', 'mật mã', 'rối loạn', 'hoang mang'],
-  SURRENDER_AFTER_LONG_THINKING: ['ngâm cờ', 'suy nghĩ', '40 giây', 'đầu hàng', 'đăm chiêu', 'nghĩ lâu', 'cuối cùng', 'nhận thua'],
-  BLOCK_AND_COUNTER_FOUR: ['phản công', 'chặn', 'nước 4', 'họng pháo', 'vừa thủ', 'vừa công', 'ảo ma', 'phản đòn'],
-  REVENGE_WIN_AFTER_LOSS_STREAK: ['phục thù', '3 ván', 'chuỗi thua', 'oanh liệt', 'tinh thần thép', 'lội ngược dòng', 'nợ'],
-  CONSECUTIVE_SPEED_LOSSES: ['liên tiếp', 'tốc hành', 'ấm nước', '12 nước', 'chớp nhoáng', 'guinness', 'ăn hành', 'nhanh'],
-  SYMMETRY_BREAK_SURPRISE: ['đối xứng', 'bắt chước', 'bẻ lái', 'bẻ hướng', 'ru ngủ', 'lừa tình', 'bất ngờ', 'chiêu bài'],
-  WIN_RIGHT_AFTER_UNDO: ['undo', 'đi lại', 'cỗ máy thời gian', 'thắng', 'quay ngược', 'doraemon', 'thực lực', 'ăn may'],
+  IRON_CURTAIN_WIN: ['bê tông', 'cốt thép', 'lì đòn', 'tử thủ', 'phòng ngự', 'kiên trì', 'hết pin', 'dai'],  LUNCH_BREAK_RUSH: ['cơm trưa', 'nghỉ trưa', 'chan nước mắt', 'nghẹn', 'hành', 'công sở', 'nuốt không trôi', 'nộp mạng'],
+  EARLY_MORNING_COFFEE: ['cà phê', 'sáng sớm', 'mở bát', 'tỉnh ngủ', 'ngái ngủ', 'ăn hành', 'ngã ngựa', 'đắng'],
+  WEEKEND_CHILL: ['cuối tuần', 'thứ bảy', 'chủ nhật', 'rảnh rỗi', 'marathon', 'người yêu', 'ăn hành', 'guinness'],
+  T_SHAPE_FORMATION: ['chữ t', 'ngã ba', 'biển báo', 'giao thông', 'vuông góc', 'hai nhánh', 'cột cờ'],
+  ZIGZAG_LIGHTNING: ['zic-zắc', 'tia chớp', 'uốn lượn', 'con rắn', 'mê cung', 'sấm sét', 'lượn lách'],
+  DOUBLE_DEAD_FOUR: ['song tứ', 'tứ tử', 'bịt kín', '4 đầu', 'chết cứng', 'khúc gỗ', 'vô vọng'],
+  CORNER_DEATH_TRAP: ['góc chết', 'góc tường', '3x3', 'nhốt', 'cá nằm trên thớt', 'dồn ép', 'chân tường'],
+  CHECKERBOARD_WEAVE: ['so le', 'đan len', 'xen kẽ', 'bàn cờ vua', 'dệt vải', 'cài răng lược', 'hoa văn'],
+  OVERTHINKING_BLUNDER: ['vắt óc', 'nghĩ lâu', 'ngâm cờ', 'đi vào lòng đất', 'quá tải', 'tự bóp', 'gia cát lượng'],
+  ONE_MINUTE_BULLET_WIN: ['1 phút', 'chưa đầy 1 phút', '60 giây', 'tốc độ ánh sáng', 'mì ăn liền', 'chớp nhoáng'],
+  UNLUCKY_THIRTEEN_MOVES: ['13', 'nước thứ 13', 'con số 13', 'xui xẻo', 'oan nghiệt', 'bản án', 'lời nguyền'],
+  SPEED_REVENGE_FAIL: ['phục thù', '1 giây', 'tái đấu', 'tức thì', 'rửa hận', 'nộp mạng', 'gấp đôi'],
+  WIN_RATE_DROP_BELOW_50: ['tỷ lệ thắng', 'winrate', '50%', 'thủng đáy', 'tụt dốc', 'cắm mỏ', 'rơi tự do', 'bại tướng', 'biểu đồ', 'phong độ', 'sụt giảm', 'gãy cánh', 'cổ phiếu', 'ngân hàng'],
+  PERFECT_CENTURY_GAMES: ['100', 'thế kỷ', 'tròn', 'cột mốc', 'kỷ lục', 'chịu đòn', 'bền bỉ', 'khách hàng', 'lì lợm'],
+  MONDAY_BLUES: ['thứ hai', 'đầu tuần', 'tuần mới', 'sáng sớm', 'cà phê', 'trừ lương', 'họp', 'u ám'],
+  TGIF_FRIDAY_AFTERNOON: ['thứ sáu', 'tan làm', 'cuối tuần', 'cuối ngày', 'quẩy', 'bia', 'hạ màn', 'nhậu', 'về sớm', 'công sở', 'tuần làm việc'],
+  AFTERNOON_FOOD_COMA: ['căng da bụng', 'chùng da mắt', 'buồn ngủ', 'mộng du', 'gà gật', 'lim dim', 'bữa trưa', 'uể oải'],
+  MIDNIGHT_BATTERY_LOW: ['3h sáng', '2h sáng', 'nửa đêm', 'cú đêm', 'pin', 'thâm mắt', 'gấu trúc', 'mất ngủ'],
+  POKE_BOT: ['chọc', 'bấm', 'avatar', 'mặt', 'ngứa', 'cù', 'đụng', 'chạm', 'tay chân'],
+  SPAM_POKE_BOT: ['spam', 'chọc liên tục', 'bấm lia lịa', 'nát chuột', 'cuồng', 'dừng lại'],
+  THEME_CHANGE: ['theme', 'màu', 'giao diện', 'gỗ', 'giấy', 'ngọc', 'cyber', 'slate', 'phong thủy', 'áo mới', 'bàn cờ', 'màu sắc', 'phông nền'],
+  BOARD_STYLE_CHANGE: ['chế độ', 'giữa ô', 'giao điểm', 'đường kẻ', 'bàn cờ'],
+  SOUND_MUTE: ['tắt tiếng', 'mute', 'im lặng', 'điếc', 'âm thanh', 'loa', 'ồn ào'],
+  SOUND_UNMUTE: ['bật tiếng', 'unmute', 'âm thanh', 'loa', 'nghe', 'nhạc'],
+  TOGGLE_STEP_NUMBERS: ['số thứ tự', 'bật số', 'tắt số', 'đếm', 'bước đi', 'nước đi', 'đánh số', 'dãy số', 'con số', 'số bước', 'bảng cửu chương', 'số 0', 'hiển thị số'],
+  OPEN_STATS: ['thống kê', 'tỷ lệ thắng', 'bảng vàng', 'thành tích', 'soi', 'xem lại'],
+  RESET_STATS: ['reset', 'xóa', 'về 0', 'tẩy trắng', 'làm lại từ đầu', 'quên đi'],
+  OPEN_RULES: ['luật', 'đọc luật', 'sách', '5 quân', 'phạm quy', 'học luật', 'cấp tốc'],
+  OPEN_BOT_MODAL: ['cấp độ', 'level', 'độ khó', 'bot', 'thông tin', 'nghiên cứu', 'soi'],
+  CHANGE_BOT_LEVEL_UP: ['tăng cấp', 'tăng độ khó', 'thử thách', 'mạnh hơn', 'tự tin', 'liều'],
+  CHANGE_BOT_LEVEL_DOWN: ['hạ cấp', 'giảm độ khó', 'sợ', 'dễ hơn', 'bắt nạt', 'yếu'],
+  TAB_BLUR: ['chuyển tab', 'bỏ rơi', 'trốn', 'lướt web', 'tab khác', 'quay lại'],
+  TAB_FOCUS: ['quay lại', 'trở lại', 'tiếp tục', 'sẵn sàng', 'tab này', 'tra cứu', 'thực tế', 'thực tại', 'chatgpt', 'hướng dẫn', 'thực chiến', 'cứu vãn', 'sống sót', 'chiêu mới', 'rửa mặt', 'gia đình', 'trợ giúp', 'học lỏm', 'bàn đấu', 'đáp án', 'bàn cờ'],
+  GAME_START: ['bắt đầu', 'khai cuộc', 'trận đấu', 'vào trận', 'so tài', 'chiến'],
+  PLAYER_GOOD_MOVE: ['nước hay', 'đẹp mắt', 'sắc bén', 'nguy hiểm', 'bất ngờ', 'phản công'],
+  BREAK_LOSS_STREAK: ['ngắt chuỗi', 'thắng lại', 'ăn may', 'hên', 'thoát nạn', 'rùa'],
+  LEVEL_UP_ALERT: ['thăng cấp', 'lên cấp', 'mở khóa', 'đẳng cấp', 'chúc mừng'],
+  CLICK_BEFORE_START: ['chưa bấm', 'bắt đầu', 'vội vàng', 'hấp tấp', 'nhấp chuột'],
+  CLICK_AFTER_GAME_OVER: ['hết trận', 'ván mới', 'kết thúc', 'bấm chi', 'thua rồi'],
+  LONG_HOVER_CELL: ['ngắm', 'hover', 'rê chuột', 'do dự', 'đắn đo', 'soi'],
+  MARATHON_SERIES: ['10 ván', 'marathon', 'kiên trì', 'cày cuốc', 'liên tục'],
+  GOD_LEVEL_VICTORY: ['thần thánh', 'level 5', 'cao nhất', 'thắng bot', 'xuất thần'],
+  GAME_DRAW: ['hòa', 'bất phân', 'kịch tính', 'hết ô', 'bắt tay'],
+  CONSECUTIVE_DRAWS: ['hòa liên tiếp', '2 ván hòa', 'cù cưa', 'ngang tài'],
+  TIT_FOR_TAT_DRAWS: ['3 ván hòa', 'thi gan', 'bất phân thắng bại', 'dây dưa'],
+  PLAYER_RESIGN: ['đầu hàng', 'nhận thua', 'buông kiếm', 'xin hàng', 'chào thua'],
+  COMEBACK_WIN: ['lội ngược dòng', 'lật kèo', 'thần kỳ', 'thoát hiểm', 'ngược dòng'],
+  NO_UNDO_WIN: ['quân tử', 'không undo', 'sạch sẽ', 'thực lực', 'chính trực'],
+  CLUTCH_100_STONES: ['100 quân', 'kỷ lục', 'kín bàn', 'căng thẳng', 'dày đặc'],
+  COPYCAT_MOVE: ['bắt chước', 'sao chép', 'đối xứng', 'copy', 'gương'],
+  BOX_SURROUND_CENTER: ['hộp', 'bao vây', 'khung', 'vây bắt', 'trung tâm'],
+  FULL_DIAGONAL_HIGHWAY: ['đường chéo', 'cao tốc', 'xuyên bàn', 'nối dài', 'dài thượt'],
+  DIAGONAL_CROSS_FORMATION: ['chữ x', 'giao nhau', 'đường chéo', 'tâm', 'chữ thập chéo'],
+  FOUR_THREE_DOUBLE_ATTACK: ['4-3', 'tứ tam', 'đòn kép', 'hai đầu', 'sát cục'],
+  OPEN_FOUR_BLUNDER: ['4 mở', 'hai đầu', 'bỏ sót', 'mù', 'thua'],
+  CENTER_MOVE: ['thiên nguyên', 'trung tâm', '7,7', 'khai cuộc', 'giữa bàn'],
+  CORNER_MOVE: ['góc', 'dạt góc', '0,0', '14,14', 'biên'],
+  EDGE_WALK_MOVE: ['mép', 'dạt biên', 'mép bàn', 'ngoài rìa', 'bờ tường'],
+  DOUBLE_THREE_TRAP: ['3-3', 'tam tam', 'bẫy đôi', 'hai mũi', 'tấn công'],
+  JUMP_THREE_TRAP: ['nhảy 3', 'nhảy cách', 'cách quãng', 'hiểm', 'bẫy'],
+  FAST_MOVE_TAUNT: ['quá nhanh', 'chưa nghĩ', 'vội', 'hấp tấp', 'bấm bừa'],
+  RUSH_MOVE: ['thần tốc', 'chớp nhoáng', 'nhanh như chớp', 'không suy nghĩ'],
+  LONG_GAME: ['40 nước', 'kéo dài', 'dai dẳng', 'căng thẳng', 'mệt mỏi'],
+  BOT_BLOCK_THREAT: ['chặn đứng', 'bịt', 'phòng thủ', 'bẻ gãy', 'dập tắt'],
+  BOT_TRAP: ['bẫy', 'sát cục', 'vcf', 'tử thần', 'không đỡ nổi'],
+  SWAP_SIDE_BOT_FIRST: ['nhường đi trước', 'quân trắng', 'bot đi trước', 'tự tin'],
+  SWAP_SIDE_PLAYER_FIRST: ['quân đen', 'đi trước', 'tiên thủ', 'giành quyền'],
+  CTRL_Z_SHORTCUT_ATTEMPT: ['ctrl+z', 'phím tắt', 'undo', 'lùi lại', 'nhanh tay'],
+  DEVTOOLS_INSPECT_HACK: ['f12', 'devtools', 'inspect', 'mã nguồn', 'soi code'],
+  SCREENSHOT_ATTEMPT: ['chụp màn hình', 'printscreen', 'lưu kỷ niệm', 'khoe', 'bằng chứng'],
+  SPACEBAR_SMASH: ['spacebar', 'đập phím', 'dấu cách', 'sốt ruột', 'gõ mạnh'],
+  WHEEL_ZOOM_ATTEMPT: ['cuộn chuột', 'zoom', 'phóng to', 'thu nhỏ', 'con lăn'],
+  DOUBLE_CLICK_STONE: ['nhấp đúp', 'double click', 'hai lần', 'quân cờ', 'bấm mạnh'],
+  RAGE_QUIT_F5_RELOAD: ['f5', 'reload', 'tải lại', 'rage quit', 'trốn chạy', 'thua'],
+  COPY_TAUNT_TEXT: ['copy', 'sao chép', 'bôi đen', 'lời thoại', 'câu gáy', 'học thuộc'],
   HOVER_UNDO_HESITATION: ['rê chuột', 'ngập ngừng', 'undo', 'do dự', 'rút tay', 'xấu hổ', 'đấu tranh', 'đi lại'],
   RESIGN_WHILE_AI_THINKING: ['đầu hàng', 'đang tính', 'suy nghĩ', 'kết liễu', 'vội vàng', 'sát cục', 'tiết kiệm'],
   CLICK_OWN_STONE: ['quân cờ', 'chính mình', 'nhấc quân', 'cờ tướng', 'bấm nhầm', 'quân mình', 'vô thức'],
@@ -383,7 +458,7 @@ for (const [categoryName, lines] of Object.entries(TAUNT_DATABASE)) {
       }
     }
 
-    // 3. Từ ngữ quá trịnh trọng / sách vở / sến súa
+    // 3. Từ ngữ quá trịnh trọng / sách vở / sến súa / lời chúc xã giao
     for (const formal of OVERLY_FORMAL_PATTERNS) {
       if (formal.regex.test(line)) {
         overlyFormalCount++;

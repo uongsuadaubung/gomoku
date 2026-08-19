@@ -12,7 +12,7 @@ export const MARATHON_SERIES: TauntDefinition = {
     "Đã 10 trận thư hùng trôi qua, hai chúng ta đang tạo nên một chuỗi kỷ niệm thi đấu vô cùng đáng nhớ!",
     "Bạn đánh cờ bền sức thật đấy, 10 ván liên tục mà từng nước cờ vẫn sắc sảo như ván đầu!",
     "Một tràng pháo tay cho sự kiên trì phi thường của bạn sau cột mốc 10 ván đấu!",
-    "Dù thắng hay thua thì tinh thần chiến đấu suốt 10 ván cờ của bạn cũng xứng đáng đạt điểm 10!",
+    "Nuốt trọn hành suốt 10 ván liên tiếp mà vẫn không chịu bỏ cuộc, bạn lì đòn số một!",
     "Chúng ta đã đồng hành cùng nhau qua 10 ván cờ đầy ắp cảm xúc, cảm ơn sự nhiệt huyết của bạn!",
     "Một kỳ thủ marathon đúng nghĩa! 10 ván cờ đã chứng kiến sự tiến bộ vượt bậc của bạn!",
     "Cày cờ hăng say thế này thì chẳng mấy chốc bạn sẽ trở thành đại kiện tướng thôi!",
