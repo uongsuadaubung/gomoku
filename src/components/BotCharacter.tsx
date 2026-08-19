@@ -1,6 +1,7 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show, createSignal, createEffect, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
 import type { BotMood } from '../services/tauntService';
+import { soundService } from '../services/soundService';
 
 interface BotCharacterProps {
   store: GameStore;
@@ -10,6 +11,58 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
   const { store } = props;
   const config = () => store.currentLevelConfig();
   const taunt = () => store.tauntState();
+
+  // Trạng thái hiệu ứng gõ chữ (Typewriter effect)
+  const [displayedText, setDisplayedText] = createSignal('');
+  const [isTyping, setIsTyping] = createSignal(false);
+  let typingTimer: number | null = null;
+
+  // Lắng nghe thay đổi câu thoại để chạy hiệu ứng gõ chữ và âm thanh chíp chíp
+  createEffect(() => {
+    const currentTaunt = taunt();
+
+    if (typingTimer) {
+      clearInterval(typingTimer);
+      typingTimer = null;
+    }
+
+    if (!currentTaunt.visible || !currentTaunt.text) {
+      setDisplayedText('');
+      setIsTyping(false);
+      return;
+    }
+
+    const fullText = currentTaunt.text;
+    const mood = currentTaunt.mood;
+    let charIdx = 0;
+
+    setDisplayedText('');
+    setIsTyping(true);
+
+    // Tốc độ gõ chữ mượt mà ~20ms / ký tự
+    typingTimer = window.setInterval(() => {
+      charIdx++;
+      const currentSub = fullText.slice(0, charIdx);
+      setDisplayedText(currentSub);
+
+      // Phát âm thanh thoại 8-bit gibberish chíp chíp vui nhộn cách quãng
+      if (charIdx % 2 === 0 && fullText[charIdx - 1]?.trim()) {
+        soundService.playVoiceBlip(mood);
+      }
+
+      if (charIdx >= fullText.length) {
+        if (typingTimer) {
+          clearInterval(typingTimer);
+          typingTimer = null;
+        }
+        setIsTyping(false);
+      }
+    }, 20);
+  });
+
+  onCleanup(() => {
+    if (typingTimer) clearInterval(typingTimer);
+  });
 
   // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại (18 sắc thái cảm xúc)
   const moodEmoji = () => {
@@ -57,7 +110,7 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
     }
   };
 
-  // Hiệu ứng chuyển động vi mô theo tâm trạng
+  // Hiệu ứng chuyển động Avatar theo tâm trạng
   const moodAnimation = () => {
     if (!taunt().visible) return 'group-hover:scale-105';
     const m: BotMood = taunt().mood;
@@ -79,6 +132,43 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
         return 'scale-110 rotate-2 shadow-amber-500/50';
       default:
         return 'scale-110 rotate-3';
+    }
+  };
+
+  // Phong cách & Màu sắc Bong bóng thoại thích ứng theo Mood
+  const bubbleTheme = () => {
+    const m: BotMood = taunt().mood;
+    switch (m) {
+      case 'rage':
+      case 'angry':
+        return {
+          box: 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 text-white border-2 border-rose-300 shadow-rose-500/40 animate-bubble-shake',
+          arrow: 'bg-rose-600 border-l-2 border-b-2 border-rose-400',
+        };
+      case 'shocked':
+      case 'mindblown':
+        return {
+          box: 'bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 text-white border-2 border-indigo-300 shadow-indigo-500/40 animate-bubble-wobble',
+          arrow: 'bg-purple-600 border-l-2 border-b-2 border-indigo-400',
+        };
+      case 'laugh':
+      case 'clown':
+      case 'party':
+        return {
+          box: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30 animate-bubble-bouncy',
+          arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+        };
+      case 'sleepy':
+      case 'bored':
+        return {
+          box: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-100 border-2 border-slate-600 shadow-slate-900/50',
+          arrow: 'bg-slate-800 border-l-2 border-b-2 border-slate-600',
+        };
+      default:
+        return {
+          box: 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 border-2 border-amber-200 shadow-amber-500/30',
+          arrow: 'bg-amber-400 border-l-2 border-b-2 border-amber-300',
+        };
     }
   };
 
@@ -126,15 +216,28 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
         </div>
       </button>
 
-      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Nằm ngang sang bên phải, co giãn tự nhiên trong khung bàn cờ) */}
-      <Show when={taunt().visible && !!taunt().text}>
+      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Typewriter + Mood-Adaptive Themes) */}
+      <Show when={taunt().visible && (displayedText() || taunt().text)}>
         <div class="flex-1 min-w-0 max-w-[480px] pointer-events-none animate-bubble-pop">
-          <div class="relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl border-2 border-amber-200">
-            {/* Nội dung câu khịa */}
-            <p class="drop-shadow-sm break-words select-none">{taunt().text}</p>
+          <div
+            class={`relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl transition-all duration-200 ${
+              bubbleTheme().box
+            }`}
+          >
+            {/* Nội dung câu khịa có Typewriter Effect */}
+            <p class="drop-shadow-sm break-words select-none inline">
+              {displayedText() || taunt().text}
+              <Show when={isTyping()}>
+                <span class="inline-block w-1.5 h-3.5 ml-1 bg-current rounded-sm animate-cursor-blink align-middle" />
+              </Show>
+            </p>
 
             {/* Mũi nhọn đuôi bong bóng thoại trỏ sang trái về phía Bot */}
-            <div class="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-400 rotate-45 border-l-2 border-b-2 border-amber-300 pointer-events-none" />
+            <div
+              class={`absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rotate-45 pointer-events-none ${
+                bubbleTheme().arrow
+              }`}
+            />
           </div>
         </div>
       </Show>

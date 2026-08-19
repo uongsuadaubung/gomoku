@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "taunts:stats": "bun scripts/stats_taunts.ts",
+    "taunts:read": "bun scripts/read_taunts.ts",
+    "taunts:append": "bun scripts/append_taunts.ts",
+    "taunts:verify": "bun scripts/verify_no_duplicates.ts",
     "verify:taunts": "bun scripts/verify_no_duplicates.ts"
   },
   "dependencies": {

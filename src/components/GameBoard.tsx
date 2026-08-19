@@ -1,4 +1,4 @@
-import { type Component, For, Show, createSignal } from 'solid-js';
+import { type Component, For, Show, createSignal, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
 import { BOARD_SIZE, EMPTY, BLACK, WHITE } from '../game/types';
 import { STAR_POINTS } from '../game/constants';
@@ -42,7 +42,52 @@ export const GameBoard: Component<GameBoardProps> = props => {
     );
   };
 
+  let longHoverTimer: number | null = null;
+  let recentHoveredCells: { pos: string; time: number }[] = [];
+
+  const clearHoverTimer = () => {
+    if (longHoverTimer) {
+      clearTimeout(longHoverTimer);
+      longHoverTimer = null;
+    }
+  };
+
+  const handleCellMouseEnter = (rIdx: number, cIdx: number, cell: number) => {
+    setHoverPos({ row: rIdx, col: cIdx });
+    clearHoverTimer();
+
+    if (canPlay() && cell === EMPTY) {
+      const now = Date.now();
+      const posKey = `${rIdx},${cIdx}`;
+      recentHoveredCells = recentHoveredCells.filter(item => now - item.time < 2500);
+      if (!recentHoveredCells.some(item => item.pos === posKey)) {
+        recentHoveredCells.push({ pos: posKey, time: now });
+      }
+
+      if (recentHoveredCells.length >= 7) {
+        store.triggerTaunt('HESITATION_DANCE', 100);
+        recentHoveredCells = [];
+      }
+
+      longHoverTimer = window.setTimeout(() => {
+        if (hoverPos()?.row === rIdx && hoverPos()?.col === cIdx && canPlay()) {
+          store.triggerTaunt('LONG_HOVER_CELL', 100);
+        }
+      }, 3500);
+    }
+  };
+
+  const handleCellMouseLeave = () => {
+    setHoverPos(null);
+    clearHoverTimer();
+  };
+
+  onCleanup(() => {
+    clearHoverTimer();
+  });
+
   const handleCellClick = (r: number, c: number) => {
+    clearHoverTimer();
     // Khi game đã kết thúc (không quan tâm bên nào thắng), nếu người chơi cố ấn thêm vào bàn cờ -> cà khịa
     if (
       store.gameStatus() === 'black_win' ||
@@ -116,27 +161,53 @@ export const GameBoard: Component<GameBoardProps> = props => {
     <div class="w-full flex flex-col items-center justify-center select-none touch-manipulation">
       {/* Khung viền Bàn cờ chính */}
       <div
-        class={`w-full max-w-[min(96vw,560px)] md:max-w-[600px] aspect-square p-1.5 sm:p-3.5 md:p-5 rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-300 flex flex-col shadow-2xl relative ${themeClass()}`}
+        class={`w-full max-w-[min(96vw,560px)] md:max-w-[600px] aspect-square p-2 sm:p-3.5 md:p-4 rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-300 shadow-2xl relative flex items-center justify-center ${themeClass()}`}
       >
-        {/* Tọa độ cột trên (A - O) */}
-        <div class={`w-full flex justify-between px-0.5 sm:px-1 mb-0.5 sm:mb-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
-          <For each={COL_LETTERS}>
-            {letter => <span class="w-[6.66%] text-center">{letter}</span>}
-          </For>
-        </div>
+        {/* Hệ thống 3x3 Grid khóa tọa độ tuyệt đối với lưới 15x15 */}
+        <div
+          class="w-full h-full"
+          style={{
+            display: 'grid',
+            'grid-template-columns': 'auto 1fr auto',
+            'grid-template-rows': 'auto 1fr auto',
+            gap: '2px',
+          }}
+        >
+          {/* (0,0) Góc trái trên */}
+          <div class="w-3.5 sm:w-4.5 md:w-5" />
 
-        {/* Thân bàn cờ ở giữa: Tọa độ trái + Lưới 15x15 + Tọa độ phải */}
-        <div class="flex-1 w-full flex items-center justify-between relative">
-          {/* Tọa độ hàng trái (15 - 1) */}
-          <div class={`h-full flex flex-col justify-between py-0.5 sm:py-1 mr-0.5 sm:mr-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
-            <For each={ROW_NUMBERS}>
-              {num => <span class="h-[6.66%] flex items-center justify-center">{num}</span>}
+          {/* (0,1) Tọa độ cột trên (A - O) - Khóa cứng theo chiều rộng 1fr của bàn cờ */}
+          <div
+            class={`w-full text-[8px] sm:text-[10px] md:text-xs font-mono font-bold select-none ${coordTextColor()}`}
+            style={{
+              display: 'grid',
+              'grid-template-columns': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+            }}
+          >
+            <For each={COL_LETTERS}>
+              {letter => <span class="flex items-center justify-center text-center leading-none py-0.5">{letter}</span>}
             </For>
           </div>
 
-          {/* Lưới 15x15 pixel-perfect */}
+          {/* (0,2) Góc phải trên */}
+          <div class="w-3.5 sm:w-4.5 md:w-5" />
+
+          {/* (1,0) Tọa độ hàng trái (15 - 1) - Khóa cứng theo chiều cao 1fr của bàn cờ */}
           <div
-            class={`flex-1 h-full aspect-square relative ${
+            class={`w-3.5 sm:w-4.5 md:w-5 h-full text-[8px] sm:text-[10px] md:text-xs font-mono font-bold select-none ${coordTextColor()}`}
+            style={{
+              display: 'grid',
+              'grid-template-rows': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+            }}
+          >
+            <For each={ROW_NUMBERS}>
+              {num => <span class="flex items-center justify-center leading-none">{num}</span>}
+            </For>
+          </div>
+
+          {/* (1,1) Lưới bàn cờ 15x15 pixel-perfect */}
+          <div
+            class={`w-full h-full relative ${
               store.boardStyle() === 'cells' ? 'border border-amber-950/40 rounded-md sm:rounded-lg overflow-hidden' : ''
             }`}
             style={{
@@ -162,8 +233,8 @@ export const GameBoard: Component<GameBoardProps> = props => {
                     return (
                       <div
                         onClick={() => handleCellClick(rIdx, cIdx)}
-                        onMouseEnter={() => setHoverPos({ row: rIdx, col: cIdx })}
-                        onMouseLeave={() => setHoverPos(null)}
+                        onMouseEnter={() => handleCellMouseEnter(rIdx, cIdx, cell)}
+                        onMouseLeave={handleCellMouseLeave}
                         class={`relative w-full h-full transition-all touch-manipulation ${
                           canPlay() && cell === EMPTY
                             ? 'cursor-pointer hover:scale-[1.02] active:scale-95'
@@ -248,19 +319,37 @@ export const GameBoard: Component<GameBoardProps> = props => {
             </For>
           </div>
 
-          {/* Tọa độ hàng phải (15 - 1) */}
-          <div class={`h-full flex flex-col justify-between py-0.5 sm:py-1 ml-0.5 sm:ml-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
+          {/* (1,2) Tọa độ hàng phải (15 - 1) - Khóa cứng theo chiều cao 1fr của bàn cờ */}
+          <div
+            class={`w-3.5 sm:w-4.5 md:w-5 h-full text-[8px] sm:text-[10px] md:text-xs font-mono font-bold select-none ${coordTextColor()}`}
+            style={{
+              display: 'grid',
+              'grid-template-rows': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+            }}
+          >
             <For each={ROW_NUMBERS}>
-              {num => <span class="h-[6.66%] flex items-center justify-center">{num}</span>}
+              {num => <span class="flex items-center justify-center leading-none">{num}</span>}
             </For>
           </div>
-        </div>
 
-        {/* Tọa độ cột dưới (A - O) */}
-        <div class={`w-full flex justify-between px-0.5 sm:px-1 mt-0.5 sm:mt-1 text-[8px] sm:text-[10px] md:text-xs font-mono select-none ${coordTextColor()}`}>
-          <For each={COL_LETTERS}>
-            {letter => <span class="w-[6.66%] text-center">{letter}</span>}
-          </For>
+          {/* (2,0) Góc trái dưới */}
+          <div class="w-3.5 sm:w-4.5 md:w-5" />
+
+          {/* (2,1) Tọa độ cột dưới (A - O) - Khóa cứng theo chiều rộng 1fr của bàn cờ */}
+          <div
+            class={`w-full text-[8px] sm:text-[10px] md:text-xs font-mono font-bold select-none ${coordTextColor()}`}
+            style={{
+              display: 'grid',
+              'grid-template-columns': `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+            }}
+          >
+            <For each={COL_LETTERS}>
+              {letter => <span class="flex items-center justify-center text-center leading-none py-0.5">{letter}</span>}
+            </For>
+          </div>
+
+          {/* (2,2) Góc phải dưới */}
+          <div class="w-3.5 sm:w-4.5 md:w-5" />
         </div>
       </div>
     </div>

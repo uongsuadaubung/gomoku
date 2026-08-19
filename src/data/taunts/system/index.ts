@@ -3,11 +3,14 @@ import { BOARD_STYLE_CHANGE } from './boardStyleChange';
 import { CHANGE_BOT_LEVEL_DOWN } from './changeBotLevelDown';
 import { CHANGE_BOT_LEVEL_UP } from './changeBotLevelUp';
 import { CLICK_OCCUPIED_CELL } from './clickOccupiedCell';
+import { DESPERATE_THEME_SWAP } from './desperateThemeSwap';
+import { LATE_NIGHT_PLAY } from './lateNightPlay';
 import { OPEN_BOT_MODAL } from './openBotModal';
 import { OPEN_RULES } from './openRules';
 import { OPEN_STATS } from './openStats';
 import { RESET_STATS } from './resetStats';
 import { SOUND_MUTE } from './soundMute';
+import { SOUND_SPAM_TOGGLE } from './soundSpamToggle';
 import { SOUND_UNMUTE } from './soundUnmute';
 import { TAB_BLUR } from './tabBlur';
 import { TAB_FOCUS } from './tabFocus';
@@ -18,11 +21,14 @@ export * from './boardStyleChange';
 export * from './changeBotLevelDown';
 export * from './changeBotLevelUp';
 export * from './clickOccupiedCell';
+export * from './desperateThemeSwap';
+export * from './lateNightPlay';
 export * from './openBotModal';
 export * from './openRules';
 export * from './openStats';
 export * from './resetStats';
 export * from './soundMute';
+export * from './soundSpamToggle';
 export * from './soundUnmute';
 export * from './tabBlur';
 export * from './tabFocus';
@@ -34,11 +40,14 @@ export const SYSTEM_TAUNTS: Record<string, TauntDefinition> = {
   CHANGE_BOT_LEVEL_DOWN,
   CHANGE_BOT_LEVEL_UP,
   CLICK_OCCUPIED_CELL,
+  DESPERATE_THEME_SWAP,
+  LATE_NIGHT_PLAY,
   OPEN_BOT_MODAL,
   OPEN_RULES,
   OPEN_STATS,
   RESET_STATS,
   SOUND_MUTE,
+  SOUND_SPAM_TOGGLE,
   SOUND_UNMUTE,
   TAB_BLUR,
   TAB_FOCUS,

@@ -206,6 +206,64 @@ class SoundService {
     osc.start(now);
     osc.stop(now + 0.1);
   }
+
+  /**
+   * Âm thanh gõ chữ thoại hoạt hình 8-bit (Gibberish chatter blip)
+   */
+  public playVoiceBlip(mood: string = 'smug'): void {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    let baseFreq = 420;
+    let waveType: OscillatorType = 'triangle';
+
+    switch (mood) {
+      case 'rage':
+      case 'angry':
+        baseFreq = 180 + Math.random() * 50;
+        waveType = 'sawtooth';
+        break;
+      case 'laugh':
+      case 'clown':
+      case 'party':
+        baseFreq = 580 + Math.random() * 120;
+        waveType = 'sine';
+        break;
+      case 'shocked':
+      case 'mindblown':
+        baseFreq = 320 + Math.random() * 80;
+        waveType = 'sawtooth';
+        break;
+      case 'sleepy':
+      case 'bored':
+        baseFreq = 220 + Math.random() * 30;
+        waveType = 'sine';
+        break;
+      default:
+        baseFreq = 390 + Math.random() * 90;
+        waveType = 'triangle';
+        break;
+    }
+
+    osc.type = waveType;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, now + 0.035);
+
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.04);
+  }
 }
 
 export const soundService = new SoundService();
+

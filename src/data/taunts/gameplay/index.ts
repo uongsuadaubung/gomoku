@@ -1,47 +1,95 @@
 import type { TauntDefinition } from '../types';
+import { ACCIDENTAL_SELF_BLOCK } from './accidentalSelfBlock';
+import { BLOCK_WRONG_END } from './blockWrongEnd';
 import { BLUNDER_MOVE } from './blunderMove';
 import { BOT_BLOCK_THREAT } from './botBlockThreat';
 import { BOT_TRAP } from './botTrap';
 import { BOT_WIN } from './botWin';
+import { BOT_WIN_LEADING_SCORE } from './botWinLeadingScore';
 import { CENTER_MOVE } from './centerMove';
+import { CLUTCH_100_STONES } from './clutch100Stones';
+import { COMEBACK_WIN } from './comebackWin';
+import { COPYCAT_MOVE } from './copycatMove';
 import { CORNER_MOVE } from './cornerMove';
+import { DEAD_FOUR_BLOCKED } from './deadFourBlocked';
+import { DOUBLE_THREE_TRAP } from './doubleThreeTrap';
+import { EDGE_WALK_MOVE } from './edgeWalkMove';
 import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
 import { GAME_DRAW } from './gameDraw';
+import { ISOLATED_FAR_MOVE } from './isolatedFarMove';
 import { LONG_GAME } from './longGame';
+import { MISSED_WINNING_MOVE } from './missedWinningMove';
+import { NO_UNDO_WIN } from './noUndoWin';
 import { PLAYER_RESIGN } from './playerResign';
 import { PLAYER_STREAK_WIN } from './playerStreakWin';
 import { PLAYER_UNDO } from './playerUndo';
 import { PLAYER_WIN } from './playerWin';
+import { PLAYER_WIN_WITH_UNDO } from './playerWinWithUndo';
 import { RUSH_MOVE } from './rushMove';
+import { SPEED_WIN_QUICK } from './speedWinQuick';
+import { SURRENDER_ON_THREAT } from './surrenderOnThreat';
+import { TURTLE_DEFENSE } from './turtleDefense';
 
+export * from './accidentalSelfBlock';
+export * from './blockWrongEnd';
 export * from './blunderMove';
 export * from './botBlockThreat';
 export * from './botTrap';
 export * from './botWin';
+export * from './botWinLeadingScore';
 export * from './centerMove';
+export * from './clutch100Stones';
+export * from './comebackWin';
+export * from './copycatMove';
 export * from './cornerMove';
+export * from './deadFourBlocked';
+export * from './doubleThreeTrap';
+export * from './edgeWalkMove';
 export * from './fastMoveTaunt';
 export * from './gameDraw';
+export * from './isolatedFarMove';
 export * from './longGame';
+export * from './missedWinningMove';
+export * from './noUndoWin';
 export * from './playerResign';
 export * from './playerStreakWin';
 export * from './playerUndo';
 export * from './playerWin';
+export * from './playerWinWithUndo';
 export * from './rushMove';
+export * from './speedWinQuick';
+export * from './surrenderOnThreat';
+export * from './turtleDefense';
 
 export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
+  ACCIDENTAL_SELF_BLOCK,
+  BLOCK_WRONG_END,
   BLUNDER_MOVE,
   BOT_BLOCK_THREAT,
   BOT_TRAP,
   BOT_WIN,
+  BOT_WIN_LEADING_SCORE,
   CENTER_MOVE,
+  CLUTCH_100_STONES,
+  COMEBACK_WIN,
+  COPYCAT_MOVE,
   CORNER_MOVE,
+  DEAD_FOUR_BLOCKED,
+  DOUBLE_THREE_TRAP,
+  EDGE_WALK_MOVE,
   FAST_MOVE_TAUNT,
   GAME_DRAW,
+  ISOLATED_FAR_MOVE,
   LONG_GAME,
+  MISSED_WINNING_MOVE,
+  NO_UNDO_WIN,
   PLAYER_RESIGN,
   PLAYER_STREAK_WIN,
   PLAYER_UNDO,
   PLAYER_WIN,
+  PLAYER_WIN_WITH_UNDO,
   RUSH_MOVE,
+  SPEED_WIN_QUICK,
+  SURRENDER_ON_THREAT,
+  TURTLE_DEFENSE,
 };
