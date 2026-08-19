@@ -215,14 +215,15 @@ export const BotCharacter: Component<BotCharacterProps> = props => {
 
       {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA (Typewriter + Mood-Adaptive Themes) */}
       <Show when={taunt().visible && (displayedText() || taunt().text)}>
-        <div class="flex-1 min-w-0 max-w-[480px] pointer-events-none animate-bubble-pop">
+        <div class="flex-1 min-w-0 max-w-[480px] pointer-events-auto animate-bubble-pop">
           <div
-            class={`relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl transition-all duration-200 ${
+            onCopy={() => store.triggerTaunt('COPY_TAUNT_TEXT', 100)}
+            class={`relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl transition-all duration-200 cursor-text select-text ${
               bubbleTheme().box
             }`}
           >
             {/* Nội dung câu khịa có Typewriter Effect */}
-            <p class="drop-shadow-sm break-words select-none inline">
+            <p class="drop-shadow-sm break-words select-text inline">
               {displayedText() || taunt().text}
               <Show when={isTyping()}>
                 <span class="inline-block w-1.5 h-3.5 ml-1 bg-current rounded-sm animate-cursor-blink align-middle" />

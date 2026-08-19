@@ -112,6 +112,20 @@ export const GameBoard: Component<GameBoardProps> = props => {
       }
       return;
     }
+
+    // Kiểm tra thao tác click loạn xạ vào nhiều ô khác nhau trong lúc bối rối (QUICK_MULTI_CELL_CLICKS)
+    const now = Date.now();
+    const recentClicks = (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks || [];
+    const filteredClicks = recentClicks.filter(item => now - item.time < 1200);
+    filteredClicks.push({ r, c, time: now });
+    (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks = filteredClicks;
+
+    const distinctCells = new Set(filteredClicks.map(item => `${item.r},${item.c}`));
+    if (distinctCells.size >= 3) {
+      (window as unknown as { _recentGomokuCellClicks?: Array<{ r: number; c: number; time: number }> })._recentGomokuCellClicks = [];
+      store.triggerTaunt('QUICK_MULTI_CELL_CLICKS', 100);
+    }
+
     store.makePlayerMove(r, c);
   };
 

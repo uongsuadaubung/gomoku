@@ -48,6 +48,11 @@ export type TauntEvent =
   | 'FULL_DIAGONAL_HIGHWAY'
   | 'CONSECUTIVE_DRAWS'
   | 'GOD_LEVEL_VICTORY'
+  | 'FOUR_THREE_DOUBLE_ATTACK'
+  | 'OPEN_FOUR_BLUNDER'
+  | 'REPEATED_UNDO_SAME_MOVE'
+  | 'DIAGONAL_CROSS_FORMATION'
+  | 'TIT_FOR_TAT_DRAWS'
 
   // 2. Idle (6 sự kiện)
   | 'STARE_AT_WIN_LINE'
@@ -57,7 +62,7 @@ export type TauntEvent =
   | 'IDLE_AFTER_LOSS'
   | 'SUPER_SLOW_MOVE'
 
-  // 3. Interaction (31 sự kiện)
+  // 3. Interaction (35 sự kiện)
   | 'HOVER_UNDO_HESITATION'
   | 'RESIGN_WHILE_AI_THINKING'
   | 'CLICK_OWN_STONE'
@@ -89,8 +94,12 @@ export type TauntEvent =
   | 'DOUBLE_CLICK_STONE'
   | 'DEVTOOLS_INSPECT_HACK'
   | 'WHEEL_ZOOM_ATTEMPT'
+  | 'COPY_TAUNT_TEXT'
+  | 'SCREENSHOT_ATTEMPT'
+  | 'QUICK_MULTI_CELL_CLICKS'
+  | 'SPACEBAR_SMASH'
 
-  // 4. System & UI (23 sự kiện)
+  // 4. System & UI (29 sự kiện)
   | 'RAPID_THEME_CYCLING'
   | 'SWITCH_BOARD_STYLE_MID_GAME'
   | 'SOUND_SPAM_TOGGLE'
@@ -113,7 +122,13 @@ export type TauntEvent =
   | 'EARLY_MORNING_COFFEE'
   | 'LUNCH_BREAK_RUSH'
   | 'WEEKEND_CHILL'
-  | 'RAGE_QUIT_F5_RELOAD';
+  | 'RAGE_QUIT_F5_RELOAD'
+  | 'MONDAY_BLUES'
+  | 'TGIF_FRIDAY_AFTERNOON'
+  | 'AFTERNOON_FOOD_COMA'
+  | 'MIDNIGHT_BATTERY_LOW'
+  | 'PERFECT_CENTURY_GAMES'
+  | 'WIN_RATE_DROP_BELOW_50';
 
 export type BotMood =
   | 'smug'        // 😏 Cười khẩy đắc thắng

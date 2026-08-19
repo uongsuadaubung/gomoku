@@ -141,6 +141,8 @@ export function createGameStore() {
 
   let worker: Worker | null = null;
   let removeEventListeners: (() => void) | null = null;
+  let lastUndoneMove: { row: number; col: number; timestamp: number } | null = null;
+  let consecutiveDrawsCount = 0;
 
   // Khởi tạo Web Worker & Global Browser Listeners
   onMount(() => {
@@ -203,6 +205,23 @@ export function createGameStore() {
       // Bắt phím tắt Ctrl+Z (Undo)
       if (e.ctrlKey && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
         triggerTaunt('CTRL_Z_SHORTCUT_ATTEMPT', 100);
+      }
+
+      // Bắt phím tắt chụp màn hình (SCREENSHOT_ATTEMPT: PrintScreen, Win+Shift+S / Cmd+Shift+4)
+      if (
+        e.key === 'PrintScreen' ||
+        e.code === 'PrintScreen' ||
+        ((e.key === 's' || e.key === 'S') && e.shiftKey && (e.metaKey || e.ctrlKey))
+      ) {
+        triggerTaunt('SCREENSHOT_ATTEMPT', 100);
+      }
+
+      // Bắt phím Spacebar đập liên hồi khi sốt ruột (SPACEBAR_SMASH)
+      if (e.code === 'Space' || e.key === ' ') {
+        if (interactionTracker.record('SPACEBAR_PRESS', 1500) >= 3) {
+          interactionTracker.clearAction('SPACEBAR_PRESS');
+          triggerTaunt('SPACEBAR_SMASH', 100);
+        }
       }
 
       if (gameStatus() !== 'playing') return;
@@ -491,7 +510,11 @@ export function createGameStore() {
     const dayOfWeek = nowDate.getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-    const isLateNight = currentHour >= 0 && currentHour < 5;
+    const isMondayMorning = dayOfWeek === 1 && currentHour >= 8 && currentHour < 10;
+    const isFridayAfternoon = dayOfWeek === 5 && currentHour >= 16 && currentHour < 18;
+    const isFoodComa = currentHour >= 13 && currentHour < 14;
+    const isMidnightLow = currentHour >= 2 && currentHour < 5;
+    const isLateNight = currentHour >= 23 || currentHour <= 1;
     const isEarlyMorning = currentHour >= 5 && currentHour < 8;
     const isLunchBreak = timeVal >= 11.5 && timeVal <= 13.2;
 
@@ -500,6 +523,10 @@ export function createGameStore() {
 
     const getOpeningGreeting = (): TauntEvent => {
       if (isImmediateRevenge) return 'IMMEDIATE_REVENGE_CLICK';
+      if (isMondayMorning && Math.random() < 0.7) return 'MONDAY_BLUES';
+      if (isFridayAfternoon && Math.random() < 0.7) return 'TGIF_FRIDAY_AFTERNOON';
+      if (isFoodComa && Math.random() < 0.6) return 'AFTERNOON_FOOD_COMA';
+      if (isMidnightLow && Math.random() < 0.7) return 'MIDNIGHT_BATTERY_LOW';
       if (isLateNight && Math.random() < 0.6) return 'LATE_NIGHT_PLAY';
       if (isEarlyMorning && Math.random() < 0.6) return 'EARLY_MORNING_COFFEE';
       if (isLunchBreak && Math.random() < 0.6) return 'LUNCH_BREAK_RUSH';
@@ -701,6 +728,19 @@ export function createGameStore() {
     const timeSinceLastMove = interactionTracker.getTimeSinceLast('PLAYER_MOVE');
     interactionTracker.record('PLAYER_MOVE', 60000);
 
+    // Kiểm tra nếu người chơi Undo xong lại đánh đúng vào ô vừa xóa (REPEATED_UNDO_SAME_MOVE)
+    if (
+      lastUndoneMove &&
+      lastUndoneMove.row === row &&
+      lastUndoneMove.col === col &&
+      Date.now() - lastUndoneMove.timestamp < 15000
+    ) {
+      triggerTaunt('REPEATED_UNDO_SAME_MOVE', 150);
+      lastUndoneMove = null;
+    } else {
+      lastUndoneMove = null;
+    }
+
     // 1. Đánh giá mở cờ / vị trí đặc biệt / tốc độ đánh (Pre-Move Pipeline)
     const preMoveTaunt = TauntEvaluator.evaluatePreMove({
       row,
@@ -826,6 +866,7 @@ export function createGameStore() {
       setStats(newStats);
       wasLastGameSpeedLoss = false;
       wasLastGameDraw = false;
+      consecutiveDrawsCount = 0;
 
       // Đánh giá kịch bản thắng của Người chơi
       const winTaunt = TauntEvaluator.evaluatePlayerWin({
@@ -838,6 +879,12 @@ export function createGameStore() {
         currentLevelId: oldLevel,
       });
       triggerTaunt(winTaunt, 500);
+
+      // Kiểm tra mốc 100 ván đấu (PERFECT_CENTURY_GAMES)
+      const totalGames = newStats.wins + newStats.losses + newStats.draws;
+      if (totalGames === 100) {
+        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+      }
 
       // Kiểm tra thăng cấp AI
       const newLevel = getLevelConfigByWins(newStats.wins, newStats.manualLevel);
@@ -854,6 +901,7 @@ export function createGameStore() {
       const newStats = StorageService.recordGame('loss');
       setStats(newStats);
       wasLastGameDraw = false;
+      consecutiveDrawsCount = 0;
 
       // Đánh giá kịch bản thắng của Bot
       const botWinTaunt = TauntEvaluator.evaluateBotWin({
@@ -863,14 +911,33 @@ export function createGameStore() {
       });
       wasLastGameSpeedLoss = moveCount <= 12;
       triggerTaunt(botWinTaunt, 400);
+
+      // Kiểm tra mốc 100 ván hoặc tụt winrate dưới 50%
+      const totalGames = newStats.wins + newStats.losses + newStats.draws;
+      if (totalGames === 100) {
+        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+      } else {
+        const prevTotal = prevStats.wins + prevStats.losses + prevStats.draws;
+        const prevWinRate = prevTotal > 0 ? (prevStats.wins / prevTotal) * 100 : 100;
+        const currentWinRate = totalGames > 0 ? (newStats.wins / totalGames) * 100 : 0;
+        if (totalGames >= 20 && currentWinRate < 50 && prevWinRate >= 50) {
+          setTimeout(() => triggerTaunt('WIN_RATE_DROP_BELOW_50', 400), 1000);
+        }
+      }
     } else {
       // Hòa
       wasLastGameSpeedLoss = false;
+      consecutiveDrawsCount++;
       const newStats = StorageService.recordGame('draw');
       setStats(newStats);
-      const drawTaunt = TauntEvaluator.evaluateDraw(wasLastGameDraw);
+      const drawTaunt = TauntEvaluator.evaluateDraw(consecutiveDrawsCount);
       wasLastGameDraw = true;
       triggerTaunt(drawTaunt, 400);
+
+      const totalGames = newStats.wins + newStats.losses + newStats.draws;
+      if (totalGames === 100) {
+        setTimeout(() => triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
+      }
     }
 
     // Sau khi hết trận, nếu người chơi không bấm ván mới thì bắt đầu kích hoạt IDLE_PRE_GAME / IDLE_AFTER_LOSS
@@ -955,6 +1022,12 @@ export function createGameStore() {
     remainingHistory.forEach(item => {
       currentBoard[item.row][item.col] = item.player;
     });
+
+    // Ghi nhớ nước cờ người chơi vừa Undo để bắt đòn REPEATED_UNDO_SAME_MOVE nếu đánh lại đúng ô cũ
+    const undoneMove = history[history.length - stepsToUndo];
+    if (undoneMove && undoneMove.player === playerColor()) {
+      lastUndoneMove = { row: undoneMove.row, col: undoneMove.col, timestamp: Date.now() };
+    }
 
     setBoard(currentBoard);
     setMoveHistory(remainingHistory);

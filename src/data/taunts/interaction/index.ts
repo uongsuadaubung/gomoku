@@ -3,6 +3,7 @@ import { BREAK_LOSS_STREAK } from './breakLossStreak';
 import { CLICK_AFTER_GAME_OVER } from './clickAfterGameOver';
 import { CLICK_BEFORE_START } from './clickBeforeStart';
 import { CLICK_OWN_STONE } from './clickOwnStone';
+import { COPY_TAUNT_TEXT } from './copyTauntText';
 import { CTRL_Z_SHORTCUT_ATTEMPT } from './ctrlZShortcutAttempt';
 import { DEVTOOLS_INSPECT_HACK } from './devtoolsInspectHack';
 import { DOUBLE_CLICK_STONE } from './doubleClickStone';
@@ -20,9 +21,12 @@ import { MOUSE_LEAVE_VIEWPORT } from './mouseLeaveViewport';
 import { MULTI_UNDO } from './multiUndo';
 import { PLAYER_GOOD_MOVE } from './playerGoodMove';
 import { POKE_BOT } from './pokeBot';
+import { QUICK_MULTI_CELL_CLICKS } from './quickMultiCellClicks';
 import { RAGE_DOWNGRADE_AFTER_LOSS } from './rageDowngradeAfterLoss';
 import { RESIGN_WHILE_AI_THINKING } from './resignWhileAiThinking';
 import { RIGHT_CLICK_INSPECT } from './rightClickInspect';
+import { SCREENSHOT_ATTEMPT } from './screenshotAttempt';
+import { SPACEBAR_SMASH } from './spacebarSmash';
 import { SPAM_POKE_BOT } from './spamPokeBot';
 import { STREAK_LOSS } from './streakLoss';
 import { SWAP_SIDE_BOT_FIRST } from './swapSideBotFirst';
@@ -35,6 +39,7 @@ export * from './breakLossStreak';
 export * from './clickAfterGameOver';
 export * from './clickBeforeStart';
 export * from './clickOwnStone';
+export * from './copyTauntText';
 export * from './ctrlZShortcutAttempt';
 export * from './devtoolsInspectHack';
 export * from './doubleClickStone';
@@ -52,9 +57,12 @@ export * from './mouseLeaveViewport';
 export * from './multiUndo';
 export * from './playerGoodMove';
 export * from './pokeBot';
+export * from './quickMultiCellClicks';
 export * from './rageDowngradeAfterLoss';
 export * from './resignWhileAiThinking';
 export * from './rightClickInspect';
+export * from './screenshotAttempt';
+export * from './spacebarSmash';
 export * from './spamPokeBot';
 export * from './streakLoss';
 export * from './swapSideBotFirst';
@@ -68,6 +76,7 @@ export const INTERACTION_TAUNTS: Record<string, TauntDefinition> = {
   CLICK_AFTER_GAME_OVER,
   CLICK_BEFORE_START,
   CLICK_OWN_STONE,
+  COPY_TAUNT_TEXT,
   CTRL_Z_SHORTCUT_ATTEMPT,
   DEVTOOLS_INSPECT_HACK,
   DOUBLE_CLICK_STONE,
@@ -85,9 +94,12 @@ export const INTERACTION_TAUNTS: Record<string, TauntDefinition> = {
   MULTI_UNDO,
   PLAYER_GOOD_MOVE,
   POKE_BOT,
+  QUICK_MULTI_CELL_CLICKS,
   RAGE_DOWNGRADE_AFTER_LOSS,
   RESIGN_WHILE_AI_THINKING,
   RIGHT_CLICK_INSPECT,
+  SCREENSHOT_ATTEMPT,
+  SPACEBAR_SMASH,
   SPAM_POKE_BOT,
   STREAK_LOSS,
   SWAP_SIDE_BOT_FIRST,

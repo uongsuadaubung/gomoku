@@ -68,10 +68,34 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'OVERCONFIDENT_BLIND_ATTACK',
   },
   {
+    id: 'four_three_double_attack',
+    priority: 104,
+    match: ctx => TauntService.isFourThreeAttack(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'FOUR_THREE_DOUBLE_ATTACK',
+  },
+  {
+    id: 'open_four_blunder',
+    priority: 103,
+    match: ctx => TauntService.isOpenFourBlunder(ctx.prevBoard, ctx.nextBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
+    taunt: 'OPEN_FOUR_BLUNDER',
+  },
+  {
+    id: 'missed_winning_move',
+    priority: 102,
+    match: ctx => TauntService.hasMissedWinningMove(ctx.prevBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'MISSED_WINNING_MOVE',
+  },
+  {
     id: 'block_and_counter_four',
     priority: 100,
     match: ctx => TauntService.isBlockAndCounterFour(ctx.prevBoard, ctx.nextBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
     taunt: 'BLOCK_AND_COUNTER_FOUR',
+  },
+  {
+    id: 'block_wrong_end',
+    priority: 98,
+    match: ctx => TauntService.isBlockWrongEnd(ctx.prevBoard, ctx.nextBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
+    taunt: 'BLOCK_WRONG_END',
   },
   {
     id: 'symmetry_break_surprise',
@@ -86,16 +110,22 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
     taunt: 'JUMP_THREE_TRAP',
   },
   {
-    id: 'missed_winning_move',
-    priority: 90,
-    match: ctx => TauntService.hasMissedWinningMove(ctx.prevBoard, ctx.player, ctx.row, ctx.col),
-    taunt: 'MISSED_WINNING_MOVE',
+    id: 'double_three_trap',
+    priority: 88,
+    match: ctx => TauntService.isPlayerDoubleThreat(ctx.nextBoard, ctx.player),
+    taunt: 'DOUBLE_THREE_TRAP',
   },
   {
     id: 'fork_attack_defense_fail',
     priority: 85,
     match: ctx => TauntService.isForkAttackDefenseFail(ctx.prevBoard, ctx.ai, ctx.player, ctx.row, ctx.col),
     taunt: 'FORK_ATTACK_DEFENSE_FAIL',
+  },
+  {
+    id: 'blunder_move',
+    priority: 82,
+    match: ctx => TauntService.isPlayerBlunder(ctx.nextBoard, ctx.ai, ctx.row, ctx.col),
+    taunt: 'BLUNDER_MOVE',
   },
   {
     id: 'dead_four_blocked',
@@ -127,9 +157,21 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
   },
   {
     id: 'triangle_formation',
-    priority: 65,
+    priority: 66,
     match: ctx => TauntService.isTriangleFormation(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
     taunt: 'TRIANGLE_FORMATION',
+  },
+  {
+    id: 'diagonal_cross_formation',
+    priority: 65,
+    match: ctx => TauntService.isDiagonalCrossFormation(ctx.nextBoard, ctx.player, ctx.row, ctx.col),
+    taunt: 'DIAGONAL_CROSS_FORMATION',
+  },
+  {
+    id: 'turtle_defense',
+    priority: 64,
+    match: ctx => TauntService.isTurtleDefense(ctx.nextBoard, ctx.player, ctx.ai, ctx.history),
+    taunt: 'TURTLE_DEFENSE',
   },
   {
     id: 'full_diagonal_highway',
@@ -152,18 +194,6 @@ const PLAYER_MOVE_RULES: Rule<PlayerMoveContext>[] = [
       return TauntService.isCloseCombatHug(pMoves, bMoves);
     },
     taunt: 'CLOSE_COMBAT_HUG',
-  },
-  {
-    id: 'blunder_move',
-    priority: 50,
-    match: ctx => TauntService.isPlayerBlunder(ctx.nextBoard, ctx.ai, ctx.row, ctx.col),
-    taunt: 'BLUNDER_MOVE',
-  },
-  {
-    id: 'double_three_trap',
-    priority: 45,
-    match: ctx => TauntService.isPlayerDoubleThreat(ctx.nextBoard, ctx.player),
-    taunt: 'DOUBLE_THREE_TRAP',
   },
   {
     id: 'player_good_move',
@@ -272,8 +302,15 @@ const PLAYER_WIN_RULES: Rule<PlayerWinContext>[] = [
   {
     id: 'revenge_win_after_loss_streak',
     priority: 40,
+    probability: 0.5,
     match: ctx => ctx.prevStats.losses >= 3 && ctx.prevStats.currentStreak === 0,
     taunt: 'REVENGE_WIN_AFTER_LOSS_STREAK',
+  },
+  {
+    id: 'break_loss_streak',
+    priority: 39,
+    match: ctx => ctx.prevStats.losses >= 3 && ctx.prevStats.currentStreak === 0,
+    taunt: 'BREAK_LOSS_STREAK',
   },
   {
     id: 'player_streak_win',
@@ -378,8 +415,9 @@ export class TauntEvaluator {
   /**
    * Đánh giá kịch bản hòa cờ
    */
-  static evaluateDraw(wasLastGameDraw: boolean): TauntEvent {
-    if (wasLastGameDraw) return 'CONSECUTIVE_DRAWS';
+  static evaluateDraw(consecutiveDrawsCount: number): TauntEvent {
+    if (consecutiveDrawsCount >= 3) return 'TIT_FOR_TAT_DRAWS';
+    if (consecutiveDrawsCount === 2) return 'CONSECUTIVE_DRAWS';
     return 'GAME_DRAW';
   }
 

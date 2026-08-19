@@ -18,10 +18,12 @@ import { CONSECUTIVE_SPEED_LOSSES } from './consecutiveSpeedLosses';
 import { COPYCAT_MOVE } from './copycatMove';
 import { CORNER_MOVE } from './cornerMove';
 import { DEAD_FOUR_BLOCKED } from './deadFourBlocked';
+import { DIAGONAL_CROSS_FORMATION } from './diagonalCrossFormation';
 import { DOUBLE_THREE_TRAP } from './doubleThreeTrap';
 import { EDGE_WALK_MOVE } from './edgeWalkMove';
 import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
 import { FORK_ATTACK_DEFENSE_FAIL } from './forkAttackDefenseFail';
+import { FOUR_THREE_DOUBLE_ATTACK } from './fourThreeDoubleAttack';
 import { FULL_DIAGONAL_HIGHWAY } from './fullDiagonalHighway';
 import { GAME_DRAW } from './gameDraw';
 import { GOD_LEVEL_VICTORY } from './godLevelVictory';
@@ -31,12 +33,14 @@ import { JUMP_THREE_TRAP } from './jumpThreeTrap';
 import { LONG_GAME } from './longGame';
 import { MISSED_WINNING_MOVE } from './missedWinningMove';
 import { NO_UNDO_WIN } from './noUndoWin';
+import { OPEN_FOUR_BLUNDER } from './openFourBlunder';
 import { OVERCONFIDENT_BLIND_ATTACK } from './overconfidentBlindAttack';
 import { PLAYER_RESIGN } from './playerResign';
 import { PLAYER_STREAK_WIN } from './playerStreakWin';
 import { PLAYER_UNDO } from './playerUndo';
 import { PLAYER_WIN } from './playerWin';
 import { PLAYER_WIN_WITH_UNDO } from './playerWinWithUndo';
+import { REPEATED_UNDO_SAME_MOVE } from './repeatedUndoSameMove';
 import { REVENGE_WIN_AFTER_LOSS_STREAK } from './revengeWinAfterLossStreak';
 import { RUSH_MOVE } from './rushMove';
 import { SPEED_WIN_QUICK } from './speedWinQuick';
@@ -44,6 +48,7 @@ import { SPLIT_BOARD_EXPEDITION } from './splitBoardExpedition';
 import { SURRENDER_AFTER_LONG_THINKING } from './surrenderAfterLongThinking';
 import { SURRENDER_ON_THREAT } from './surrenderOnThreat';
 import { SYMMETRY_BREAK_SURPRISE } from './symmetryBreakSurprise';
+import { TIT_FOR_TAT_DRAWS } from './titForTatDraws';
 import { TRIANGLE_FORMATION } from './triangleFormation';
 import { TURTLE_DEFENSE } from './turtleDefense';
 import { WIN_RIGHT_AFTER_UNDO } from './winRightAfterUndo';
@@ -67,10 +72,12 @@ export * from './consecutiveSpeedLosses';
 export * from './copycatMove';
 export * from './cornerMove';
 export * from './deadFourBlocked';
+export * from './diagonalCrossFormation';
 export * from './doubleThreeTrap';
 export * from './edgeWalkMove';
 export * from './fastMoveTaunt';
 export * from './forkAttackDefenseFail';
+export * from './fourThreeDoubleAttack';
 export * from './fullDiagonalHighway';
 export * from './gameDraw';
 export * from './godLevelVictory';
@@ -80,12 +87,14 @@ export * from './jumpThreeTrap';
 export * from './longGame';
 export * from './missedWinningMove';
 export * from './noUndoWin';
+export * from './openFourBlunder';
 export * from './overconfidentBlindAttack';
 export * from './playerResign';
 export * from './playerStreakWin';
 export * from './playerUndo';
 export * from './playerWin';
 export * from './playerWinWithUndo';
+export * from './repeatedUndoSameMove';
 export * from './revengeWinAfterLossStreak';
 export * from './rushMove';
 export * from './speedWinQuick';
@@ -93,6 +102,7 @@ export * from './splitBoardExpedition';
 export * from './surrenderAfterLongThinking';
 export * from './surrenderOnThreat';
 export * from './symmetryBreakSurprise';
+export * from './titForTatDraws';
 export * from './triangleFormation';
 export * from './turtleDefense';
 export * from './winRightAfterUndo';
@@ -117,10 +127,12 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   COPYCAT_MOVE,
   CORNER_MOVE,
   DEAD_FOUR_BLOCKED,
+  DIAGONAL_CROSS_FORMATION,
   DOUBLE_THREE_TRAP,
   EDGE_WALK_MOVE,
   FAST_MOVE_TAUNT,
   FORK_ATTACK_DEFENSE_FAIL,
+  FOUR_THREE_DOUBLE_ATTACK,
   FULL_DIAGONAL_HIGHWAY,
   GAME_DRAW,
   GOD_LEVEL_VICTORY,
@@ -130,12 +142,14 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   LONG_GAME,
   MISSED_WINNING_MOVE,
   NO_UNDO_WIN,
+  OPEN_FOUR_BLUNDER,
   OVERCONFIDENT_BLIND_ATTACK,
   PLAYER_RESIGN,
   PLAYER_STREAK_WIN,
   PLAYER_UNDO,
   PLAYER_WIN,
   PLAYER_WIN_WITH_UNDO,
+  REPEATED_UNDO_SAME_MOVE,
   REVENGE_WIN_AFTER_LOSS_STREAK,
   RUSH_MOVE,
   SPEED_WIN_QUICK,
@@ -143,6 +157,7 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   SURRENDER_AFTER_LONG_THINKING,
   SURRENDER_ON_THREAT,
   SYMMETRY_BREAK_SURPRISE,
+  TIT_FOR_TAT_DRAWS,
   TRIANGLE_FORMATION,
   TURTLE_DEFENSE,
   WIN_RIGHT_AFTER_UNDO,

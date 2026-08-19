@@ -611,6 +611,98 @@ export class TauntService {
   }
 
   /**
+   * Kiểm tra xem người chơi có chặn nhầm một đầu khi đối thủ có thế 3 mở cả 2 đầu không
+   */
+  static isBlockWrongEnd(
+    prevBoard: BoardMatrix,
+    nextBoard: BoardMatrix,
+    botColor: ActivePlayer,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    const size = prevBoard.length;
+    const directions = [
+      [1, 0],
+      [0, 1],
+      [1, 1],
+      [1, -1],
+    ];
+
+    for (const [dr, dc] of directions) {
+      // Kiểm tra xem ô (row, col) người chơi vừa đánh có tiếp giáp với 1 chuỗi 3 quân của Bot không
+      let countForward = 0;
+      let r = row + dr;
+      let c = col + dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && prevBoard[r][c] === botColor) {
+        countForward++;
+        r += dr;
+        c += dc;
+      }
+
+      let countBackward = 0;
+      let br = row - dr;
+      let bc = col - dc;
+      while (br >= 0 && br < size && bc >= 0 && bc < size && prevBoard[br][bc] === botColor) {
+        countBackward++;
+        br -= dr;
+        bc -= dc;
+      }
+
+      // Nếu ô người chơi vừa chặn nằm ở 1 đầu của chuỗi 3 quân của Bot
+      if (countForward === 3 && countBackward === 0) {
+        // Đầu đối diện (r, c) trước đó có trống không?
+        const otherEndEmpty = r >= 0 && r < size && c >= 0 && c < size && nextBoard[r][c] === EMPTY;
+        if (otherEndEmpty) return true;
+      } else if (countBackward === 3 && countForward === 0) {
+        const otherEndEmpty = br >= 0 && br < size && bc >= 0 && bc < size && nextBoard[br][bc] === EMPTY;
+        if (otherEndEmpty) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Kiểm tra lối đánh phòng thủ thụ động kiểu "rùa rụt cổ" (co cụm bám sát đối thủ, không tự tạo thế)
+   */
+  static isTurtleDefense(
+    board: BoardMatrix,
+    playerColor: ActivePlayer,
+    botColor: ActivePlayer,
+    history: Array<{ row: number; col: number; player: ActivePlayer }>
+  ): boolean {
+    if (history.length < 12) return false;
+
+    const playerMoves = history.filter(m => m.player === playerColor);
+    if (playerMoves.length < 6) return false;
+
+    // Lấy 4 nước gần nhất của người chơi
+    const recentPlayerMoves = playerMoves.slice(-4);
+
+    // Kiểm tra xem cả 4 nước gần nhất có đều dính sát (khoảng cách Chebyshev = 1) vào ít nhất 1 quân của Bot không
+    const size = board.length;
+    for (const move of recentPlayerMoves) {
+      let adjacentToBot = false;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          const nr = move.row + dr;
+          const nc = move.col + dc;
+          if (nr >= 0 && nr < size && nc >= 0 && nc < size && board[nr][nc] === botColor) {
+            adjacentToBot = true;
+            break;
+          }
+        }
+        if (adjacentToBot) break;
+      }
+      if (!adjacentToBot) return false;
+    }
+
+    // Và người chơi không có bất kỳ đe dọa mở 3 hoặc 4 nào
+    return !this.isPlayerThreatMove(board, playerColor);
+  }
+
+  /**
    * Kiểm tra xem người chơi có liên tiếp xếp từ 4 quân trở lên nối dài trên cùng 1 đường chéo lớn không
    */
   static isFullDiagonalHighway(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
@@ -642,6 +734,132 @@ export class TauntService {
       if (count >= 4) return true;
     }
     return false;
+  }
+
+  /**
+   * Kiểm tra đòn tấn công kép 4-3 (tạo nước 4 và nước 3 mở cùng lúc)
+   */
+  static isFourThreeAttack(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+    const directions = [
+      [1, 0],
+      [0, 1],
+      [1, 1],
+      [1, -1],
+    ];
+
+    let fourCount = 0;
+    let openThreeCount = 0;
+
+    for (const [dr, dc] of directions) {
+      let count = 1;
+      let r = row + dr;
+      let c = col + dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) {
+        count++;
+        r += dr;
+        c += dc;
+      }
+      const end1Open = r >= 0 && r < size && c >= 0 && c < size && board[r][c] === EMPTY;
+
+      r = row - dr;
+      c = col - dc;
+      while (r >= 0 && r < size && c >= 0 && c < size && board[r][c] === playerColor) {
+        count++;
+        r -= dr;
+        c -= dc;
+      }
+      const end2Open = r >= 0 && r < size && c >= 0 && c < size && board[r][c] === EMPTY;
+
+      if (count === 4 && (end1Open || end2Open)) {
+        fourCount++;
+      } else if (count === 3 && end1Open && end2Open) {
+        openThreeCount++;
+      }
+    }
+
+    return fourCount >= 1 && openThreeCount >= 1;
+  }
+
+  /**
+   * Kiểm tra xem người chơi có bỏ sót để đối phương tạo nước 4 mở 2 đầu không
+   */
+  static isOpenFourBlunder(
+    prevBoard: BoardMatrix,
+    nextBoard: BoardMatrix,
+    botColor: ActivePlayer,
+    playerColor: ActivePlayer,
+    row: number,
+    col: number
+  ): boolean {
+    const size = prevBoard.length;
+    const directions = [
+      [1, 0],
+      [0, 1],
+      [1, 1],
+      [1, -1],
+    ];
+
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (prevBoard[r][c] !== botColor) continue;
+
+        for (const [dr, dc] of directions) {
+          // Kiểm tra chuỗi 3 quân của Bot trong prevBoard
+          if (
+            r + 2 * dr < size &&
+            r + 2 * dr >= 0 &&
+            c + 2 * dc < size &&
+            c + 2 * dc >= 0 &&
+            prevBoard[r + dr][c + dc] === botColor &&
+            prevBoard[r + 2 * dr][c + 2 * dc] === botColor
+          ) {
+            const beforeR = r - dr;
+            const beforeC = c - dc;
+            const afterR = r + 3 * dr;
+            const afterC = c + 3 * dc;
+
+            // Nếu trong prevBoard, cả 2 đầu đều trống
+            const prevOpen1 = beforeR >= 0 && beforeR < size && beforeC >= 0 && beforeC < size && prevBoard[beforeR][beforeC] === EMPTY;
+            const prevOpen2 = afterR >= 0 && afterR < size && afterC >= 0 && afterC < size && prevBoard[afterR][afterC] === EMPTY;
+
+            if (prevOpen1 && prevOpen2) {
+              // Người chơi không đánh vào bất kỳ đầu nào trong 2 đầu
+              const blockedEnd1 = row === beforeR && col === beforeC;
+              const blockedEnd2 = row === afterR && col === afterC;
+              if (!blockedEnd1 && !blockedEnd2) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Kiểm tra thế cờ chữ thập chéo X (2 đường chéo giao nhau tạo thành hình chữ X lớn)
+   */
+  static isDiagonalCrossFormation(board: BoardMatrix, playerColor: ActivePlayer, row: number, col: number): boolean {
+    const size = board.length;
+
+    // Đếm quân trên đường chéo chính [1, 1]
+    let mainDiagCount = 1;
+    let r = row + 1, c = col + 1;
+    while (r < size && c < size && board[r][c] === playerColor) { mainDiagCount++; r++; c++; }
+    r = row - 1; c = col - 1;
+    while (r >= 0 && c >= 0 && board[r][c] === playerColor) { mainDiagCount++; r--; c--; }
+
+    // Đếm quân trên đường chéo phụ [1, -1]
+    let antiDiagCount = 1;
+    r = row + 1; c = col - 1;
+    while (r < size && c >= 0 && board[r][c] === playerColor) { antiDiagCount++; r++; c--; }
+    r = row - 1; c = col + 1;
+    while (r >= 0 && c < size && board[r][c] === playerColor) { antiDiagCount++; r--; c++; }
+
+    // Cả 2 đường chéo đều có ít nhất 3 quân giao nhau tại (row, col)
+    return mainDiagCount >= 3 && antiDiagCount >= 3;
   }
 }
 
