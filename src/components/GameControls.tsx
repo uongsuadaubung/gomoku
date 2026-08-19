@@ -64,14 +64,36 @@ export const GameControls: Component = () => {
       <Show when={store.gameMode() === 'puzzle'}>
         <div class="flex flex-col gap-2.5">
           {/* Header thông tin thế cờ */}
-          <div class="flex items-center justify-between p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
-            <div class="flex items-center gap-1.5">
-              <span class="text-amber-400">{'⭐'.repeat(store.currentPuzzle()?.stars || 1)}</span>
-              <span class="font-extrabold text-white">{store.currentPuzzle()?.name || 'Thế Cờ'}</span>
+          <div class="flex flex-col gap-1.5 p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-amber-400">{'⭐'.repeat(store.currentPuzzle()?.stars || 1)}</span>
+                <span class="font-extrabold text-white">{store.currentPuzzle()?.name || 'Thế Cờ'}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <Show when={store.currentPuzzle()?.puzzleType === 'DEFENSE'}>
+                  <span class="text-[10px] text-sky-300 font-black bg-sky-500/20 px-2 py-0.5 rounded-lg border border-sky-500/40 flex items-center gap-1 shadow-sm">
+                    🛡️ DEFENSE (Thủ & Phản)
+                  </span>
+                </Show>
+                <Show when={store.currentPuzzle()?.puzzleType === 'VCT'}>
+                  <span class="text-[10px] text-amber-300 font-black bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                    ⚡ VCT (Bẫy Đôi)
+                  </span>
+                </Show>
+                <Show when={store.currentPuzzle()?.puzzleType === 'VCF' || (!store.currentPuzzle()?.puzzleType && store.currentPuzzle()?.puzzleType !== 'DEFENSE' && store.currentPuzzle()?.puzzleType !== 'VCT')}>
+                  <span class="text-[10px] text-rose-300 font-black bg-rose-500/20 px-2 py-0.5 rounded-lg border border-rose-500/40 flex items-center gap-1 shadow-sm">
+                    🔥 VCF (Đòn 4)
+                  </span>
+                </Show>
+              </div>
             </div>
-            <span class="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
-              Tìm Đòn Sát Cục
-            </span>
+            <Show when={store.currentPuzzle()?.description}>
+              <div class="text-[11px] text-slate-400 italic flex items-center gap-1">
+                <span>💡</span>
+                <span>{store.currentPuzzle()?.description}</span>
+              </div>
+            </Show>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">

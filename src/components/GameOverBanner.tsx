@@ -118,7 +118,7 @@ export const GameOverBanner: Component = () => {
                 <Show
                   when={isPlayerWinner()}
                   fallback={
-                    `Chưa giải được sát cục! Bạn bị tụt về Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐.`
+                    `Chưa giải được sát cục! Giữ nguyên Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐. Hãy thử lại!`
                   }
                 >
                   {`Xuất sắc! Bạn đã giải thành công. Thăng cấp lên Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐!`}

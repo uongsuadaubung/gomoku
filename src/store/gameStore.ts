@@ -723,10 +723,15 @@ export function createGameStore() {
   }
 
   /**
-   * Bắt đầu chế độ Thế Cờ Giữa Trận (Tactical Puzzle 1-5 Sao)
+   * Bắt đầu chế độ Thế Cờ Giữa Trận (Tactical Puzzle)
+   * Random ngẫu nhiên cấp độ trong dải từ 1 đến maxUnlocked
    */
   function startPuzzleMode(stars?: number) {
-    const targetStars = stars ?? (stats().puzzle?.currentLevel || 1);
+    const maxUnlocked = Math.max(1, stats().puzzle?.currentLevel || 1);
+    let targetStars = stars;
+    if (targetStars === undefined) {
+      targetStars = Math.floor(Math.random() * maxUnlocked) + 1;
+    }
     const scenario = generateTacticalScenario(targetStars);
     setGameMode('puzzle');
     setCurrentPuzzle(scenario);

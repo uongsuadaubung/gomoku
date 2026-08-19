@@ -36,6 +36,9 @@ export class PuzzleStrategy implements GameModeStrategy {
       stats.puzzle.currentLevel = 1;
     }
 
+    const currentMax = stats.puzzle.currentLevel || 1;
+    const playedStars = extra?.stars || 1;
+
     stats.puzzle.totalGames++;
 
     if (result === 'win') {
@@ -47,13 +50,19 @@ export class PuzzleStrategy implements GameModeStrategy {
       if (extra?.stars && extra.stars >= 1) {
         stats.puzzle.solvedByStars[extra.stars] = (stats.puzzle.solvedByStars[extra.stars] || 0) + 1;
       }
-      // Không giới hạn trần: Cứ giải thắng là tăng tiếp (1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7...)
-      stats.puzzle.currentLevel = (stats.puzzle.currentLevel || 1) + 1;
+
+      // CHỈ TĂNG CẤP KHI ĐÃ VƯỢT QUA CẤP ĐÓ (playedStars >= currentMax)
+      // Nếu random ra cấp thấp hơn (playedStars < currentMax) -> Giữ nguyên không tăng
+      if (playedStars >= currentMax) {
+        stats.puzzle.currentLevel = Math.min(7, currentMax + 1);
+      } else {
+        stats.puzzle.currentLevel = currentMax;
+      }
     } else {
       stats.puzzle.totalFailed++;
       stats.puzzle.currentStreak = 0;
-      // Không giải được (thua hoặc bỏ cuộc) thì tụt level (tối thiểu là mức 1)
-      stats.puzzle.currentLevel = Math.max(1, (stats.puzzle.currentLevel || 1) - 1);
+      // Không giải được thì giữ nguyên mốc cao nhất đã mở khóa (không bị tụt cấp)
+      stats.puzzle.currentLevel = currentMax;
     }
 
     return stats;

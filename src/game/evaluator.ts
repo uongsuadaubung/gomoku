@@ -1,6 +1,52 @@
 import { BOARD_SIZE, EMPTY, BLACK, WHITE, ActivePlayer, BoardMatrix } from './types';
 import { SCORES } from './constants';
 
+const OPEN_FOUR_REGEX = /011110/g;
+
+const BLOCKED_FOUR_PATTERNS = [
+  /211110/g,
+  /011112/g,
+  /10111/g,
+  /11011/g,
+  /11101/g,
+  /^11110/g,
+  /01111$/g,
+];
+
+const OPEN_THREE_PATTERNS = [
+  /011100/g,
+  /001110/g,
+  /010110/g,
+  /011010/g,
+];
+
+const BLOCKED_THREE_PATTERNS = [
+  /211100/g,
+  /001112/g,
+  /210110/g,
+  /011012/g,
+  /211010/g,
+  /010112/g,
+  /10011/g,
+  /11001/g,
+  /10101/g,
+  /^11100/g,
+  /00111$/g,
+];
+
+const OPEN_TWO_PATTERNS = [
+  /001100/g,
+  /01010/g,
+  /010010/g,
+];
+
+const BLOCKED_TWO_PATTERNS = [
+  /211000/g,
+  /000112/g,
+  /210100/g,
+  /001012/g,
+];
+
 /**
  * Đánh giá điểm một chuỗi (mẫu hình) theo 1 hướng đối với 1 người chơi
  */
@@ -28,7 +74,7 @@ function evaluateLinePattern(
   let blockedTwo = 0;
 
   // Quét các đoạn con độ dài 5 hoặc 6
-  // Chuyển chuỗi thành định dạng ký tự để regex / pattern matching siêu nhanh
+  // Chuyển chuỗi thành định dạng ký tự để pattern matching siêu nhanh
   let str = '';
   for (let i = 0; i < len; i++) {
     const val = line[i];
@@ -44,74 +90,35 @@ function evaluateLinePattern(
   }
 
   // 2. Open Four: 011110
-  const openFourMatches = str.match(/011110/g);
+  const openFourMatches = str.match(OPEN_FOUR_REGEX);
   if (openFourMatches) openFour += openFourMatches.length;
 
-  // 3. Blocked Four: 211110, 011112, 10111, 11011, 11101, hoặc ở mép bàn cờ
-  const blockedFourPatterns = [
-    /211110/g,
-    /011112/g,
-    /10111/g,
-    /11011/g,
-    /11101/g,
-    /^11110/g,
-    /01111$/g,
-  ];
-  for (const pat of blockedFourPatterns) {
+  // 3. Blocked Four
+  for (const pat of BLOCKED_FOUR_PATTERNS) {
     const matches = str.match(pat);
     if (matches) blockedFour += matches.length;
   }
 
-  // 4. Open Three: 01110, 010110, 011010
-  const openThreePatterns = [
-    /011100/g,
-    /001110/g,
-    /010110/g,
-    /011010/g,
-  ];
-  for (const pat of openThreePatterns) {
+  // 4. Open Three
+  for (const pat of OPEN_THREE_PATTERNS) {
     const matches = str.match(pat);
     if (matches) openThree += matches.length;
   }
 
-  // 5. Blocked Three: 211100, 001112, 210110, 011012, 211010, 010112, 10011, 11001, 10101...
-  const blockedThreePatterns = [
-    /211100/g,
-    /001112/g,
-    /210110/g,
-    /011012/g,
-    /211010/g,
-    /010112/g,
-    /10011/g,
-    /11001/g,
-    /10101/g,
-    /^11100/g,
-    /00111$/g,
-  ];
-  for (const pat of blockedThreePatterns) {
+  // 5. Blocked Three
+  for (const pat of BLOCKED_THREE_PATTERNS) {
     const matches = str.match(pat);
     if (matches) blockedThree += matches.length;
   }
 
-  // 6. Open Two: 001100, 01010, 010010
-  const openTwoPatterns = [
-    /001100/g,
-    /01010/g,
-    /010010/g,
-  ];
-  for (const pat of openTwoPatterns) {
+  // 6. Open Two
+  for (const pat of OPEN_TWO_PATTERNS) {
     const matches = str.match(pat);
     if (matches) openTwo += matches.length;
   }
 
   // 7. Blocked Two
-  const blockedTwoPatterns = [
-    /211000/g,
-    /000112/g,
-    /210100/g,
-    /001012/g,
-  ];
-  for (const pat of blockedTwoPatterns) {
+  for (const pat of BLOCKED_TWO_PATTERNS) {
     const matches = str.match(pat);
     if (matches) blockedTwo += matches.length;
   }

@@ -1,74 +1,41 @@
 import { BOARD_SIZE, EMPTY, BLACK, WHITE, ActivePlayer, BoardMatrix, Move } from './types';
 import { checkWin, getCandidateMoves } from './board';
 import { evaluatePositionScore } from './evaluator';
-
-/**
- * Kiểm tra xem một nước đi có tạo ra chuỗi 4 quân (Four) hoặc 5 quân (Five) cho player hay không
- */
-function isFourOrFive(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
-  board[row][col] = player;
-  const directions = [
-    { dr: 0, dc: 1 },
-    { dr: 1, dc: 0 },
-    { dr: 1, dc: 1 },
-    { dr: 1, dc: -1 },
-  ];
-
-  let makesThreat = false;
-
-  for (const dir of directions) {
-    let count = 1;
-    // Đếm về trước
-    let r = row + dir.dr;
-    let c = col + dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r += dir.dr;
-      c += dir.dc;
-    }
-    // Đếm về sau
-    r = row - dir.dr;
-    c = col - dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r -= dir.dr;
-      c -= dir.dc;
-    }
-
-    if (count >= 4) {
-      makesThreat = true;
-      break;
-    }
-  }
-
-  board[row][col] = EMPTY;
-  return makesThreat;
-}
+import { isFourOrFive, BOARD_DIRECTIONS } from './threatUtils';
 
 /**
  * Tìm ô đối thủ bắt buộc phải chặn khi bị tạo nước 4
  */
-function findDefenseMovesForFour(board: BoardMatrix, attackPlayer: ActivePlayer): Move[] {
+function findDefenseMovesForFour(board: BoardMatrix, attackPlayer: ActivePlayer, attackRow?: number, attackCol?: number): Move[] {
   const oppPlayer: ActivePlayer = attackPlayer === BLACK ? WHITE : BLACK;
-  const candidates = getCandidateMoves(board, 2);
   const defenseMoves: Move[] = [];
 
-  for (const move of candidates) {
-    // Nếu đối thủ đánh vào đây mà hóa giải hoặc thắng
-    board[move.row][move.col] = oppPlayer;
-    const win = checkWin(board);
-    board[move.row][move.col] = EMPTY;
-
-    if (win) {
-      return [move];
+  // Lấy các ô cần kiểm tra: nếu có attackRow, attackCol thì chỉ quét trong phạm vi tia của nước vừa đánh
+  const checkCells: Array<{ row: number; col: number }> = [];
+  if (attackRow !== undefined && attackCol !== undefined) {
+    for (const dir of BOARD_DIRECTIONS) {
+      for (let dist = -4; dist <= 4; dist++) {
+        if (dist === 0) continue;
+        const r = attackRow + dir.dr * dist;
+        const c = attackCol + dir.dc * dist;
+        if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === EMPTY) {
+          if (!checkCells.some(cell => cell.row === r && cell.col === c)) {
+            checkCells.push({ row: r, col: c });
+          }
+        }
+      }
     }
+  } else {
+    checkCells.push(...getCandidateMoves(board, 2));
+  }
 
+  for (const move of checkCells) {
     // Nếu attackPlayer đánh vào đây tạo ra 5 quân -> Đây chính là ô đối thủ phải chặn!
     board[move.row][move.col] = attackPlayer;
     const attackWin = checkWin(board);
     board[move.row][move.col] = EMPTY;
 
-    if (attackWin) {
+    if (attackWin && attackWin.winner === attackPlayer) {
       defenseMoves.push(move);
     }
   }
@@ -89,16 +56,19 @@ export function solveVCF(
   if (currentDepth >= maxDepth) return null;
 
   const candidates = getCandidateMoves(board, 2);
-  // Sắp xếp các nước đi có điểm cục bộ cao nhất (VCF ưu tiên tấn công dồn dập)
-  const sortedCandidates = candidates
-    .map(m => ({
-      ...m,
-      score: evaluatePositionScore(board, m.row, m.col, attackPlayer, 1.0, 0.0),
-    }))
-    .sort((a, b) => (b.score || 0) - (a.score || 0));
+  const fourCandidates: Move[] = [];
 
-  for (const move of sortedCandidates) {
-    // 1. Kiểm tra nếu đi nước này thắng ngay
+  // Lọc nhanh: Chỉ duyệt những ô tạo ra Four (4 quân) hoặc Five (5 quân)
+  for (const move of candidates) {
+    if (isFourOrFive(board, move.row, move.col, attackPlayer)) {
+      fourCandidates.push(move);
+    }
+  }
+
+  if (fourCandidates.length === 0) return null;
+
+  for (const move of fourCandidates) {
+    // 1. Kiểm tra nếu đi nước này thắng ngay (5 quân liên tiếp)
     board[move.row][move.col] = attackPlayer;
     const win = checkWin(board);
     if (win && win.winner === attackPlayer) {
@@ -106,15 +76,8 @@ export function solveVCF(
       return move;
     }
 
-    // 2. Kiểm tra nếu nước này tạo thành Four
-    const isThreat = isFourOrFive(board, move.row, move.col, attackPlayer);
-    if (!isThreat) {
-      board[move.row][move.col] = EMPTY;
-      continue;
-    }
-
-    // 3. Tìm các ô mà đối thủ bắt buộc phải nhảy vào chặn
-    const defenseMoves = findDefenseMovesForFour(board, attackPlayer);
+    // 2. Tìm các ô mà đối thủ bắt buộc phải nhảy vào chặn
+    const defenseMoves = findDefenseMovesForFour(board, attackPlayer, move.row, move.col);
 
     if (defenseMoves.length === 0) {
       // Đối thủ không chặn được (tức là 4 mở 2 đầu hoặc double 4) -> Thắng tuyệt đối!
@@ -122,7 +85,7 @@ export function solveVCF(
       return move;
     }
 
-    // Nếu chỉ có 1 hoặc 2 ô chặn, thử cho đối thủ chặn và đệ quy tìm tiếp
+    // Nếu có ô chặn, thử cho đối thủ chặn và đệ quy tìm nước tạo 4 tiếp theo
     let allDefensesLeadToWin = true;
     const oppPlayer: ActivePlayer = attackPlayer === BLACK ? WHITE : BLACK;
 

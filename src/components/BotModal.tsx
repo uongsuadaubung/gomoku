@@ -4,7 +4,7 @@ import {
   Bot,
   Swords,
   Trophy,
-  CheckCircle2,
+  CircleCheck,
   Lock,
   Flame,
 } from 'lucide-solid';
@@ -156,7 +156,7 @@ export const BotModal: Component = () => {
 
                               <Show when={unlocked && !isCampaignCurrent() && !isMatchCurrent()}>
                                 <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-0.5">
-                                  <CheckCircle2 size={12} /> Đã Mở Khóa
+                                  <CircleCheck size={12} /> Đã Mở Khóa
                                 </span>
                               </Show>
 

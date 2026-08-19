@@ -102,7 +102,7 @@ export const MainMenu: Component = () => {
                 Giải Đố Sát Cục
               </h2>
               <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                Đấu trí tìm đòn kết liễu trong những thế cờ hiểm hóc. Giải đúng để thăng hạng vô hạn, sai lầm sẽ bị tụt hạng!
+                Đấu trí tìm đòn kết liễu trong những thế cờ hiểm hóc. Giải đúng để thăng cấp và chinh phục các đỉnh cao mới!
               </p>
             </div>
 
