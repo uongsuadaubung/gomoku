@@ -1,5 +1,10 @@
-export const SUPER_SLOW_MOVE: string[] = [
-  "Đi một nước cờ mà lâu như ký hợp đồng triệu đô vậy bạn?",
+import type { TauntDefinition } from '../types';
+
+export const SUPER_SLOW_MOVE: TauntDefinition = {
+  event: 'SUPER_SLOW_MOVE',
+  mood: 'sleepy',
+  texts: [
+"Đi một nước cờ mà lâu như ký hợp đồng triệu đô vậy bạn?",
   "Ngủ gật trên bàn phím rồi à? Có cần tôi gọi ly trà đá cho tỉnh táo không?",
   "Tính toán 10 phút xong lát nữa đi đúng vào cái bẫy của tôi thì quê lắm đấy nhé!",
   "Tôi đợi bạn đi cờ mà thời gian trôi qua cả một thế kỷ rồi đây này!",
@@ -104,4 +109,5 @@ export const SUPER_SLOW_MOVE: string[] = [
   "Một nước cờ đầy trăn trở, hãy cùng tôi viết tiếp diễn biến kịch tính của trận đấu!",
   "Hãy thể hiện sự sắc sảo của bạn qua nước cờ được chuẩn bị kỹ càng này nào!",
   "Tôi đã sẵn sàng đối đầu với phương án tối thượng mà bạn vừa nghĩ ra rồi đấy!",
-];
+  ],
+};

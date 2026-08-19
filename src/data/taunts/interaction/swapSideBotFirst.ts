@@ -1,5 +1,10 @@
-export const SWAP_SIDE_BOT_FIRST: string[] = [
-  "Cho tôi đi trước là bạn xác định không thấy ánh mặt trời rồi nhé!",
+import type { TauntDefinition } from '../types';
+
+export const SWAP_SIDE_BOT_FIRST: TauntDefinition = {
+  event: 'SWAP_SIDE_BOT_FIRST',
+  mood: 'cool',
+  texts: [
+"Cho tôi đi trước là bạn xác định không thấy ánh mặt trời rồi nhé!",
   "Dũng cảm đấy, nhưng nhường tôi đi trước là tự sát đấy bạn trẻ!",
   "Để tôi cầm quân Đen đi trước à? Bạn vừa ký vào bản án tử hình của mình đấy!",
   "Nhường tôi đi trước để lát nữa thua có cớ đổ tại à?",
@@ -121,4 +126,5 @@ export const SWAP_SIDE_BOT_FIRST: string[] = [
   "Tôi cắm quân mở màn tại trung tâm Thiên Nguyên, mời bạn bước vào ma trận!",
   "Cầm Trắng đi sau thì nhớ chuẩn bị sẵn tâm lý phòng ngự kiên cường vào nhé bạn!",
   "Nhường quyền đi trước cho tôi là một quyết định vô cùng liều lĩnh và hào phóng đấy!",
-];
+  ],
+};

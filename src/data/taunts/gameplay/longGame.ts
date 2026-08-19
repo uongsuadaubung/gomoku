@@ -1,5 +1,10 @@
-export const LONG_GAME: string[] = [
-  "Đánh dai như đỉa đói vậy bạn ơi, kết thúc sớm cho tôi đi ngủ nào!",
+import type { TauntDefinition } from '../types';
+
+export const LONG_GAME: TauntDefinition = {
+  event: 'LONG_GAME',
+  mood: 'bored',
+  texts: [
+"Đánh dai như đỉa đói vậy bạn ơi, kết thúc sớm cho tôi đi ngủ nào!",
   "Trận đấu dài nhất lịch sử mà kết cục bạn vẫn sẽ thua tôi thôi!",
   "Cố đấm ăn xôi kéo dài đến 40 nước, bạn kiên trì chịu ăn hành thật đấy!",
   "Đánh cờ hay đang dệt vải thế bạn? Dày đặc bàn cờ rồi kìa!",
@@ -126,4 +131,5 @@ export const LONG_GAME: string[] = [
   "Bàn cờ chật ních quân rồi, hai ta đang đọ xem ai lì đòn hơn ai đây!",
   "Một màn đấu trí tiêu hao calo thực sự, đánh xong ván này chắc tôi sút mất vài lạng thịt!",
   "Giằng co từng tấc đất thế này mới đúng chất cờ kinh kỳ, chuẩn bị đón đòn quyết định nào bạn!",
-];
+  ],
+};

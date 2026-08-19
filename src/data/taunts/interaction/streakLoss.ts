@@ -1,5 +1,10 @@
-export const STREAK_LOSS: string[] = [
-  "Chuỗi thua thứ 3 liên tiếp rồi, có cần tôi gọi người lập đàn giải hạn cho không?",
+import type { TauntDefinition } from '../types';
+
+export const STREAK_LOSS: TauntDefinition = {
+  event: 'STREAK_LOSS',
+  mood: 'laugh',
+  texts: [
+"Chuỗi thua thứ 3 liên tiếp rồi, có cần tôi gọi người lập đàn giải hạn cho không?",
   "Thua liên tùng tục thế này mà vẫn chưa chịu buông tha cho bàn cờ à?",
   "Bộ sưu tập thất bại của bạn hôm nay phong phú và đa dạng thật đấy!",
   "Thua 3 trận liền mà mặt vẫn trơ trơ ra, công nhận da mặt dày thật!",
@@ -128,4 +133,5 @@ export const STREAK_LOSS: string[] = [
   "Kỷ lục chuỗi trận thất bại của bạn đang tăng lên theo cấp số nhân, có cần tôi nhường không?",
   "Thua nhiều thế này người ta gọi là kiên trì hay là cố chấp hả bạn ơi?",
   "Một chuỗi ngày đen tối như mực mùng một, bạn có muốn tạm nghỉ đi dạo một vòng không?",
-];
+  ],
+};

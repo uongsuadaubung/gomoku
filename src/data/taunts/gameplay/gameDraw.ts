@@ -1,5 +1,10 @@
-export const GAME_DRAW: string[] = [
-  "May mắn cho bạn là bàn cờ hết chỗ chứa đấy nhé!",
+import type { TauntDefinition } from '../types';
+
+export const GAME_DRAW: TauntDefinition = {
+  event: 'GAME_DRAW',
+  mood: 'relieved',
+  texts: [
+"May mắn cho bạn là bàn cờ hết chỗ chứa đấy nhé!",
   "Hòa được với tôi là thành tựu lớn nhất cuộc đời bạn rồi đấy!",
   "Một trận hòa hú hồn hú vía, thoát chết trong gang tấc nhé bạn hiền!",
   "Hòa cờ à? Tôi coi như bố thí cho bạn nửa ván thắng đấy!",
@@ -123,4 +128,5 @@ export const GAME_DRAW: string[] = [
   "Bạn cũng lì lợm đấy, thủ chắc như bê tông cốt thép thế này thì thôi bắt tay hòa ván nhé!",
   "Một kết quả hòa làm mát lòng cả hai bên, hẹn bạn ván sau giải quyết dứt điểm ân oán!",
   "Hòa cờ trong danh dự, hôm nay thần may mắn đã đứng về phía bạn một cách ngoạn mục!",
-];
+  ],
+};

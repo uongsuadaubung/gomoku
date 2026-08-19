@@ -1,5 +1,10 @@
-export const IDLE_AFTER_LOSS: string[] = [
-  "Bạn sợ à?",
+import type { TauntDefinition } from '../types';
+
+export const IDLE_AFTER_LOSS: TauntDefinition = {
+  event: 'IDLE_AFTER_LOSS',
+  mood: 'smug',
+  texts: [
+"Bạn sợ à?",
   "Sợ rồi đúng không? Không dám bấm vào trận nữa à?",
   "Thua xong đứng hình luôn à bạn ơi?",
   "Run tay đến mức không dám bấm vào trận luôn hả?",
@@ -174,4 +179,5 @@ export const IDLE_AFTER_LOSS: string[] = [
   "Thua một ván cờ để hiểu thêm một người bạn, đó cũng là cái duyên tốt đẹp trong đời!",
   "Hãy coi thất bại vừa rồi như một bài học quý giá mà cuộc đời dành tặng cho bạn!",
   "Khép lại quá khứ, hướng tới tương lai, sân chơi này luôn rộng mở đón chào bạn trở lại!",
-];
+  ],
+};

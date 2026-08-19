@@ -1,5 +1,10 @@
-export const BOT_TRAP: string[] = [
-  "Đố bạn đỡ được nước này của tôi đấy!",
+import type { TauntDefinition } from '../types';
+
+export const BOT_TRAP: TauntDefinition = {
+  event: 'BOT_TRAP',
+  mood: 'evil',
+  texts: [
+"Đố bạn đỡ được nước này của tôi đấy!",
   "Nhìn thấy gì chưa bạn trẻ?",
   "Chuẩn bị tinh thần nhận thua đi là vừa!",
   "Thế cờ này thì thánh cũng không cứu nổi bạn!",
@@ -145,4 +150,5 @@ export const BOT_TRAP: string[] = [
   "Đấy, cứ ngỡ mình là thợ săn, ai ngờ lại thành con mồi ngoan ngoãn dính bẫy!",
   "Một đòn song sát êm ái tiễn bạn lên đường, đỡ đầu này thì tôi thọc đầu kia!",
   "Thiên la địa võng đã khép lại, mời bạn thưởng thức trọn vẹn vị đắng của thất bại!",
-];
+  ],
+};

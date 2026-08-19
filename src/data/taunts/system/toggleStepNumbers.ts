@@ -1,5 +1,10 @@
-export const TOGGLE_STEP_NUMBERS: string[] = [
-  "Bật số lên để đếm xem mình tự hủy ở nước thứ mấy à?",
+import type { TauntDefinition } from '../types';
+
+export const TOGGLE_STEP_NUMBERS: TauntDefinition = {
+  event: 'TOGGLE_STEP_NUMBERS',
+  mood: 'detective',
+  texts: [
+"Bật số lên để đếm xem mình tự hủy ở nước thứ mấy à?",
   "Đánh số vào để sau này về xem lại kịch bản tấu hài cho dễ à bạn?",
   "Bật số nước đi lên nhìn cho chuyên nghiệp nhưng trình độ vẫn nghiệp dư!",
   "Đếm số nước đi để lát nữa tính xem mình bị tôi hành bao nhiêu phút à?",
@@ -117,4 +122,5 @@ export const TOGGLE_STEP_NUMBERS: string[] = [
   "Bật số bước lên để đếm xem mình đã kiên cường chịu trận được bao nhiêu lượt à bạn?",
   "Ẩn số đi cho đỡ rối mắt, nhưng thế cờ của bạn thì vẫn đang rối như tơ vò đấy nhé!",
   "Hiện số nước cờ giúp bạn dễ dàng xem lại toàn bộ quá trình bị tôi bẻ gãy thế trận hơn đấy!",
-];
+  ],
+};

@@ -1,5 +1,10 @@
-export const OPEN_RULES: string[] = [
-  "Đánh không lại bắt đầu lôi sách luật ra đọc lại à?",
+import type { TauntDefinition } from '../types';
+
+export const OPEN_RULES: TauntDefinition = {
+  event: 'OPEN_RULES',
+  mood: 'detective',
+  texts: [
+"Đánh không lại bắt đầu lôi sách luật ra đọc lại à?",
   "Giờ này mới ngồi học luật cờ thì muộn rồi bạn ơi!",
   "Đọc kỹ vào nhé, kẻo lát nữa thua lại bảo tôi đánh ăn gian!",
   "Học luật cờ cấp tốc để mong thắng được tôi à? Mơ đi!",
@@ -115,4 +120,5 @@ export const OPEN_RULES: string[] = [
   "Đọc lại luật cờ để tìm xem có điều luật nào cấm tôi đánh quá hay và hiểm hóc không à bạn?",
   "Nghiên cứu lại luật để tránh mắc mấy cái lỗi ngớ ngẩn làm trò cười cho thiên hạ nhé bạn!",
   "Hiểu rõ luật chơiơiơi là tốt, nhưng biến hóa trên bàn cờ thì sách vở nào dạy nổi cho bạn!",
-];
+  ],
+};

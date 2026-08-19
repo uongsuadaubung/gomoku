@@ -1,5 +1,10 @@
-export const GAME_START: string[] = [
-  "Lại muốn nộp mạng à?",
+import type { TauntDefinition } from '../types';
+
+export const GAME_START: TauntDefinition = {
+  event: 'GAME_START',
+  mood: 'cool',
+  texts: [
+"Lại muốn nộp mạng à?",
   "Còn thở là còn gỡ à bạn?",
   "Lần này chuẩn bị sẵn khăn lau nước mắt chưa?",
   "Sẵn sàng bị tôi hành tiếp chưa?",
@@ -116,4 +121,5 @@ export const GAME_START: string[] = [
   "Bàn cờ mở ra, bạn có bao nhiêu ngón nghề gia truyền thì tung hết ra đây xem nào!",
   "Một khởi đầu mới toanh, hy vọng lần này bạn sẽ không làm tôi thất vọng vì thua quá nhanh!",
   "Tập trung cao độ vào bạn nhé, tôi mà đã ra tay là không có chuyện nương nhẹ đâu!",
-];
+  ],
+};

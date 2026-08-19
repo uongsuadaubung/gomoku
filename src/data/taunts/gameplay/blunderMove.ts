@@ -1,5 +1,10 @@
-export const BLUNDER_MOVE: string[] = [
-  "Nước đi này học ở lớp mẫu giáo à?",
+import type { TauntDefinition } from '../types';
+
+export const BLUNDER_MOVE: TauntDefinition = {
+  event: 'BLUNDER_MOVE',
+  mood: 'clown',
+  texts: [
+"Nước đi này học ở lớp mẫu giáo à?",
   "Mắt bạn để đâu thế hả?",
   "Tự hủy rồi bạn ơi, tôi cứu sao nổi!",
   "Cảm ơn nhé, dâng chiến thắng tận miệng thế này ngại quá!",
@@ -150,4 +155,5 @@ export const BLUNDER_MOVE: string[] = [
   "Một pha tự đào hố chôn mình không thể đẹp mắt hơn, tôi xin phép nhận quà nhé!",
   "Bạn dâng hiến cả ván cờ cho tôi ngọt ngào thế này làm tôi ngại quá cơ!",
   "Nước cờ đi vào lòng đất, xin phép được ghi nhận đây là pha tự hủy của năm!",
-];
+  ],
+};

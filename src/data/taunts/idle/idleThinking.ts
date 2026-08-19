@@ -1,5 +1,10 @@
-export const IDLE_THINKING: string[] = [
-  "Ngủ quên trên bàn cờ rồi à?",
+import type { TauntDefinition } from '../types';
+
+export const IDLE_THINKING: TauntDefinition = {
+  event: 'IDLE_THINKING',
+  mood: 'bored',
+  texts: [
+"Ngủ quên trên bàn cờ rồi à?",
   "Nghĩ từ sáng tới tối bạn cũng không thắng được tôi đâu!",
   "Đi nhanh cho tôi còn chơi ván khác nào!",
   "Có cần tôi bật quạt cho mát não không?",
@@ -298,4 +303,5 @@ export const IDLE_THINKING: string[] = [
   "Thế sự như bàn cờ, lúc thịnh lúc suy, quan trọng là tâm bất biến giữa dòng đời vạn biến!",
   "Người biết buông bỏ cái lợi nhỏ trước mắt mới là người thâu tóm được đại cục mai sau!",
   "Tiếng đàn buông lơi giữa chiều đông lạnh, còn bạn thì ngơ ngác giữa bàn cờ vây quanh...",
-];
+  ],
+};

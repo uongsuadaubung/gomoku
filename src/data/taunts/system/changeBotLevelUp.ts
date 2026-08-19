@@ -1,5 +1,10 @@
-export const CHANGE_BOT_LEVEL_UP: string[] = [
-  "Tự tin chọn cấp cao thế? Chuẩn bị tinh thần nếm mùi địa ngục chưa?",
+import type { TauntDefinition } from '../types';
+
+export const CHANGE_BOT_LEVEL_UP: TauntDefinition = {
+  event: 'CHANGE_BOT_LEVEL_UP',
+  mood: 'cool',
+  texts: [
+"Tự tin chọn cấp cao thế? Chuẩn bị tinh thần nếm mùi địa ngục chưa?",
   "Liều lĩnh chọn cấp khó à? Để xem bạn trụ được mấy nước trước khi khóc thét!",
   "Tăng cấp độ lên để trải nghiệm cảm giác bị hủy diệt trong tích tắc à?",
   "Không biết lượng sức mình, tăng cấp lên chỉ để làm bia tập bắn cho tôi thôi!",
@@ -120,4 +125,5 @@ export const CHANGE_BOT_LEVEL_UP: string[] = [
   "Dám chọn đối đầu với cấp độ cao hơn, tôi rất nể phục dũng khí và quyết tâm vượt khó của bạn!",
   "Chọn đối đầu với cấp độ cao hơn, bạn chuẩn bị tinh thần được tôi thị phạm những đòn đánh đỉnh chóp nhé!",
   "Nâng độ khó lên là bạn sẽ không có cơ hội sửa sai đâu, một tích tắc lơ là là trả giá đắt ngay!",
-];
+  ],
+};

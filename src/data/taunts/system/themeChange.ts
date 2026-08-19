@@ -1,5 +1,10 @@
-export const THEME_CHANGE: string[] = [
-  "Đổi bàn cờ đẹp hơn cũng không giúp bạn đánh bớt dở đi đâu!",
+import type { TauntDefinition } from '../types';
+
+export const THEME_CHANGE: TauntDefinition = {
+  event: 'THEME_CHANGE',
+  mood: 'detective',
+  texts: [
+"Đổi bàn cờ đẹp hơn cũng không giúp bạn đánh bớt dở đi đâu!",
   "Đổi phong thủy à? Phong thủy không cứu nổi trình độ đâu bạn ơi!",
   "Bàn cờ có dát vàng thì kết quả bạn vẫn thua tôi thôi!",
   "Thay màu áo mới để che giấu sự cay cú của những trận thua trước à?",
@@ -124,4 +129,5 @@ export const THEME_CHANGE: string[] = [
   "Giao diện mới nhìn nhã nhặn đấy, mong là nước cờ của bạn cũng đẹp mắt như chiếc áo mới này!",
   "Khoác lên bàn cờ chiếc áo mới không làm quân cờ của bạn tự nhảy vào thế thắng đâu nhé!",
   "Đổi sang phong cách mới nhìn có vẻ thanh lịch đấy, nhưng vào trận thì vẫn phải nếm đòn thôi!",
-];
+  ],
+};

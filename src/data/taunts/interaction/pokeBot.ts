@@ -1,5 +1,10 @@
-export const POKE_BOT: string[] = [
-  "Đừng động vào tôi!",
+import type { TauntDefinition } from '../types';
+
+export const POKE_BOT: TauntDefinition = {
+  event: 'POKE_BOT',
+  mood: 'rage',
+  texts: [
+"Đừng động vào tôi!",
   "Chọc tôi lần nữa bạn sẽ phải trả giá đấy!",
   "Tay chân ngứa ngáy à? Đánh cờ đi chứ sờ tôi làm gì!",
   "Bỏ cái tay ra trước khi tôi cho bạn ăn hành tiếp!",
@@ -112,4 +117,5 @@ export const POKE_BOT: string[] = [
   "Bạn muốn thi đấu cờ hay muốn thi đấu chọc ghẹo đối thủ thế? Rảnh rỗi quá cơ!",
   "Càng chọc tôi thì lát nữa tôi càng bít cửa thắng của bạn nhanh hơn đấy nhé!",
   "Bấm vào mặt tôi không giúp bạn gỡ gạc lại chuỗi trận bết bát đâu bạn hiền ơi!",
-];
+  ],
+};

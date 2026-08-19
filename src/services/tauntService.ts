@@ -4,115 +4,45 @@ import {
   type TauntEvent,
   type BotMood,
   type TauntItem,
+  type TauntDefinition,
+  TAUNT_REGISTRY,
   TAUNT_DATABASE,
 } from '../data/taunts';
 
-export type { TauntEvent, BotMood, TauntItem };
-export { TAUNT_DATABASE };
+export type { TauntEvent, BotMood, TauntItem, TauntDefinition };
+export { TAUNT_REGISTRY, TAUNT_DATABASE };
 
-// Lưu lịch sử để không bị lặp lại câu thoại vừa nói
-const lastTauntMap: Record<string, string> = {};
+// Lưu index câu thoại vừa nói để tránh lặp lại câu trước đó với chi phí O(1)
+const lastIndexMap: Partial<Record<TauntEvent, number>> = {};
 
 export class TauntService {
   /**
-   * Lấy một câu thoại ngẫu nhiên theo sự kiện, tránh lặp lại câu gần nhất
+   * Lấy một câu thoại ngẫu nhiên theo sự kiện:
+   * - Độ phức tạp O(1), Zero-Allocation (không dùng .filter() tạo mảng rác)
+   * - Tự động lấy BotMood từ định nghĩa sự kiện (không dùng giant switch-case)
    */
   static getTaunt(event: TauntEvent): TauntItem {
-    const list = TAUNT_DATABASE[event] || TAUNT_DATABASE.BOT_WIN;
-    const last = lastTauntMap[event];
-    const filtered = list.filter(item => item !== last);
-    const pool = filtered.length > 0 ? filtered : list;
-    const chosenText = pool[Math.floor(Math.random() * pool.length)];
-    lastTauntMap[event] = chosenText;
+    const def = TAUNT_REGISTRY[event] || TAUNT_REGISTRY.BOT_WIN;
+    const list = def.texts;
+    const len = list.length;
 
-    let mood: BotMood = 'smug';
-    switch (event) {
-      case 'BOT_WIN':
-      case 'STREAK_LOSS':
-        mood = 'laugh';
-        break;
-      case 'PLAYER_RESIGN':
-        mood = 'salute';
-        break;
-      case 'PLAYER_UNDO':
-      case 'MULTI_UNDO':
-      case 'CORNER_MOVE':
-      case 'CHANGE_BOT_LEVEL_DOWN':
-      case 'RESET_STATS':
-        mood = 'disdain';
-        break;
-      case 'BLUNDER_MOVE':
-      case 'FAST_MOVE_TAUNT':
-      case 'RUSH_MOVE':
-      case 'CLICK_OCCUPIED_CELL':
-      case 'CLICK_BEFORE_START':
-      case 'CLICK_AFTER_GAME_OVER':
-        mood = 'clown';
-        break;
-
-      case 'BOT_TRAP':
-        mood = 'evil';
-        break;
-      case 'GAME_START':
-      case 'SWAP_SIDE_BOT_FIRST':
-      case 'CHANGE_BOT_LEVEL_UP':
-        mood = 'cool';
-        break;
-      case 'POKE_BOT':
-      case 'SPAM_POKE_BOT':
-        mood = 'rage';
-        break;
-      case 'TAB_BLUR':
-        mood = 'angry';
-        break;
-      case 'IDLE_THINKING':
-      case 'LONG_GAME':
-        mood = 'bored';
-        break;
-      case 'IDLE_IN_GAME':
-      case 'SUPER_SLOW_MOVE':
-        mood = 'sleepy';
-        break;
-      case 'PLAYER_GOOD_MOVE':
-      case 'PLAYER_WIN':
-        mood = 'shocked';
-        break;
-      case 'BREAK_LOSS_STREAK':
-      case 'PLAYER_STREAK_WIN':
-        mood = 'mindblown';
-        break;
-      case 'GAME_DRAW':
-        mood = 'relieved';
-        break;
-      case 'LEVEL_UP_ALERT':
-        mood = 'party';
-        break;
-      case 'SOUND_MUTE':
-        mood = 'shush';
-        break;
-      case 'THEME_CHANGE':
-      case 'TOGGLE_STEP_NUMBERS':
-      case 'OPEN_STATS':
-      case 'OPEN_RULES':
-      case 'OPEN_BOT_MODAL':
-      case 'BOARD_STYLE_CHANGE':
-        mood = 'detective';
-        break;
-      case 'IDLE_PRE_GAME':
-      case 'IDLE_AFTER_LOSS':
-      case 'SWAP_SIDE_PLAYER_FIRST':
-      case 'BOT_BLOCK_THREAT':
-      case 'TAB_FOCUS':
-      case 'CENTER_MOVE':
-      case 'SOUND_UNMUTE':
-      default:
-        mood = 'smug';
-        break;
+    if (len === 0) {
+      return { text: '...', mood: def.mood };
     }
 
+    let nextIndex = Math.floor(Math.random() * len);
+    const lastIndex = lastIndexMap[event];
+
+    if (len > 1 && nextIndex === lastIndex) {
+      // Nhảy sang một index khác trong tập (len - 1) phần tử còn lại
+      nextIndex = (nextIndex + 1 + Math.floor(Math.random() * (len - 1))) % len;
+    }
+
+    lastIndexMap[event] = nextIndex;
+
     return {
-      text: chosenText,
-      mood,
+      text: list[nextIndex],
+      mood: def.mood,
     };
   }
 

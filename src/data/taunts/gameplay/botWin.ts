@@ -1,5 +1,10 @@
-export const BOT_WIN: string[] = [
-  "Non và xanh lắm bạn ơi!",
+import type { TauntDefinition } from '../types';
+
+export const BOT_WIN: TauntDefinition = {
+  event: 'BOT_WIN',
+  mood: 'laugh',
+  texts: [
+"Non và xanh lắm bạn ơi!",
   "Trình này mà cũng đòi thắng tôi à?",
   "Xóa game đi cho đỡ tốn dung lượng!",
   "Gà thì chịu khó nhặt thóc đi nhé!",
@@ -220,4 +225,5 @@ export const BOT_WIN: string[] = [
   "Bạn về luyện thêm dăm ba năm nữa rồi hẵng quay lại tìm tôi đàm đạo cờ nhé!",
   "Đòn đánh dứt khoát tiễn bạn về hậu trường ngẫm nghĩ sự đời, tuyệt tác!",
   "Ván cờ kết thúc đẹp như mơ, chỉ tiếc là giấc mơ này người cười là tôi còn người khóc là bạn!",
-];
+  ],
+};

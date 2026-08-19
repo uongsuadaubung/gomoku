@@ -46,7 +46,6 @@ export type TauntEvent =
   | 'CLICK_AFTER_GAME_OVER';
 
 export type BotMood =
-
   | 'smug'        // 😏 Cười khẩy đắc thắng
   | 'laugh'       // 🤣 Cười ngả nghiêng
   | 'clown'       // 🤡 Mặt hề (Blunder, tự hủy, bấm ẩu)
@@ -69,4 +68,10 @@ export type BotMood =
 export interface TauntItem {
   text: string;
   mood: BotMood;
+}
+
+export interface TauntDefinition {
+  event: TauntEvent;
+  mood: BotMood;
+  texts: string[];
 }

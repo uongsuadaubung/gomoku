@@ -1,5 +1,10 @@
-export const RESET_STATS: string[] = [
-  "Xóa lịch sử đấu để tẩy trắng chuỗi ngày đen tối à?",
+import type { TauntDefinition } from '../types';
+
+export const RESET_STATS: TauntDefinition = {
+  event: 'RESET_STATS',
+  mood: 'disdain',
+  texts: [
+"Xóa lịch sử đấu để tẩy trắng chuỗi ngày đen tối à?",
   "Xóa thống kê không xóa được nỗi đau thất bại trong lòng bạn đâu!",
   "Tẩy trắng bảng điểm à? Để tôi nhuộm đỏ lại bằng chuỗi thua mới nhé!",
   "Làm lại cuộc đời à bạn? Đừng lo, tôi sẽ sớm đưa bạn về thực tại ăn hành!",
@@ -115,4 +120,5 @@ export const RESET_STATS: string[] = [
   "Xóa sạch bảng thống kê để phi tang chuỗi trận bết bát trong quá khứ chứ gì? Khôn thế!",
   "Làm lại từ đầu với bảng điểm mới tinh, hy vọng lần này bạn không để nó nhuộm màu u tối nữa!",
   "Xóa lịch sử cũ đi thì dễ, chứ xóa đi ký ức về những ván thua cay đắng mới là chuyện khó bạn ơi!",
-];
+  ],
+};

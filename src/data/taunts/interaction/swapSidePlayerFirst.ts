@@ -1,5 +1,10 @@
-export const SWAP_SIDE_PLAYER_FIRST: string[] = [
-  "Cầm quân Đen đi trước mà lát nữa thua tôi là đội nón ra đường nhé!",
+import type { TauntDefinition } from '../types';
+
+export const SWAP_SIDE_PLAYER_FIRST: TauntDefinition = {
+  event: 'SWAP_SIDE_PLAYER_FIRST',
+  mood: 'smug',
+  texts: [
+"Cầm quân Đen đi trước mà lát nữa thua tôi là đội nón ra đường nhé!",
   "Được đi trước mà vẫn thua thì đừng có đổ tại số phận đen đủi!",
   "Tôi nhường bạn đi trước đấy, liệu mà đánh cho đàng hoàng ra trò!",
   "Cầm tiên thủ trong tay, để xem bạn có làm nên trò trống gì không!",
@@ -126,4 +131,5 @@ export const SWAP_SIDE_PLAYER_FIRST: string[] = [
   "Cầm Đen trong tay mà không hạ gục được tôi là bạn phải xem lại trình độ đấy nhé!",
   "Lợi thế chủ động thuộc về bạn, mở màn bằng một nước thật tự tin và hoành tráng xem nào!",
   "Cầm Đen đi trước thì cứ việc tung hết đòn sở trường ra, tôi sẽ cho bạn thấy cách bẻ gãy mọi mũi giáo tấn công!",
-];
+  ],
+};

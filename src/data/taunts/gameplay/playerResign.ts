@@ -1,5 +1,10 @@
-export const PLAYER_RESIGN: string[] = [
-  "Chưa chi đã đầu hàng rồi à, yếu đuối thế!",
+import type { TauntDefinition } from '../types';
+
+export const PLAYER_RESIGN: TauntDefinition = {
+  event: 'PLAYER_RESIGN',
+  mood: 'salute',
+  texts: [
+"Chưa chi đã đầu hàng rồi à, yếu đuối thế!",
   "Biết điều đấy, đỡ mất thời gian của tôi!",
   "Yếu thì đừng ra gió bạn ơi!",
   "Sợ rồi à? Tưởng thế nào!",
@@ -151,4 +156,5 @@ export const PLAYER_RESIGN: string[] = [
   "Biết mình biết ta, đầu hàng giữ lại chút tôn nghiêm, bạn làm thế là chuẩn bài rồi đấy!",
   "Rút lui chiến lược để bảo toàn danh dự, một quyết định không thể hợp lý hơn!",
   "Bạn xin hàng nhanh như cách người yêu cũ trở mặt vậy, thôi hẹn bạn ván sau nhé!",
-];
+  ],
+};

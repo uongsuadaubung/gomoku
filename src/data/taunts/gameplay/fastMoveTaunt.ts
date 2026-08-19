@@ -1,5 +1,10 @@
-export const FAST_MOVE_TAUNT: string[] = [
-  "Tay nhanh hơn não à bạn ơi?",
+import type { TauntDefinition } from '../types';
+
+export const FAST_MOVE_TAUNT: TauntDefinition = {
+  event: 'FAST_MOVE_TAUNT',
+  mood: 'clown',
+  texts: [
+"Tay nhanh hơn não à bạn ơi?",
   "Đánh nhanh thế tưởng mình là thần cờ à? Lát nữa lại bấm Đi Lại cho xem!",
   "Bấm cờ như đúng rồi, đánh nhanh thắng nhanh hay đánh nhanh tự hủy nhanh thế?",
   "Đi cờ không cần suy nghĩ luôn, bản lĩnh hay là bất cần đời thế bạn?",
@@ -137,4 +142,5 @@ export const FAST_MOVE_TAUNT: string[] = [
   "Bấm cờ lia lịa để thị uy tôi à? Nhìn lại cái nước cờ hớ hênh vừa đi kìa bạn!",
   "Bạn đánh nhanh thế này lát nữa thua sớm lại bảo tại tôi không cho bạn thời gian nghĩ!",
   "Từ từ thôi bạn, cờ caro là nghệ thuật của sự thâm sâu, nhanh quá chỉ tổ tự hủy sớm thôi!",
-];
+  ],
+};

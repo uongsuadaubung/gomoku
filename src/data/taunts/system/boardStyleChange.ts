@@ -1,5 +1,10 @@
-export const BOARD_STYLE_CHANGE: string[] = [
-  "Đặt cờ giữa ô hay trên giao điểm thì bạn vẫn thua tôi thôi!",
+import type { TauntDefinition } from '../types';
+
+export const BOARD_STYLE_CHANGE: TauntDefinition = {
+  event: 'BOARD_STYLE_CHANGE',
+  mood: 'detective',
+  texts: [
+"Đặt cờ giữa ô hay trên giao điểm thì bạn vẫn thua tôi thôi!",
   "Đổi phong cách nhìn cho sành điệu à? Cốt lõi là ở cái đầu cơ bạn ơi!",
   "Chuyển kiểu đặt quân để tìm cảm hứng chiến thắng à? Vô ích thôi!",
   "Giao diện mới nhưng tư duy chơi cờ thì vẫn dậm chân tại chỗ!",
@@ -115,4 +120,5 @@ export const BOARD_STYLE_CHANGE: string[] = [
   "Tùy chỉnh cách đặt cờ theo đúng sở thích của bạn, ván đấu sẽ trọn vẹn hơn rất nhiều!",
   "Đổi phong cách đặt cờ liên tục thế bạn? Đổi kiểu gì thì kết quả cuối cùng vẫn nằm ở tài năng thôi!",
   "Tùy chỉnh hiển thị cho hợp mắt để đánh cờ cho mượt mà, chúc bạn có một trải nghiệm thật ưng ý!",
-];
+  ],
+};

@@ -1,5 +1,10 @@
-export const IDLE_IN_GAME: string[] = [
-  "Ngủ quên trên bàn cờ rồi à?",
+import type { TauntDefinition } from '../types';
+
+export const IDLE_IN_GAME: TauntDefinition = {
+  event: 'IDLE_IN_GAME',
+  mood: 'sleepy',
+  texts: [
+"Ngủ quên trên bàn cờ rồi à?",
   "Nghĩ từ sáng tới tối bạn cũng không thắng được tôi đâu!",
   "Đi nhanh cho tôi còn chơi ván khác nào!",
   "Có cần tôi bật quạt cho mát não không?",
@@ -272,4 +277,5 @@ export const IDLE_IN_GAME: string[] = [
   "Tự cổ chí kim, bậc quân tử thấy cờ bí là phải chuyển hướng, sao bạn cứ đâm đầu vào bụi rậm?",
   "Một nụ cười bằng mười thang thuốc bổ, hạ cờ xuống đi rồi hai ta cùng cười nào!",
   "Đừng để nỗi sợ thất bại giam cầm tư duy của bạn, phóng khoáng hạ cờ đi bạn hiền!",
-];
+  ],
+};

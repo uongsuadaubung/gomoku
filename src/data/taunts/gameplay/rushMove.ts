@@ -1,5 +1,10 @@
-export const RUSH_MOVE: string[] = [
-  "Đánh nhanh thế? Tay nhanh hơn não rồi lát lại đòi bấm Đi Lại cho xem!",
+import type { TauntDefinition } from '../types';
+
+export const RUSH_MOVE: TauntDefinition = {
+  event: 'RUSH_MOVE',
+  mood: 'clown',
+  texts: [
+"Đánh nhanh thế? Tay nhanh hơn não rồi lát lại đòi bấm Đi Lại cho xem!",
   "Chưa kịp chớp mắt đã đặt cờ, vào bẫy của tôi rồi bạn trẻ ơi!",
   "Đánh cờ hay là đang bấm máy tính tính tiền vậy bạn?",
   "Hấp tấp thế này là dấu hiệu của sự tự hủy sắp diễn ra đấy!",
@@ -104,4 +109,5 @@ export const RUSH_MOVE: string[] = [
   "Một pha đi cờ không cần chờ đợi, cuộc rượt đuổi thế trận đang đến hồi gay cấn!",
   "Tốc độ ra đòn rất ấn tượng, hãy cùng tôi cống hiến một trận so tài mãn nhãn!",
   "Bạn đánh nhanh và rất quyết đoán, ván cờ này chắc chắn sẽ vô cùng kịch tính!",
-];
+  ],
+};

@@ -1,5 +1,10 @@
-export const TAB_FOCUS: string[] = [
-  "Quay lại rồi à? Tra cứu bí kíp trên mạng có tìm ra đường sống nào không?",
+import type { TauntDefinition } from '../types';
+
+export const TAB_FOCUS: TauntDefinition = {
+  event: 'TAB_FOCUS',
+  mood: 'smug',
+  texts: [
+"Quay lại rồi à? Tra cứu bí kíp trên mạng có tìm ra đường sống nào không?",
   "Đã học lỏm xong chiêu thức mới chưa? Vào nộp mạng tiếp nào!",
   "Chào mừng bạn quay trở lại với nỗi sợ hãi mang tên tôi!",
   "Tìm kiếm trợ giúp xong chưa? Đánh tiếp đi xem nào!",
@@ -116,4 +121,5 @@ export const TAB_FOCUS: string[] = [
   "Quay lại rồi à bạn? Đã tìm ra cao kiến nào để phá giải thế cờ hiểm hóc của tôi chưa?",
   "Chào mừng bạn trở lại võ đài, vừa đi rửa mặt cho tỉnh táo sau cú sốc thế trận vừa rồi à?",
   "Tập trung toàn bộ tinh lực lại đây và cho tôi thấy bạn đã chuẩn bị đòn đáp trả gì nào!",
-];
+  ],
+};

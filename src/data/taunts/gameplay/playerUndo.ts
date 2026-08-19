@@ -1,5 +1,10 @@
-export const PLAYER_UNDO: string[] = [
-  "Lại hối cờ à? Trẻ con thế!",
+import type { TauntDefinition } from '../types';
+
+export const PLAYER_UNDO: TauntDefinition = {
+  event: 'PLAYER_UNDO',
+  mood: 'disdain',
+  texts: [
+"Lại hối cờ à? Trẻ con thế!",
   "Đánh dở lại còn thích đi lại!",
   "Có đi lại 100 lần thì bạn vẫn thua tôi thôi!",
   "Đánh cờ mà như đi chợ vậy bạn?",
@@ -141,4 +146,5 @@ export const PLAYER_UNDO: string[] = [
   "Cho bạn quay ngược thời gian đấy, để tôi xem nước mới này bạn có khôn ngoan hơn được tí nào không!",
   "Kỳ thủ chân chính ai lại dùng vé quay lại tuổi thơ nhiều thế này hả bạn!",
   "Đi sai một ly là đi tong một dặm, bạn dựa vào nút Undo mãi thế không thấy ngượng à?",
-];
+  ],
+};

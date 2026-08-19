@@ -1,5 +1,10 @@
-export const OPEN_STATS: string[] = [
-  "Mở thống kê ra để ngắm lại chuỗi ngày đen tối của mình à?",
+import type { TauntDefinition } from '../types';
+
+export const OPEN_STATS: TauntDefinition = {
+  event: 'OPEN_STATS',
+  mood: 'detective',
+  texts: [
+"Mở thống kê ra để ngắm lại chuỗi ngày đen tối của mình à?",
   "Xem tỷ lệ thắng thấp lè tè có thấy đau nhói trong tim không bạn?",
   "Mở bảng thành tích ra để tự nhắc nhở bản thân về những trận thua muối mặt à?",
   "Bảng thống kê toàn màu đỏ rực rỡ của sự thất bại, nhìn đã con mắt ghê!",
@@ -118,4 +123,5 @@ export const OPEN_STATS: string[] = [
   "Mở bảng thống kê ra để ngắm lại chuỗi thành tích đầy sóng gió và nước mắt của mình à bạn?",
   "Bảng số liệu không biết nói dối đâu bạn ạ, tỷ lệ thắng thế kia thì phải rèn luyện nhiều lắm!",
   "Soi lại thành tích để lấy động lực phục thù à? Tôi đánh giá cao tinh thần không chịu khuất phục này!",
-];
+  ],
+};

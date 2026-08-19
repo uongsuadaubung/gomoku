@@ -1,5 +1,10 @@
-export const CHANGE_BOT_LEVEL_DOWN: string[] = [
-  "Sợ quá nên Hạ độ khó của tôi xuống để tìm kiếm chiến thắng an ủi à? Hèn thế!",
+import type { TauntDefinition } from '../types';
+
+export const CHANGE_BOT_LEVEL_DOWN: TauntDefinition = {
+  event: 'CHANGE_BOT_LEVEL_DOWN',
+  mood: 'disdain',
+  texts: [
+"Sợ quá nên Hạ độ khó của tôi xuống để tìm kiếm chiến thắng an ủi à? Hèn thế!",
   "Đánh không lại cấp cao bắt đầu hạ cấp xuống bắt nạt tôi dễ à?",
   "Hạ cấp xuống đánh cho đỡ nhục à bạn ơi? Trốn tránh thực tại ghê!",
   "Tìm về vùng an toàn của kẻ yếu đuối à? Tôi vẫn sẽ hành bạn tiếp thôi!",
@@ -121,4 +126,5 @@ export const CHANGE_BOT_LEVEL_DOWN: string[] = [
   "Hạ cấp độ của tôi để tự an ủi bản thân là mình đánh cờ không đến nỗi nào, buồn cười thật sự!",
   "Giảm bớt độ khó để tìm chút cảm giác dễ thở, nhưng vào trận thì vẫn phải toát mồ hôi hột đấy nhé!",
   "Lùi một bước về mức dễ hơn để luyện lại bài căn bản, chúc bạn sớm tìm lại được sự tự tin!",
-];
+  ],
+};

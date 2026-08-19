@@ -1,5 +1,10 @@
-export const MULTI_UNDO: string[] = [
-  "Định bấm Đi Lại tua ngược về lúc mới sinh ra luôn hay gì bạn ơi?",
+import type { TauntDefinition } from '../types';
+
+export const MULTI_UNDO: TauntDefinition = {
+  event: 'MULTI_UNDO',
+  mood: 'disdain',
+  texts: [
+"Định bấm Đi Lại tua ngược về lúc mới sinh ra luôn hay gì bạn ơi?",
   "Đánh cờ hay là đang chỉnh sửa video tua ngược thế bạn?",
   "Bấm Undo nhiều thế máy sắp sinh ra nút Đi Tiếp để bù lại cho bạn rồi kìa!",
   "Kỳ thủ dùng bảo bối cỗ máy thời gian của Doraemon à? Đánh tiếp đi đừng quay xe nữa!",
@@ -104,4 +109,5 @@ export const MULTI_UNDO: string[] = [
   "Hãy thể hiện bản lĩnh của mình qua nước cờ mới được chau chuốt kỹ càng này nào!",
   "Tôi đã sẵn sàng đối đầu với phương án mới mà bạn vừa lựa chọn rồi đấy!",
   "Một ván cờ hay là ván cờ có sự nỗ lực không ngừng nghỉ từ cả hai phía!",
-];
+  ],
+};

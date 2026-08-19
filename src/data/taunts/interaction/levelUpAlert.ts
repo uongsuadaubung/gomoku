@@ -1,5 +1,10 @@
-export const LEVEL_UP_ALERT: string[] = [
-  "Lên cấp mới rồi à? Đừng tưởng bở, cấp sau tôi sẽ hành bạn gấp đôi!",
+import type { TauntDefinition } from '../types';
+
+export const LEVEL_UP_ALERT: TauntDefinition = {
+  event: 'LEVEL_UP_ALERT',
+  mood: 'party',
+  texts: [
+"Lên cấp mới rồi à? Đừng tưởng bở, cấp sau tôi sẽ hành bạn gấp đôi!",
   "Chúc mừng thăng cấp, bạn chính thức bước chân vào địa ngục trần gian!",
   "Lên được một cấp mà mặt mày hớn hở, chuẩn bị nếm mùi bão táp tiếp nhé!",
   "Cấp độ mới sẽ cho bạn biết thế nào là sự tàn khốc thực sự của kỳ nghệ!",
@@ -127,4 +132,5 @@ export const LEVEL_UP_ALERT: string[] = [
   "Mở khóa thử thách mới, chuẩn bị tinh thần đối mặt với những bẫy sát cục liên hoàn từ tôi!",
   "Trình độ bạn đã lên một tầm cao mới, tôi sẽ tung ra toàn bộ thực lực để tiếp đãi bạn!",
   "Vượt qua bài kiểm tra rồi đấy, từ giờ mỗi nước cờ đều là một bài toán hóc búa cho bạn!",
-];
+  ],
+};

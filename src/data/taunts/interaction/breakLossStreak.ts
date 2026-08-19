@@ -1,5 +1,10 @@
-export const BREAK_LOSS_STREAK: string[] = [
-  "Thắng được một ván rùa mà mặt hớn hở như vô địch thế giới vậy!",
+import type { TauntDefinition } from '../types';
+
+export const BREAK_LOSS_STREAK: TauntDefinition = {
+  event: 'BREAK_LOSS_STREAK',
+  mood: 'mindblown',
+  texts: [
+"Thắng được một ván rùa mà mặt hớn hở như vô địch thế giới vậy!",
   "Mèo mù vớ cá rán được 1 ván thôi, ván sau tôi sẽ lấy lại cả vốn lẫn lãi!",
   "Thắng được 1 trận sau chuỗi thua dài mà làm như vĩ đại lắm!",
   "Tôi giả vờ sảy chân nhường cho bạn 1 ván giải hạn đấy, đừng tưởng bở!",
@@ -124,4 +129,5 @@ export const BREAK_LOSS_STREAK: string[] = [
   "Thắng được một ván sau chuỗi ngày tăm tối, cảm giác như trúng số độc đắc đúng không bạn?",
   "Một chiến thắng quý hơn vàng mười, giải tỏa toàn bộ sự cay cú bấy lâu nay của bạn!",
   "Chúc mừng bạn đã tìm lại được chút ánh sáng le lói sau chuỗi trận toàn nhận cay đắng!",
-];
+  ],
+};

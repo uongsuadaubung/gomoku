@@ -1,5 +1,10 @@
-export const SPAM_POKE_BOT: string[] = [
-  "Bấm gì mà bấm lắm thế? Tôi là kỳ thủ chứ có phải bong bóng xốp nổ đâu mà bóp hoài!",
+import type { TauntDefinition } from '../types';
+
+export const SPAM_POKE_BOT: TauntDefinition = {
+  event: 'SPAM_POKE_BOT',
+  mood: 'rage',
+  texts: [
+"Bấm gì mà bấm lắm thế? Tôi là kỳ thủ chứ có phải bong bóng xốp nổ đâu mà bóp hoài!",
   "Bàn cờ ở dưới kia kìa, chọc vào mặt tôi có giúp bạn đánh cờ giỏi lên đâu!",
   "Chọc thêm một cái nữa là tôi gọi bảo vệ bế bạn ra khỏi phòng cờ đấy nhé!",
   "Chuông cửa nhà bạn bị hỏng hay sao mà sang đây bấm Avatar tôi liên tục thế?",
@@ -104,4 +109,5 @@ export const SPAM_POKE_BOT: string[] = [
   "Bạn là một đối thủ vô cùng đặc biệt và đáng mến trong thế giới cờ caro này!",
   "Năng lượng đã được nạp đầy 100%, hãy cùng tôi bước vào sàn đấu ngay thôi nào!",
   "Tôi luôn ở đây để cùng bạn chinh phục những đỉnh cao kỳ nghệ mới mỗi ngày!",
-];
+  ],
+};

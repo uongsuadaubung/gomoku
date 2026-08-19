@@ -1,46 +1,47 @@
-import { BOT_WIN } from './botWin';
-import { PLAYER_RESIGN } from './playerResign';
-import { PLAYER_UNDO } from './playerUndo';
+import type { TauntDefinition } from '../types';
 import { BLUNDER_MOVE } from './blunderMove';
-import { BOT_TRAP } from './botTrap';
-import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
 import { BOT_BLOCK_THREAT } from './botBlockThreat';
-import { CORNER_MOVE } from './cornerMove';
+import { BOT_TRAP } from './botTrap';
+import { BOT_WIN } from './botWin';
 import { CENTER_MOVE } from './centerMove';
-import { LONG_GAME } from './longGame';
+import { CORNER_MOVE } from './cornerMove';
+import { FAST_MOVE_TAUNT } from './fastMoveTaunt';
 import { GAME_DRAW } from './gameDraw';
-import { PLAYER_WIN } from './playerWin';
+import { LONG_GAME } from './longGame';
+import { PLAYER_RESIGN } from './playerResign';
 import { PLAYER_STREAK_WIN } from './playerStreakWin';
+import { PLAYER_UNDO } from './playerUndo';
+import { PLAYER_WIN } from './playerWin';
 import { RUSH_MOVE } from './rushMove';
 
-export * from './botWin';
-export * from './playerResign';
-export * from './playerUndo';
 export * from './blunderMove';
-export * from './botTrap';
-export * from './fastMoveTaunt';
 export * from './botBlockThreat';
-export * from './cornerMove';
+export * from './botTrap';
+export * from './botWin';
 export * from './centerMove';
-export * from './longGame';
+export * from './cornerMove';
+export * from './fastMoveTaunt';
 export * from './gameDraw';
-export * from './playerWin';
+export * from './longGame';
+export * from './playerResign';
 export * from './playerStreakWin';
+export * from './playerUndo';
+export * from './playerWin';
 export * from './rushMove';
 
-export const GAMEPLAY_TAUNTS = {
-  BOT_WIN,
-  PLAYER_RESIGN,
-  PLAYER_UNDO,
+export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   BLUNDER_MOVE,
-  BOT_TRAP,
-  FAST_MOVE_TAUNT,
   BOT_BLOCK_THREAT,
-  CORNER_MOVE,
+  BOT_TRAP,
+  BOT_WIN,
   CENTER_MOVE,
-  LONG_GAME,
+  CORNER_MOVE,
+  FAST_MOVE_TAUNT,
   GAME_DRAW,
-  PLAYER_WIN,
+  LONG_GAME,
+  PLAYER_RESIGN,
   PLAYER_STREAK_WIN,
+  PLAYER_UNDO,
+  PLAYER_WIN,
   RUSH_MOVE,
 };

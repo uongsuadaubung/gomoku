@@ -1,5 +1,10 @@
-export const CENTER_MOVE: string[] = [
-  "Cũng biết chiếm tâm Thiên Nguyên đấy, để xem giữ được mấy nước!",
+import type { TauntDefinition } from '../types';
+
+export const CENTER_MOVE: TauntDefinition = {
+  event: 'CENTER_MOVE',
+  mood: 'smug',
+  texts: [
+"Cũng biết chiếm tâm Thiên Nguyên đấy, để xem giữ được mấy nước!",
   "Mở màn đúng sách giáo khoa mẫu giáo đấy, nhưng gặp tôi là tắt điện!",
   "Chiếm trung tâm tự tin ghê, lát nữa bị tôi đánh dạt biên cho xem!",
   "Nước cờ mở màn chuẩn chỉ đấy, hy vọng những nước sau không bị ngáo!",
@@ -130,4 +135,5 @@ export const CENTER_MOVE: string[] = [
   "Khu trung tâm là chiến địa đầu rơi máu chảy, bạn bước vào là phải chuẩn bị tinh thần ăn đòn!",
   "Một nước khai cuộc chuẩn chỉ, nhưng duy trì được phong độ hay không mới là chuyện lớn!",
   "Nắm được trung lộ rồi đấy, giờ hãy phô diễn xem bản lĩnh của bạn đến đâu nào!",
-];
+  ],
+};

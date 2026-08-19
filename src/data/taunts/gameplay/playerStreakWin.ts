@@ -1,5 +1,10 @@
-export const PLAYER_STREAK_WIN: string[] = [
-  "Thắng liên tiếp mấy ván là bắt đầu thấy trời đất đảo lộn rồi đúng không? Ván tới tôi đánh bại bạn!",
+import type { TauntDefinition } from '../types';
+
+export const PLAYER_STREAK_WIN: TauntDefinition = {
+  event: 'PLAYER_STREAK_WIN',
+  mood: 'mindblown',
+  texts: [
+"Thắng liên tiếp mấy ván là bắt đầu thấy trời đất đảo lộn rồi đúng không? Ván tới tôi đánh bại bạn!",
   "Được ngày phong độ xuất thần đấy, nhưng chuỗi may mắn của bạn sắp cạn kiệt rồi!",
   "Hai ván thắng liên tiếp làm bạn tưởng mình là bất khả chiến bại rồi à? Tỉnh mộng đi!",
   "Bạn dùng phần mềm hỗ trợ đúng không? Chứ người bình thường sao thắng tôi liên tục thế được!",
@@ -104,4 +109,5 @@ export const PLAYER_STREAK_WIN: string[] = [
   "Bạn đã chứng minh được đẳng cấp cao qua chuỗi trận này, xin ngả mũ thán phục!",
   "Hãy chuẩn bị cho một màn tranh tài đỉnh cao, nơi chuỗi thắng của bạn sẽ được thử thách!",
   "Chuỗi phong độ rất ấn tượng, bạn xứng đáng là một đối thủ xứng tầm nhất của tôi!",
-];
+  ],
+};

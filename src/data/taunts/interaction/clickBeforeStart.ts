@@ -1,5 +1,10 @@
-export const CLICK_BEFORE_START: string[] = [
-  "Chưa chọn ai đi trước mà đã vội chọc bàn cờ rồi à? 🙄!",
+import type { TauntDefinition } from '../types';
+
+export const CLICK_BEFORE_START: TauntDefinition = {
+  event: 'CLICK_BEFORE_START',
+  mood: 'clown',
+  texts: [
+"Chưa chọn ai đi trước mà đã vội chọc bàn cờ rồi à? 🙄!",
   "Bình tĩnh nào bạn ơi, chọn xem ai đi trước ở bảng bên dưới kìa!",
   "Háo thắng thế! Bấm chọn người đi trước ở bảng bên dưới trước đã.",
   "Gõ bàn cờ làm gì? Chọn lượt đi bên dưới kìa người đẹp ơi!",
@@ -104,4 +109,5 @@ export const CLICK_BEFORE_START: string[] = [
   "Đừng vội, trận đấu hay còn ở phía trước, chọn ai đi trước ở dưới đi nào!",
   "Chưa chọn bên mà hạ cờ là phạm quy đấy nhé, chọn lượt đi ở dưới kìa!",
   "Bấm vào bàn cờ làm chi? Chọn ai là người đi trước ở bảng bên dưới đi nào!",
-];
+  ],
+};

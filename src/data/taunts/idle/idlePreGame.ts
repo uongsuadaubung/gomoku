@@ -1,5 +1,10 @@
-export const IDLE_PRE_GAME: string[] = [
-  "Đứng ngắm giao diện mãi thế? Sợ không dám bấm vào trận à?",
+import type { TauntDefinition } from '../types';
+
+export const IDLE_PRE_GAME: TauntDefinition = {
+  event: 'IDLE_PRE_GAME',
+  mood: 'smug',
+  texts: [
+"Đứng ngắm giao diện mãi thế? Sợ không dám bấm vào trận à?",
   "Bấm vào trận đi chứ đứng hình làm gì bạn ơi!",
   "Còn thở là còn gỡ, hay là sợ tôi quá rồi?",
   "Có dám bấm vào trận để tôi hành tiếp không?",
@@ -222,4 +227,5 @@ export const IDLE_PRE_GAME: string[] = [
   "Thanh xuân như một tách trà, đứng nhìn sảnh mãi hết bà thanh xuân!",
   "Muốn thành công phải trải qua nhiều thử thách, bấm vào trận để thử thách bản thân tiếp nào!",
   "Cười lên đi bạn, cuộc đời vẫn đẹp sao, ván cờ mới đang chờ bạn làm nên kỳ tích kìa!",
-];
+  ],
+};

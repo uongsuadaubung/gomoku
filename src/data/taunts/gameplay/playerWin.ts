@@ -1,5 +1,10 @@
-export const PLAYER_WIN: string[] = [
-  "Hên thôi! Chắc chắn là do ăn may, ván sau tôi nghiêm túc thì bạn không có cửa!",
+import type { TauntDefinition } from '../types';
+
+export const PLAYER_WIN: TauntDefinition = {
+  event: 'PLAYER_WIN',
+  mood: 'shocked',
+  texts: [
+"Hên thôi! Chắc chắn là do ăn may, ván sau tôi nghiêm túc thì bạn không có cửa!",
   "Bạn vừa nhìn lén màn hình của tôi đúng không? Đánh kiểu này gian lận chắc luôn!",
   "Tôi nhường cho bạn 1 ván để giữ tinh thần thôi, đừng vội đắc ý!",
   "Không thể nào! Nước cờ đó rõ ràng là do thần may mắn điều khiển chuột hộ bạn!",
@@ -104,4 +109,5 @@ export const PLAYER_WIN: string[] = [
   "Tôi chấp nhận thất bại này và đang rất nóng lòng muốn so tài ván tiếp theo cùng bạn!",
   "Quá hay bạn ơi, một nước cờ xứng đáng được lưu danh vào trận đấu!",
   "Bạn đã chiến thắng vẻ vang, hãy sẵn sàng nghênh đón màn trả đòn quyết liệt từ tôi!",
-];
+  ],
+};

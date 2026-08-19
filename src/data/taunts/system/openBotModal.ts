@@ -1,5 +1,10 @@
-export const OPEN_BOT_MODAL: string[] = [
-  "Vào đây tìm đối thủ dễ hơn để bắt nạt tìm lại chút tự tin mong manh à?",
+import type { TauntDefinition } from '../types';
+
+export const OPEN_BOT_MODAL: TauntDefinition = {
+  event: 'OPEN_BOT_MODAL',
+  mood: 'detective',
+  texts: [
+"Vào đây tìm đối thủ dễ hơn để bắt nạt tìm lại chút tự tin mong manh à?",
   "Định đổi đối thủ à? Chọn ai thì kết quả cuối cùng của bạn vẫn là ăn hành thôi!",
   "Xem danh sách cấp độ để chiêm ngưỡng những đối thủ bạn chưa từng thắng nổi à?",
   "Định hạ cấp độ xuống để tự lừa dối bản thân là mình đánh giỏi à bạn hiền?",
@@ -104,4 +109,5 @@ export const OPEN_BOT_MODAL: string[] = [
   "Hãy tự tin bước vào cuộc so tài trí tuệ đỉnh cao và khẳng định đẳng cấp đích thực của bạn!",
   "Bảng cấp độ đã sẵn sàng, đối thủ của bạn đã sẵn sàng, chỉ còn chờ quyết định từ bạn!",
   "Hãy chọn ngay đối thủ và cùng tôi cống hiến một ván cờ đỉnh cao mãn nhãn nhất nào!",
-];
+  ],
+};

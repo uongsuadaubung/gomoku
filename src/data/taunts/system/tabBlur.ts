@@ -1,5 +1,10 @@
-export const TAB_BLUR: string[] = [
-  "Đi đâu đấy? Đi tra Google tìm cách giải cờ đúng không?",
+import type { TauntDefinition } from '../types';
+
+export const TAB_BLUR: TauntDefinition = {
+  event: 'TAB_BLUR',
+  mood: 'angry',
+  texts: [
+"Đi đâu đấy? Đi tra Google tìm cách giải cờ đúng không?",
   "Chuyển tab sang xem phim để trốn tránh thực tại à?",
   "Vừa rời tab là tôi biết bạn đang bế tắc toàn tập rồi!",
   "Treo tab ở đây để đi cầu cứu cao nhân phương nào à?",
@@ -119,4 +124,5 @@ export const TAB_BLUR: string[] = [
   "Bỏ tab đi đâu giữa trận thế bạn ơi? Đang mở mạng tra cứu cẩm nang phá thế cờ của tôi à?",
   "Rời khỏi bàn cờ giữa chừng là đang tạo cơ hội vàng cho tôi tính toán sâu thêm vài nước đấy nhé!",
   "Chạy đi đâu đấy bạn hiền? Đừng bảo là sang cầu cứu các cao thủ cờ vỉa hè đấy nhé!",
-];
+  ],
+};

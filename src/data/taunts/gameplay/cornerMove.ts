@@ -1,5 +1,10 @@
-export const CORNER_MOVE: string[] = [
-  "Ra tận góc bàn cờ ngồi đếm lá vàng rơi à bạn?",
+import type { TauntDefinition } from '../types';
+
+export const CORNER_MOVE: TauntDefinition = {
+  event: 'CORNER_MOVE',
+  mood: 'disdain',
+  texts: [
+"Ra tận góc bàn cờ ngồi đếm lá vàng rơi à bạn?",
   "Đánh góc để trốn tôi à? Chạy đâu cho hết nắng!",
   "Định lập căn cứ địa bí mật ở góc bàn cờ à? Mơ mộng quá!",
   "Đánh vào góc bàn cờ thế này chắc đang lạc lối giữa dòng đời đúng không?",
@@ -132,4 +137,5 @@ export const CORNER_MOVE: string[] = [
   "Tính xây pháo đài cố thủ ở góc bàn cờ à? Tôi bao vây bốn phía cho bạn hết đường thở luôn!",
   "Rời xa trung tâm là tự tay cắt đứt đường sống, bạn học nước này ở đâu thế hả bạn?",
   "Cắm cờ nơi hoang vu hẻo lánh thế kia, bạn định gửi quân đi tị nạn đấy à?",
-];
+  ],
+};

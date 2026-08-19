@@ -1,5 +1,10 @@
-export const SOUND_UNMUTE: string[] = [
-  "Bật loa lên để nghe tôi khai sáng trí tuệ à? Ngoan đấy!",
+import type { TauntDefinition } from '../types';
+
+export const SOUND_UNMUTE: TauntDefinition = {
+  event: 'SOUND_UNMUTE',
+  mood: 'smug',
+  texts: [
+"Bật loa lên để nghe tôi khai sáng trí tuệ à? Ngoan đấy!",
   "Chuẩn bị lắng nghe bản giao hưởng của sự thất bại chưa bạn hiền?",
   "Bật âm thanh lên để nghe từng đòn sát thương tâm lý của tôi nào!",
   "Dũng cảm bật loa lại rồi à? Để xem chịu đựng được bao lâu nhé!",
@@ -116,4 +121,5 @@ export const SOUND_UNMUTE: string[] = [
   "Bật loa lên rồi à? Hãy lắng nghe trọn vẹn những âm thanh chiến thắng vang dội từ tôi nhé!",
   "Tiếng cờ gõ lách cách giòn giã đã quay lại, chuẩn bị thưởng thức từng đòn đánh đanh thép nào!",
   "Có tiếng vào trận đấu mới xôm tụ chứ bạn, tha hồ nghe tôi bình phẩm từng nước cờ nhé!",
-];
+  ],
+};

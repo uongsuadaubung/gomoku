@@ -1,5 +1,10 @@
-export const PLAYER_GOOD_MOVE: string[] = [
-  "Hên thôi, đừng tưởng bở!",
+import type { TauntDefinition } from '../types';
+
+export const PLAYER_GOOD_MOVE: TauntDefinition = {
+  event: 'PLAYER_GOOD_MOVE',
+  mood: 'shocked',
+  texts: [
+"Hên thôi, đừng tưởng bở!",
   "Cũng biết giãy đấy nhỉ?",
   "Mèo mù vớ phải cá rán à?",
   "Được đấy, nhưng sắp hết phép rồi!",
@@ -140,4 +145,5 @@ export const PLAYER_GOOD_MOVE: string[] = [
   "Khéo thế nhờ! Pha xử lý bất ngờ làm tôi cũng phải giật mình mất nửa giây đấy!",
   "Đấy, đánh cờ là phải có chiều sâu như thế chứ! Bắt đầu thấy ván cờ có tí nhiệt rồi đấy!",
   "Một pha ra đòn rất có nét, nhưng đừng vội đắc chí sớm, kịch hay còn ở phía sau!",
-];
+  ],
+};

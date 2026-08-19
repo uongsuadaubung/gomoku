@@ -1,5 +1,10 @@
-export const BOT_BLOCK_THREAT: string[] = [
-  "Mưu mẹo trẻ con thế này mà đòi qua mắt tôi à?",
+import type { TauntDefinition } from '../types';
+
+export const BOT_BLOCK_THREAT: TauntDefinition = {
+  event: 'BOT_BLOCK_THREAT',
+  mood: 'smug',
+  texts: [
+"Mưu mẹo trẻ con thế này mà đòi qua mắt tôi à?",
   "Tưởng tôi mù không nhìn thấy nước 4 của bạn chắc?",
   "Định bẫy tôi à? Trò này tôi chơi từ lúc bạn còn chưa biết cầm quân cờ!",
   "Bị tôi chặn đứng ngay trước cửa thiên đường, cay cú chưa?",
@@ -140,4 +145,5 @@ export const BOT_BLOCK_THREAT: string[] = [
   "Bịt kín cửa thắng của bạn trong một nốt nhạc, giờ thì mời bạn chuyển sang thế thủ!",
   "Chặn đứng âm mưu hiểm độc chỉ bằng một cú hạ cờ nhẹ tênh, bạn thấy tôi khéo không?",
   "Thành đồng vách sắt dựng lên rồi, bạn mang xe tăng đến cũng không đục thủng được đâu!",
-];
+  ],
+};

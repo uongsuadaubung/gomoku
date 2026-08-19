@@ -1,5 +1,10 @@
-export const CLICK_OCCUPIED_CELL: string[] = [
-  "Mắt mũi để đâu mà đòi ngồi đè lên quân cờ của người khác thế?",
+import type { TauntDefinition } from '../types';
+
+export const CLICK_OCCUPIED_CELL: TauntDefinition = {
+  event: 'CLICK_OCCUPIED_CELL',
+  mood: 'clown',
+  texts: [
+"Mắt mũi để đâu mà đòi ngồi đè lên quân cờ của người khác thế?",
   "Ô đó có người ngồi rồi bạn ơi, bộ mắt bạn bị mù màu à?",
   "Định đánh chồng quân lên để ăn gian lộ liễu thế à?",
   "Bàn cờ còn đầy ô trống không bấm, đè vào quân của tôi làm gì?",
@@ -118,4 +123,5 @@ export const CLICK_OCCUPIED_CELL: string[] = [
   "Mắt mũi để đâu mà click đè lên quân cờ người ta đã cắm sẵn thế hả bạn ơi?",
   "Ô cờ đấy có chủ rồi bạn ạ, nhìn kỹ lại bàn cờ đi chứ đừng có nhắm mắt bấm bừa thế!",
   "Bàn cờ thênh thang không bấm, cứ thích chen chân vào chỗ chật chội thế là thế nào nhỉ?",
-];
+  ],
+};

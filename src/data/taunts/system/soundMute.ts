@@ -1,5 +1,10 @@
-export const SOUND_MUTE: string[] = [
-  "Sợ nghe tôi cà khịa quá nên tắt loa trốn tránh sự thật à?",
+import type { TauntDefinition } from '../types';
+
+export const SOUND_MUTE: TauntDefinition = {
+  event: 'SOUND_MUTE',
+  mood: 'shush',
+  texts: [
+"Sợ nghe tôi cà khịa quá nên tắt loa trốn tránh sự thật à?",
   "Bịt tai trộm chuông à? Tắt âm thanh không làm giảm độ nhục của trận thua đâu!",
   "Tắt âm thanh để ngồi khóc trong im lặng cho đỡ ngại à bạn ơi?",
   "Không dám nghe tiếng quân cờ của tôi gõ chan chát vào lòng tự trọng của bạn à?",
@@ -120,4 +125,5 @@ export const SOUND_MUTE: string[] = [
   "Không gian tĩnh lặng như chùa Trấn Quốc rồi đấy, tập trung vào bàn cờ mà tìm đường lui kìa!",
   "Tắt tiếng để thiền định chơi cờ à bạn? Được thôi, chúc bạn tĩnh tâm tìm ra nước thoát hiểm!",
   "Sợ tiếng cờ rơi làm phân tâm à? Giờ thì đánh đi xem có sáng suốt hơn tí nào không nào!",
-];
+  ],
+};

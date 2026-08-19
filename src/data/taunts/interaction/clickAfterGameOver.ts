@@ -1,5 +1,10 @@
-export const CLICK_AFTER_GAME_OVER: string[] = [
-  "Ủa tính click trừ tà hay gì? Ván cờ chết queo rồi bạn ê!",
+import type { TauntDefinition } from '../types';
+
+export const CLICK_AFTER_GAME_OVER: TauntDefinition = {
+  event: 'CLICK_AFTER_GAME_OVER',
+  mood: 'clown',
+  texts: [
+"Ủa tính click trừ tà hay gì? Ván cờ chết queo rồi bạn ê!",
   "Bấm chi cho mòn vân tay vậy? Bàn cờ nó khinh không thèm nhận quân nữa đâu!",
   "Bớt bớt cái tay lại đi, tính đẻ trứng trên bàn cờ hay sao mà bấm miết?",
   "Bàn cờ đã hóa đá rồi, có gõ nát cái màn hình thì cũng chẳng thay đổi được gì đâu!",
@@ -104,4 +109,5 @@ export const CLICK_AFTER_GAME_OVER: string[] = [
   "Nút Ván Tiếp Theo chà bá lửa ngay bên cạnh kìa, mắt để đi đâu mà bấm vô đây?",
   "Hết phim rồi, bật đèn dọn rác rồi, khán giả mau giải tán sang ván mới!",
   "Bấm tiếp là tôi phát loa phường bêu tên bạn vì tội quấy rối bàn cờ đã kết thúc đấy!",
-];
+  ],
+};
