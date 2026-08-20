@@ -106,15 +106,15 @@ export const MainMenu: Component = () => {
               </p>
             </div>
 
-            {/* Current Puzzle Level Status */}
+            {/* Current Puzzle Status */}
             <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center">
               <div class="flex items-center gap-2.5">
-                <span class="text-lg tracking-tighter">
-                  {puzzleLevel() <= 5 ? '⭐'.repeat(puzzleLevel()) : `⭐x${puzzleLevel()}`}
-                </span>
+                <div class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  <Puzzle size={18} />
+                </div>
                 <div>
                   <div class="text-xs font-black text-white">
-                    {puzzleLevel() <= 5 ? `Thế Cờ Mức ${puzzleLevel()}⭐` : `Thế Cờ Đỉnh Cao (${puzzleLevel()}⭐)`}
+                    Giải Đố Sát Cục
                   </div>
                   <div class="text-[10px] text-emerald-400 font-medium">
                     Thử thách nhãn quan chiến thuật

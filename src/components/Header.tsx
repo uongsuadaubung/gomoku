@@ -3,10 +3,10 @@ import {
   Volume2,
   VolumeX,
   Settings,
-  HelpCircle,
-  BarChart3,
+  CircleQuestionMark,
+  ChartColumn,
   Bot,
-  Home,
+  House,
   Trophy,
   Puzzle,
   Swords,
@@ -27,7 +27,7 @@ export const Header: Component = () => {
               title="Quay về Trang Chủ / Menu"
               class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-400 hover:text-amber-300 border border-slate-700/80 flex items-center gap-1 text-xs font-bold transition-all shadow-sm"
             >
-              <Home size={16} />
+              <House size={16} />
               <span class="hidden sm:inline">Menu</span>
             </button>
           </Show>
@@ -72,17 +72,15 @@ export const Header: Component = () => {
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold shadow-inner">
             <Show when={store.gameMode() === 'campaign'}>
               <Trophy size={14} class="text-indigo-400" />
-              <span class="text-indigo-300">Chiến Dịch • Bot {store.currentLevelConfig().vietnameseName}</span>
+              <span class="text-indigo-300">Chiến Dịch</span>
             </Show>
             <Show when={store.gameMode() === 'puzzle'}>
               <Puzzle size={14} class="text-emerald-400" />
-              <span class="text-emerald-300">
-                Sát Cục {(store.currentPuzzle()?.stars || 1) <= 5 ? '⭐'.repeat(store.currentPuzzle()?.stars || 1) : `⭐x${store.currentPuzzle()?.stars || 1}`}
-              </span>
+              <span class="text-emerald-300">Thế Cờ</span>
             </Show>
             <Show when={store.gameMode() === 'custom'}>
               <Swords size={14} class="text-amber-400" />
-              <span class="text-amber-300">Đấu Tập • Bot {store.currentLevelConfig().vietnameseName}</span>
+              <span class="text-amber-300">Đấu Tập</span>
             </Show>
           </div>
         </Show>
@@ -111,7 +109,7 @@ export const Header: Component = () => {
             title="Hướng dẫn luật chơi"
             class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 text-xs font-medium"
           >
-            <HelpCircle size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />
+            <CircleQuestionMark size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />
             <span class="hidden md:inline">Luật</span>
           </button>
 
@@ -126,10 +124,8 @@ export const Header: Component = () => {
             title="Thống kê kết quả ván đấu"
             class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
           >
-            <BarChart3 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
-            <span class="bg-emerald-500/20 text-emerald-300 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border border-emerald-500/30">
-              {store.stats().wins}W
-            </span>
+            <ChartColumn size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
+            <span class="hidden md:inline">Thống Kê</span>
           </button>
 
           {/* Bot Level Modal */}
@@ -144,9 +140,7 @@ export const Header: Component = () => {
             class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
           >
             <Bot size={16} class="text-amber-400 sm:w-[18px] sm:h-[18px]" />
-            <span class="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border border-amber-500/30 truncate max-w-[80px] sm:max-w-none">
-              Bot {store.currentLevelConfig().vietnameseName}
-            </span>
+            <span class="hidden md:inline">Đối Thủ</span>
           </button>
 
           {/* Settings */}

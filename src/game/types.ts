@@ -36,13 +36,15 @@ export interface CustomGameConfig {
 export type ThemeType = 'wood' | 'paper' | 'cyber' | 'slate' | 'jade';
 export type BoardStyle = 'intersections' | 'cells'; // 'intersections': Trên giao điểm đường kẻ, 'cells': Giữa ô vuông
 
+export type TacticalWinType = 'none' | 'vcf' | 'vct';
+
 export interface AIStats {
   depth: number;
   nodesEvaluated: number;
   timeMs: number;
   winProbability: number;
   bestScore: number;
-  vcfFound?: boolean;
+  tacticalType: TacticalWinType;
 }
 
 export interface LevelConfig {
@@ -59,6 +61,7 @@ export interface LevelConfig {
   defenseWeight: number;       // Trọng số phòng thủ [0.3 - 1.5]
   temperature: number;         // Nhiệt độ Softmax chọn nước đi [0.0 - 1.0] (0 = tuyệt đối tối ưu)
   vcfDepth: number;            // Độ sâu tìm kiếm chuỗi VCF (0 = tắt)
+  vctDepth: number;            // Độ sâu tìm kiếm chuỗi VCT (0 = tắt)
   color: string;
   gradient: string;
   badgeBg: string;

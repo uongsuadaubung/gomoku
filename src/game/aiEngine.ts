@@ -12,6 +12,7 @@ import { checkWin, getCandidateMoves, isBoardFull } from './board';
 import { evaluateBoardScore, evaluatePositionScore } from './evaluator';
 import { zobrist, TranspositionTable } from './zobrist';
 import { solveVCF } from './vcf';
+import { solveVCT } from './vct';
 import { getLevelConfigByWins, SCORES } from './constants';
 
 export class AIEngine {
@@ -57,6 +58,7 @@ export class AIEngine {
           timeMs: 0,
           winProbability: 50,
           bestScore: 0,
+          tacticalType: 'none',
         },
       };
     }
@@ -70,6 +72,7 @@ export class AIEngine {
           timeMs: 0,
           winProbability: 50,
           bestScore: 0,
+          tacticalType: 'none',
         },
       };
     }
@@ -87,12 +90,13 @@ export class AIEngine {
           timeMs: Math.round(performance.now() - this.startTime),
           winProbability: threatMove.winProbability,
           bestScore: threatMove.score,
+          tacticalType: 'none',
         },
       };
     }
 
     // ─────────────────────────────────────────────────────────────
-    // STAGE 2: TÌM KIẾM SÁT CỤC CHIẾN THUẬT (Tactical VCF Solver)
+    // STAGE 2: TÌM KIẾM SÁT CỤC CHIẾN THUẬT (Tactical VCF & VCT Solver)
     // ─────────────────────────────────────────────────────────────
     if (levelConfig.vcfDepth > 0) {
       const vcfMove = solveVCF(board, aiPlayer, levelConfig.vcfDepth);
@@ -105,7 +109,24 @@ export class AIEngine {
             timeMs: Math.round(performance.now() - this.startTime),
             winProbability: 99,
             bestScore: SCORES.OPEN_FOUR,
-            vcfFound: true,
+            tacticalType: 'vcf',
+          },
+        };
+      }
+    }
+
+    if (levelConfig.vctDepth > 0) {
+      const vctMove = solveVCT(board, aiPlayer, levelConfig.vctDepth);
+      if (vctMove) {
+        return {
+          move: vctMove,
+          stats: {
+            depth: Math.min(8, levelConfig.vctDepth),
+            nodesEvaluated: this.nodesCount,
+            timeMs: Math.round(performance.now() - this.startTime),
+            winProbability: 98,
+            bestScore: SCORES.OPEN_FOUR,
+            tacticalType: 'vct',
           },
         };
       }
@@ -190,6 +211,7 @@ export class AIEngine {
           timeMs: Math.round(performance.now() - this.startTime),
           winProbability: winProb,
           bestScore: selectedMove.score || 0,
+          tacticalType: 'none',
         },
       };
     }
@@ -265,6 +287,7 @@ export class AIEngine {
         timeMs: elapsedMs,
         winProbability,
         bestScore: globalBestScore,
+        tacticalType: 'none',
       },
     };
   }

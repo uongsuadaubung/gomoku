@@ -1,4 +1,5 @@
 import { UserStats, ThemeType, BoardStyle, GameMode } from '../game/types';
+import { PuzzleScenario } from '../game/puzzles/types';
 import { getGameStrategy } from '../game/strategies';
 
 const STORAGE_KEYS = {
@@ -9,6 +10,7 @@ const STORAGE_KEYS = {
   BOARD_STYLE: 'gomoku_board_style_v1',
   ENABLE_TAUNTS: 'gomoku_enable_taunts_v1',
   MUTED: 'gomoku_muted',
+  ACTIVE_PUZZLE: 'gomoku_active_puzzle_v1',
 };
 
 const DEFAULT_STATS: UserStats = {
@@ -179,5 +181,26 @@ export class StorageService {
 
   public static setMuted(muted: boolean): void {
     localStorage.setItem(STORAGE_KEYS.MUTED, String(muted));
+  }
+
+  public static getActivePuzzle(): PuzzleScenario | null {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_PUZZLE);
+      return data ? (JSON.parse(data) as PuzzleScenario) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public static saveActivePuzzle(puzzle: PuzzleScenario | null): void {
+    try {
+      if (puzzle) {
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_PUZZLE, JSON.stringify(puzzle));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.ACTIVE_PUZZLE);
+      }
+    } catch {
+      // ignore
+    }
   }
 }

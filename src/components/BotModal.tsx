@@ -102,7 +102,7 @@ export const BotModal: Component = () => {
               </div>
             </div>
 
-            {/* Danh sách toàn bộ 8 cấp độ Bot */}
+            {/* Danh sách toàn bộ các cấp độ Bot */}
             <div>
               <div class="flex items-center justify-between mb-3">
                 <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
@@ -118,8 +118,13 @@ export const BotModal: Component = () => {
                   {level => {
                     const isCampaignCurrent = () => campaignConfig().id === level.id;
                     const isCampaignUnlocked = () => campaignWins() >= level.minWins;
-                    const isMatchCurrent = () => store.currentLevelConfig().id === level.id;
                     const unlocked = isCampaignUnlocked();
+                    const isMatchCurrent = () => {
+                      if (!unlocked || store.gameMode() === 'puzzle' || store.gameMode() === 'menu') return false;
+                      if (store.gameMode() === 'campaign') return campaignConfig().id === level.id;
+                      if (store.gameMode() === 'custom') return store.customConfig().botLevel === level.id;
+                      return false;
+                    };
 
                     return (
                       <div
@@ -181,6 +186,10 @@ export const BotModal: Component = () => {
                                 <Show when={level.vcfDepth > 0}>
                                   <span>•</span>
                                   <span class="text-rose-400 font-bold">VCF Sát cục {level.vcfDepth} tầng</span>
+                                </Show>
+                                <Show when={level.vctDepth > 0}>
+                                  <span>•</span>
+                                  <span class="text-purple-400 font-bold">VCT Đòn bẫy {level.vctDepth} tầng</span>
                                 </Show>
                               </div>
                             </Show>

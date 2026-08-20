@@ -96,10 +96,10 @@ export const GameOverBanner: Component = () => {
               >
                 <Show
                   when={isPlayerWinner()}
-                  fallback={<span class="text-rose-400">Chưa Giải Được Sát Cục! 💥</span>}
+                  fallback={<span class="text-rose-400">Chưa Giải Được Thế Cờ! 💥</span>}
                 >
                   <span class="text-emerald-400">
-                    Sát Cục Thành Công! {'⭐'.repeat(store.currentPuzzle()?.stars || 1)} 🎉
+                    Giải Thế Cờ Thành Công! 🎉
                   </span>
                 </Show>
               </Show>
@@ -117,11 +117,9 @@ export const GameOverBanner: Component = () => {
               >
                 <Show
                   when={isPlayerWinner()}
-                  fallback={
-                    `Chưa giải được sát cục! Giữ nguyên Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐. Hãy thử lại!`
-                  }
+                  fallback={'Chưa giải được thế cờ! Hãy thử lại hoặc chuyển sang thế cờ mới.'}
                 >
-                  {`Xuất sắc! Bạn đã giải thành công. Thăng cấp lên Sát Cục Mức ${store.stats().puzzle?.currentLevel || 1}⭐!`}
+                  {'Xuất sắc! Bạn đã giải mã thành công thế cờ hóc búa này.'}
                 </Show>
               </Show>
             </p>
@@ -142,7 +140,7 @@ export const GameOverBanner: Component = () => {
               <span class="text-[11px] text-slate-400 font-medium">Chế độ</span>
               <span class="text-xs font-bold text-slate-200 mt-0.5 truncate max-w-[120px]">
                 {store.gameMode() === 'puzzle'
-                  ? `Sát Cục ${store.currentPuzzle()?.stars || 1}⭐`
+                  ? (store.currentPuzzle()?.name || 'Thế Cờ Giữa Trận')
                   : store.gameMode() === 'custom'
                   ? `Đấu Tập (Bot ${store.currentLevelConfig().vietnameseName})`
                   : `Chiến Dịch (Bot ${store.currentLevelConfig().vietnameseName})`}

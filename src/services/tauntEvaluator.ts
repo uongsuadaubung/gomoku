@@ -1,4 +1,5 @@
 import { ActivePlayer, BoardMatrix, MoveHistoryItem, UserStats } from '../game/types';
+import { AI_LEVELS } from '../game/constants';
 import { TauntEvent } from '../data/taunts/types';
 import { TauntService } from './tauntService';
 
@@ -295,7 +296,7 @@ const PLAYER_WIN_RULES: Rule<PlayerWinContext>[] = [
   {
     id: 'god_level_victory',
     priority: 110,
-    match: ctx => ctx.currentLevelId === 5,
+    match: ctx => ctx.currentLevelId === AI_LEVELS.length,
     taunt: 'GOD_LEVEL_VICTORY',
   },
   {

@@ -145,10 +145,16 @@ export const AIStatusPanel: Component = () => {
       </div>
 
       {/* Sát cục Alert */}
-      <Show when={store.aiStats()?.vcfFound}>
+      <Show when={store.aiStats()?.tacticalType === 'vcf'}>
         <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold animate-bounce">
           <ShieldAlert size={14} class="text-red-400" />
-          <span>Bot phát hiện đòn Sát Cục liên hoàn kết liễu!</span>
+          <span>Bot kích hoạt chuỗi Sát Cục VCF kết liễu!</span>
+        </div>
+      </Show>
+      <Show when={store.aiStats()?.tacticalType === 'vct'}>
+        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-bold animate-bounce">
+          <ShieldAlert size={14} class="text-purple-400" />
+          <span>Bot kích hoạt chuỗi Đòn Bẫy VCT kết liễu!</span>
         </div>
       </Show>
 

@@ -63,75 +63,45 @@ export const GameControls: Component = () => {
       {/* 1. CHẾ ĐỘ THẾ CỜ GIỮA TRẬN (PUZZLE) */}
       <Show when={store.gameMode() === 'puzzle'}>
         <div class="flex flex-col gap-2.5">
-          {/* Header thông tin thế cờ */}
-          <div class="flex flex-col gap-1.5 p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1.5">
-                <span class="text-amber-400">{'⭐'.repeat(store.currentPuzzle()?.stars || 1)}</span>
-                <span class="font-extrabold text-white">{store.currentPuzzle()?.name || 'Thế Cờ'}</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <Show when={store.currentPuzzle()?.puzzleType === 'DEFENSE'}>
-                  <span class="text-[10px] text-sky-300 font-black bg-sky-500/20 px-2 py-0.5 rounded-lg border border-sky-500/40 flex items-center gap-1 shadow-sm">
-                    🛡️ DEFENSE (Thủ & Phản)
-                  </span>
-                </Show>
-                <Show when={store.currentPuzzle()?.puzzleType === 'VCT'}>
-                  <span class="text-[10px] text-amber-300 font-black bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/40 flex items-center gap-1 shadow-sm">
-                    ⚡ VCT (Bẫy Đôi)
-                  </span>
-                </Show>
-                <Show when={store.currentPuzzle()?.puzzleType === 'VCF' || (!store.currentPuzzle()?.puzzleType && store.currentPuzzle()?.puzzleType !== 'DEFENSE' && store.currentPuzzle()?.puzzleType !== 'VCT')}>
-                  <span class="text-[10px] text-rose-300 font-black bg-rose-500/20 px-2 py-0.5 rounded-lg border border-rose-500/40 flex items-center gap-1 shadow-sm">
-                    🔥 VCF (Đòn 4)
-                  </span>
-                </Show>
-              </div>
-            </div>
-            <Show when={store.currentPuzzle()?.description}>
-              <div class="text-[11px] text-slate-400 italic flex items-center gap-1">
-                <span>💡</span>
-                <span>{store.currentPuzzle()?.description}</span>
-              </div>
-            </Show>
+          {/* Tên thế cờ nghệ thuật */}
+          <div class="flex items-center justify-between px-3 py-2 bg-slate-950/70 border border-slate-800 rounded-xl text-xs shadow-inner">
+            <span class="text-[11px] text-slate-400 font-medium">Thế cờ</span>
+            <span class="font-black text-amber-300 tracking-wide">
+              {store.currentPuzzle()?.name || 'Thế Cờ Giữa Trận'}
+            </span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <button
-              onClick={() => store.nextPuzzleScenario()}
-              class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <Sparkles size={14} />
-              <span>Thế Cờ Mới</span>
-            </button>
-
-            <button
-              onClick={() => store.restartCurrentPuzzle()}
-              class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <RotateCcw size={14} />
-              <span>Chơi Lại</span>
-            </button>
-
+          <div class="grid grid-cols-2 gap-2.5">
+            {/* Vị trí 1: Khi đang chơi là 'Đầu Hàng' -> Khi ván kết thúc (hoặc sau khi Đầu Hàng) chuyển thành 'Thế Cờ Mới' */}
             <Show
               when={isMatchActive()}
               fallback={
                 <button
-                  onClick={() => store.goToMainMenu()}
-                  class="col-span-2 sm:col-span-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                  onClick={() => store.nextPuzzleScenario()}
+                  class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer animate-subtle-glow"
                 >
-                  <span>🏠 Về Menu</span>
+                  <Sparkles size={14} />
+                  <span>Thế Cờ Mới</span>
                 </button>
               }
             >
               <button
                 onClick={() => store.resignGame()}
-                class="col-span-2 sm:col-span-1 py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                class="py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Flag size={14} />
-                <span>Nhận Thua</span>
+                <span>Đầu Hàng</span>
               </button>
             </Show>
+
+            {/* Vị trí 2: Nút Chơi Lại thế cờ hiện tại */}
+            <button
+              onClick={() => store.restartCurrentPuzzle()}
+              class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <RotateCcw size={14} />
+              <span>Chơi Lại</span>
+            </button>
           </div>
         </div>
       </Show>

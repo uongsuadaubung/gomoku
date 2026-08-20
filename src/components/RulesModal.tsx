@@ -1,5 +1,5 @@
 import { Component, Show } from 'solid-js';
-import { X, BookOpen, CheckCircle, Zap, Lightbulb } from 'lucide-solid';
+import { X, BookOpen, CircleCheck, Zap, Lightbulb } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { ModalBotTaunt } from './ModalBotTaunt';
 
@@ -36,7 +36,7 @@ export const RulesModal: Component = () => {
             <ModalBotTaunt />
             <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
               <h3 class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-1.5">
-                <CheckCircle size={16} /> 1. Mục Tiêu Trận Đấu
+                <CircleCheck size={16} /> 1. Mục Tiêu Trận Đấu
               </h3>
               <p>
                 Hai bên lần lượt đặt từng quân cờ vào các giao điểm trống trên bàn cờ 15x15. Người đầu tiên xếp được <strong>chuỗi 5 quân liên tiếp</strong> (ngang, dọc hoặc chéo) không bị ngắt quãng sẽ <strong>chiến thắng ngay lập tức</strong>.

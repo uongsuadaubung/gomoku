@@ -724,15 +724,25 @@ export function createGameStore() {
 
   /**
    * Bắt đầu chế độ Thế Cờ Giữa Trận (Tactical Puzzle)
-   * Random ngẫu nhiên cấp độ trong dải từ 1 đến maxUnlocked
+   * Giữ nguyên thế cờ đang dang dở nếu người chơi chưa giải xong hoặc chưa đầu hàng
    */
-  function startPuzzleMode(stars?: number) {
-    const maxUnlocked = Math.max(1, stats().puzzle?.currentLevel || 1);
-    let targetStars = stars;
-    if (targetStars === undefined) {
-      targetStars = Math.floor(Math.random() * maxUnlocked) + 1;
+  function startPuzzleMode(stars?: number, forceNew: boolean = false) {
+    let scenario: PuzzleScenario | null = null;
+
+    if (!forceNew) {
+      scenario = StorageService.getActivePuzzle();
     }
-    const scenario = generateTacticalScenario(targetStars);
+
+    if (!scenario) {
+      const maxUnlocked = Math.max(1, stats().puzzle?.currentLevel || 1);
+      let targetStars = stars;
+      if (targetStars === undefined) {
+        targetStars = Math.floor(Math.random() * maxUnlocked) + 1;
+      }
+      scenario = generateTacticalScenario(targetStars);
+      StorageService.saveActivePuzzle(scenario);
+    }
+
     setGameMode('puzzle');
     setCurrentPuzzle(scenario);
     setIsSeriesActive(false);
@@ -760,11 +770,12 @@ export function createGameStore() {
    * Chơi lại đúng thế cờ hiện tại từ đầu
    */
   function restartCurrentPuzzle() {
-    const scenario = currentPuzzle();
+    const scenario = currentPuzzle() || StorageService.getActivePuzzle();
     if (!scenario) {
-      startPuzzleMode();
+      startPuzzleMode(undefined, true);
       return;
     }
+    StorageService.saveActivePuzzle(scenario);
     if (worker && isAiThinking()) {
       worker.postMessage({ type: 'CANCEL' });
       setIsAiThinking(false);
@@ -785,10 +796,13 @@ export function createGameStore() {
   }
 
   /**
-   * Sang thế cờ tiếp theo
+   * Sang thế cờ tiếp theo (Đầu hàng ván đang chơi nếu có và tạo thế cờ mới)
    */
   function nextPuzzleScenario(stars?: number) {
-    startPuzzleMode(stars);
+    if (gameMode() === 'puzzle' && gameStatus() === 'playing') {
+      resignGame();
+    }
+    startPuzzleMode(stars, true);
   }
 
   /**
@@ -901,7 +915,7 @@ export function createGameStore() {
       matchCtx.botEverHadOpenThreat = true;
     }
     const statsObj = aiStats();
-    if (statsObj?.vcfFound || (statsObj?.bestScore || 0) >= SCORES.OPEN_FOUR) {
+    if (statsObj?.tacticalType === 'vcf' || statsObj?.tacticalType === 'vct' || (statsObj?.bestScore || 0) >= SCORES.OPEN_FOUR) {
       triggerTaunt('BOT_TRAP', 200);
     } else if (isBlocking && Math.random() < 0.6) {
       triggerTaunt('BOT_BLOCK_THREAT', 250);
@@ -1055,6 +1069,9 @@ export function createGameStore() {
     }
 
     const currentMode = gameMode();
+    if (currentMode === 'puzzle') {
+      StorageService.saveActivePuzzle(null);
+    }
     const extraInfo = {
       stars: currentPuzzle()?.stars,
       botLevel: currentLevelConfig().id,

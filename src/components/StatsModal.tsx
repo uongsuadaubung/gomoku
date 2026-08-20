@@ -1,7 +1,7 @@
 import { type Component, Show, createSignal } from 'solid-js';
 import {
   X,
-  BarChart3,
+  ChartColumn,
   RotateCcw,
   Trophy,
   Puzzle,
@@ -26,7 +26,7 @@ export const StatsModal: Component = () => {
           <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                <BarChart3 size={20} />
+                <ChartColumn size={20} />
               </div>
               <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-white">Thống Kê Chi Tiết</h2>
