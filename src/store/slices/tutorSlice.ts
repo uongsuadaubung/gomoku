@@ -78,7 +78,10 @@ export function createTutorSlice(props: TutorSliceProps) {
    */
   function setOpponentLevel(lvl: number) {
     const clamped = Math.max(1, Math.min(12, lvl));
-    setSelectedOpponentLevel(clamped);
+    if (selectedOpponentLevel() !== clamped) {
+      setSelectedOpponentLevel(clamped);
+      resetTutorMatchSession();
+    }
   }
 
   /**
@@ -338,6 +341,8 @@ export function createTutorSlice(props: TutorSliceProps) {
     clearTutorState();
     setMatchEvaluations([]);
     setTutorMatchReview(null);
+    setTutorSpeech('');
+    setTutorMood('calm');
   }
 
   return {

@@ -345,6 +345,7 @@ export function createGameStore() {
     if (startLevel) {
       tutor.setOpponentLevel(startLevel);
     }
+    tutor.resetTutorMatchSession();
     setGameMode('tutor');
     series.setIsSeriesActive(false);
     series.setSeriesGameNumber(0);
@@ -368,6 +369,7 @@ export function createGameStore() {
       board: board(),
       playerColor: BLACK,
       services: {
+        resetTutorMatchSession: tutor.resetTutorMatchSession,
         triggerTutorSpeech: tutor.triggerTutorSpeech,
         analyzePreMove: tutor.analyzePreMove,
         triggerTaunt: taunt.triggerTaunt,
@@ -380,6 +382,7 @@ export function createGameStore() {
 
   function nextTutorLevel() {
     const nextLvl = Math.min(12, tutor.selectedOpponentLevel() + 1);
+    tutor.setOpponentLevel(nextLvl);
     startTutorMode(nextLvl);
   }
 
