@@ -418,64 +418,64 @@ export const BotAvatar: Component<BotAvatarProps> = (props) => {
         <defs>
           {/* 3D Warm Yellow Gradient for Face */}
           <radialGradient id="botFaceGrad" cx="38%" cy="32%" r="65%">
-            <stop offset="0%" stop-color="#fef08a" />
-            <stop offset="55%" stop-color="#f59e0b" />
-            <stop offset="100%" stop-color="#d97706" />
+            <stop offset="0%" stop-color="#fef08a" style={{ 'stop-color': '#fef08a' }} />
+            <stop offset="55%" stop-color="#f59e0b" style={{ 'stop-color': '#f59e0b' }} />
+            <stop offset="100%" stop-color="#d97706" style={{ 'stop-color': '#d97706' }} />
           </radialGradient>
 
           {/* 3D Purple Gradient for Evil Face 😈 */}
           <radialGradient id="evilFaceGrad" cx="38%" cy="32%" r="65%">
-            <stop offset="0%" stop-color="#d8b4fe" />
-            <stop offset="55%" stop-color="#9333ea" />
-            <stop offset="100%" stop-color="#581c87" />
+            <stop offset="0%" stop-color="#d8b4fe" style={{ 'stop-color': '#d8b4fe' }} />
+            <stop offset="55%" stop-color="#9333ea" style={{ 'stop-color': '#9333ea' }} />
+            <stop offset="100%" stop-color="#581c87" style={{ 'stop-color': '#581c87' }} />
           </radialGradient>
 
           {/* 3D Blue Shock Gradient for Panic Face 😱 */}
           <radialGradient id="panicFaceGrad" cx="40%" cy="35%" r="65%">
-            <stop offset="0%" stop-color="#bae6fd" />
-            <stop offset="50%" stop-color="#38bdf8" />
-            <stop offset="100%" stop-color="#0284c7" />
+            <stop offset="0%" stop-color="#bae6fd" style={{ 'stop-color': '#bae6fd' }} />
+            <stop offset="50%" stop-color="#38bdf8" style={{ 'stop-color': '#38bdf8' }} />
+            <stop offset="100%" stop-color="#0284c7" style={{ 'stop-color': '#0284c7' }} />
           </radialGradient>
 
           {/* Eye Shadow Gradient */}
           <linearGradient id="eyeShadowGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#cbd5e1" stop-opacity="0.6" />
-            <stop offset="100%" stop-color="#ffffff" stop-opacity="1" />
+            <stop offset="0%" stop-color="#cbd5e1" stop-opacity="0.6" style={{ 'stop-color': '#cbd5e1', 'stop-opacity': 0.6 }} />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="1" style={{ 'stop-color': '#ffffff', 'stop-opacity': 1 }} />
           </linearGradient>
 
           {/* Sunglasses Dark Gradient */}
           <linearGradient id="sunglassGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#334155" />
-            <stop offset="50%" stop-color="#0f172a" />
-            <stop offset="100%" stop-color="#020617" />
+            <stop offset="0%" stop-color="#334155" style={{ 'stop-color': '#334155' }} />
+            <stop offset="50%" stop-color="#0f172a" style={{ 'stop-color': '#0f172a' }} />
+            <stop offset="100%" stop-color="#020617" style={{ 'stop-color': '#020617' }} />
           </linearGradient>
 
           {/* Gold Monocle Gradient */}
           <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fef08a" />
-            <stop offset="50%" stop-color="#eab308" />
-            <stop offset="100%" stop-color="#a16207" />
+            <stop offset="0%" stop-color="#fef08a" style={{ 'stop-color': '#fef08a' }} />
+            <stop offset="50%" stop-color="#eab308" style={{ 'stop-color': '#eab308' }} />
+            <stop offset="100%" stop-color="#a16207" style={{ 'stop-color': '#a16207' }} />
           </linearGradient>
 
           {/* 3D Fiery Red Gradient for Angry / Rage Face 😤 / 😡 */}
           <radialGradient id="angryFaceGrad" cx="38%" cy="32%" r="65%">
-            <stop offset="0%" stop-color="#fca5a5" />
-            <stop offset="40%" stop-color="#ef4444" />
-            <stop offset="75%" stop-color="#dc2626" />
-            <stop offset="100%" stop-color="#991b1b" />
+            <stop offset="0%" stop-color="#fca5a5" style={{ 'stop-color': '#fca5a5' }} />
+            <stop offset="40%" stop-color="#ef4444" style={{ 'stop-color': '#ef4444' }} />
+            <stop offset="75%" stop-color="#dc2626" style={{ 'stop-color': '#dc2626' }} />
+            <stop offset="100%" stop-color="#991b1b" style={{ 'stop-color': '#991b1b' }} />
           </radialGradient>
 
           {/* Steam Puff Gradient 😤 */}
           <linearGradient id="steamGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
-            <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.75" />
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" style={{ 'stop-color': '#ffffff', 'stop-opacity': 0.95 }} />
+            <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.75" style={{ 'stop-color': '#cbd5e1', 'stop-opacity': 0.75 }} />
           </linearGradient>
         </defs>
 
         {/* ========================================================================= */}
         {/* 1. KHUÔN ĐẦU CƠ SỞ (Chuyển màu mượt mà khi đổi sang Quỷ/Panic/Angry) */}
         {/* ========================================================================= */}
-        <circle cx="24" cy="24" r="21" fill={faceRig().faceFill} class="avatar-base-head" />
+        <circle cx="24" cy="24" r="21" fill={faceRig().faceFill || '#f59e0b'} class="avatar-base-head" />
         <path d="M 10 16 A 18 18 0 0 1 38 16 A 21 21 0 0 0 10 16" fill="#ffffff" opacity="0.28" />
 
         {/* Trán toát mồ hôi xanh đậm khi Panic 😱 */}

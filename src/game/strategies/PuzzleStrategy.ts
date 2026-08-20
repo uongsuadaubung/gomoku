@@ -1,8 +1,14 @@
-import { GameModeStrategy } from './types';
+import { BaseStrategy } from './BaseStrategy';
+import {
+  GameOverPresentationContext,
+  GameOverWinContext,
+  GameOverLossContext,
+  GameOverDrawContext,
+} from './types';
 import { GameMode, LevelConfig, UserStats } from '../types';
 import { AI_LEVELS } from '../constants';
 
-export class PuzzleStrategy implements GameModeStrategy {
+export class PuzzleStrategy extends BaseStrategy {
   public readonly mode: GameMode = 'puzzle';
 
   public getBotLevel(): LevelConfig {
@@ -10,9 +16,47 @@ export class PuzzleStrategy implements GameModeStrategy {
     return AI_LEVELS[AI_LEVELS.length - 1];
   }
 
+  public override getCurrentStreak(stats: UserStats): number {
+    return stats.puzzle?.currentStreak ?? 0;
+  }
+
+  public override getGameOverTitle(ctx: GameOverPresentationContext): { text: string; color: string } {
+    if (ctx.won) return { text: 'Giải Thế Cờ Thành Công! 🎉', color: 'text-emerald-400' };
+    return { text: 'Chưa Giải Được Thế Cờ! 💥', color: 'text-rose-400' };
+  }
+
+  public override getGameOverDescription(ctx: GameOverPresentationContext): string {
+    if (ctx.won) return 'Xuất sắc! Bạn đã giải mã thành công thế cờ hóc búa này.';
+    return 'Chưa giải được thế cờ! Hãy thử lại hoặc chuyển sang thế cờ mới.';
+  }
+
+  public override getModeSummary(ctx: GameOverPresentationContext): string {
+    return ctx.currentPuzzleName || 'Thế Cờ Giữa Trận';
+  }
+
+  public override getMoveCountDisplay(historyLength: number, puzzleInitialLength?: number): string {
+    const extraMoves = historyLength - (puzzleInitialLength || 0);
+    return `${extraMoves} nước thêm`;
+  }
+
   public canUndo(): boolean {
     // Chế độ thế cờ cấm tuyệt đối Undo để rèn luyện tư duy tính toán chính xác
     return false;
+  }
+
+  public override onPlayerWin(ctx: GameOverWinContext): void {
+    super.onPlayerWin(ctx);
+    ctx.services.clearActivePuzzle?.();
+  }
+
+  public override onBotWin(ctx: GameOverLossContext): void {
+    super.onBotWin(ctx);
+    ctx.services.clearActivePuzzle?.();
+  }
+
+  public override onDraw(ctx: GameOverDrawContext): void {
+    super.onDraw(ctx);
+    ctx.services.clearActivePuzzle?.();
   }
 
   public recordGame(

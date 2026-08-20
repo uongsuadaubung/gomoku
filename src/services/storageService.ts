@@ -51,6 +51,16 @@ const DEFAULT_STATS: UserStats = {
     totalGames: 0,
     selectedTimeSeconds: 10,
   },
+  tutor: {
+    currentLevel: 1,
+    highestLevel: 1,
+    totalWins: 0,
+    totalLosses: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    totalGames: 0,
+    byBotLevel: {},
+  },
   wins: 0,
   losses: 0,
   draws: 0,
@@ -86,6 +96,11 @@ export class StorageService {
           blitz: {
             ...DEFAULT_STATS.blitz,
             ...(parsed.blitz || {}),
+          },
+          tutor: {
+            ...DEFAULT_STATS.tutor,
+            ...(parsed.tutor || {}),
+            byBotLevel: { ...(parsed.tutor?.byBotLevel || {}) },
           },
         };
       }

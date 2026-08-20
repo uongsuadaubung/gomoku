@@ -1,11 +1,12 @@
 import { Component, Show } from 'solid-js';
-import { Sparkles, Trophy, Swords, Puzzle, Flame, Zap, Crown } from 'lucide-solid';
+import { Sparkles, Trophy, Swords, Puzzle, Flame, Zap, Crown, GraduationCap } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
 import { BotAvatar } from './BotAvatar';
 
 const MODE_BADGES: Record<string, { label: string; Icon: typeof Trophy; colorClass: string }> = {
   campaign: { label: 'Chiến Dịch', Icon: Trophy, colorClass: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+  tutor: { label: 'Gia Sư 1-1', Icon: GraduationCap, colorClass: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
   blitz: { label: 'Cờ Chớp', Icon: Zap, colorClass: 'text-rose-400 bg-rose-500/10 border-rose-500/20' },
   puzzle: { label: 'Sát Cục', Icon: Puzzle, colorClass: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
   custom: { label: 'Đấu Tập', Icon: Swords, colorClass: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
@@ -17,21 +18,7 @@ export const LevelBadge: Component = () => {
   const campaignConfig = () => store.campaignLevelConfig();
   const campaignWins = () => store.stats().campaign?.wins ?? store.stats().wins;
 
-  const streak = () => {
-    const s = store.stats();
-    switch (store.gameMode()) {
-      case 'campaign':
-        return s.campaign?.currentStreak ?? s.currentStreak;
-      case 'blitz':
-        return s.blitz?.currentStreak ?? 0;
-      case 'puzzle':
-        return s.puzzle?.currentStreak ?? 0;
-      case 'custom':
-        return s.custom?.currentStreak ?? 0;
-      default:
-        return 0;
-    }
-  };
+  const streak = () => store.currentStreak();
 
   // Biểu cảm khuôn mặt Bot động theo chuỗi thắng thua (Name-first)
   const dynamicAvatar = () => {

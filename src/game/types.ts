@@ -20,7 +20,7 @@ export type MatchStage = 'ready' | 'playing' | 'game_over';
 
 export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw';
 
-export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz';
+export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz' | 'tutor';
 
 export interface WinInfo {
   winner: ActivePlayer;
@@ -31,6 +31,47 @@ export interface WinInfo {
 export interface CustomGameConfig {
   botLevel: number;
   playerColor: ActivePlayer;
+}
+
+import type { TutorPreMoveEvent, TutorPostMoveEvent } from '../data/tutor/types';
+
+export interface TutorPreMoveAnalysis {
+  suggestedMove: Move;
+  coordLabel: string;
+  event: TutorPreMoveEvent;
+  speech: string;
+  isDirectCoord: boolean;
+  threatLevel: 'winning' | 'danger' | 'warning' | 'neutral';
+}
+
+export interface TutorPostMoveFeedback {
+  playerMove: Move;
+  playerCoordLabel: string;
+  bestMove: Move;
+  bestCoordLabel: string;
+  event: TutorPostMoveEvent;
+  speech: string;
+  quality: 'brilliant' | 'good' | 'missed_win' | 'missed_fork' | 'blunder' | 'passive';
+}
+
+export interface TutorBotEvaluation {
+  botMove: Move;
+  botCoordLabel: string;
+  speech: string;
+}
+
+export interface TutorMatchReview {
+  totalPlayerMoves: number;
+  brilliantMoves: number;
+  goodMoves: number;
+  blunders: number;
+  missedWins: number;
+  passiveMoves: number;
+  accuracy: number; // 0 - 100%
+  grade: 'S' | 'A' | 'B' | 'C' | 'D';
+  gradeTitle: string;
+  gradeBadgeClass: string;
+  summaryAdvice: string;
 }
 
 export type ThemeType = 'wood' | 'paper' | 'cyber' | 'slate' | 'jade';
@@ -105,6 +146,17 @@ export interface BlitzStats {
   selectedTimeSeconds: 5 | 10 | 15;
 }
 
+export interface TutorStats {
+  currentLevel: number;        // Cấp Bot đối thủ hiện tại (1 - 12)
+  highestLevel: number;        // Kỷ lục cấp cao nhất từng vượt qua (1 - 12)
+  totalWins: number;
+  totalLosses: number;
+  currentStreak: number;
+  bestStreak: number;
+  totalGames: number;
+  byBotLevel: Record<number, { wins: number; losses: number; draws: number }>;
+}
+
 export interface UserStats {
   // 🏆 1. Chiến dịch (Campaign)
   campaign: ModeStats;
@@ -114,6 +166,8 @@ export interface UserStats {
   custom: CustomStats;
   // ⚡ 4. Cờ chớp sinh tử (Blitz)
   blitz: BlitzStats;
+  // 🎓 5. Học viện Gia Sư (Tutor)
+  tutor: TutorStats;
 
   // Dữ liệu tương thích cấp cao
   wins: number;

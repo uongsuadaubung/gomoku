@@ -4,6 +4,7 @@ import { PuzzleControls } from './controls/PuzzleControls';
 import { BlitzControls } from './controls/BlitzControls';
 import { CampaignControls } from './controls/CampaignControls';
 import { CustomControls } from './controls/CustomControls';
+import { TutorControls } from './controls/TutorControls';
 
 export const GameControls: Component = () => {
   const store = useGame();
@@ -30,7 +31,13 @@ export const GameControls: Component = () => {
         <Match when={store.gameMode() === 'custom'}>
           <CustomControls />
         </Match>
+
+        {/* 5. CHẾ ĐỘ HỌC VIỆN GIA SƯ (TUTOR) */}
+        <Match when={store.gameMode() === 'tutor'}>
+          <TutorControls />
+        </Match>
       </Switch>
     </div>
   );
 };
+

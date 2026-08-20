@@ -34,6 +34,7 @@ import { createSeriesSlice } from './slices/seriesSlice';
 import { createPuzzleSlice } from './slices/puzzleSlice';
 import { createTauntSlice } from './slices/tauntSlice';
 import { createBlitzSlice } from './slices/blitzSlice';
+import { createTutorSlice } from './slices/tutorSlice';
 
 export function createGameStore() {
   // 1. Trạng thái Bàn cờ & Ván đấu
@@ -59,6 +60,7 @@ export function createGameStore() {
   const settings = createSettingsSlice();
   const series = createSeriesSlice();
   const puzzle = createPuzzleSlice({ stats: settings.stats });
+  const tutor = createTutorSlice({ stats: settings.stats, setStats: settings.setStats });
 
   // Safe timeout helper
   const pendingTimeouts: number[] = [];
@@ -124,7 +126,6 @@ export function createGameStore() {
     },
   });
 
-  // Tính toán AI Color & Strategies
   const aiColor = createMemo<ActivePlayer>(() => (playerColor() === BLACK ? WHITE : BLACK));
   const currentStrategy = createMemo(() => getGameStrategy(gameMode()));
 
@@ -133,14 +134,22 @@ export function createGameStore() {
   });
 
   const currentLevelConfig = createMemo<LevelConfig>(() => {
-    return currentStrategy().getBotLevel(settings.stats(), series.customConfig());
+    return currentStrategy().getBotLevel({
+      stats: settings.stats(),
+      customConfig: series.customConfig(),
+      tutorLevel: tutor.selectedOpponentLevel(),
+    });
   });
 
   const nextSeriesPlayerSide = createMemo<boolean>(() => {
-    if (gameMode() === 'custom') {
-      return series.customConfig()?.playerColor === BLACK;
-    }
-    return playerColor() !== BLACK;
+    return currentStrategy().getNextSeriesPlayerSide({
+      currentPlayerColor: playerColor(),
+      customConfig: series.customConfig(),
+    });
+  });
+
+  const currentStreak = createMemo<number>(() => {
+    return currentStrategy().getCurrentStreak(settings.stats());
   });
 
   const isPlayerInHeavyLossStreak = () => settings.stats().currentStreak === 0 && settings.stats().losses >= 3;
@@ -313,14 +322,65 @@ export function createGameStore() {
     setCurrentTurn(BLACK);
 
     soundService.playGameStartSound();
-    const startTaunt = TauntEvaluator.evaluateGameStart(matchCtx.lastGameResult);
-    taunt.triggerTaunt(startTaunt, 200);
+    currentStrategy().onGameStart({
+      lastGameResult: matchCtx.lastGameResult,
+      botConfig: currentLevelConfig(),
+      board: board(),
+      playerColor: BLACK,
+      services: {
+        triggerTutorSpeech: tutor.triggerTutorSpeech,
+        analyzePreMove: tutor.analyzePreMove,
+        triggerTaunt: taunt.triggerTaunt,
+        startBlitzTimer: blitz.startBlitzTimer,
+      },
+    });
     taunt.resetIdleTimer();
-    blitz.startBlitzTimer();
   }
 
   function nextBlitzLevel() {
     startBlitzMode(blitz.blitzTimeLimit());
+  }
+
+  function startTutorMode(startLevel?: number) {
+    if (startLevel) {
+      tutor.setOpponentLevel(startLevel);
+    }
+    setGameMode('tutor');
+    series.setIsSeriesActive(false);
+    series.setSeriesGameNumber(0);
+    series.setLastResigned(false);
+    setPlayerColor(BLACK);
+    setBoard(createEmptyBoard());
+    setMoveHistory([]);
+    setLastMove(null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setAiThinkingProgress({ depth: 0, nodes: 0 });
+    setGameStatus('playing');
+    setMatchStage('playing');
+    setCurrentTurn(BLACK);
+
+    soundService.playGameStartSound();
+    currentStrategy().onGameStart({
+      lastGameResult: matchCtx.lastGameResult,
+      botConfig: currentLevelConfig(),
+      board: board(),
+      playerColor: BLACK,
+      services: {
+        triggerTutorSpeech: tutor.triggerTutorSpeech,
+        analyzePreMove: tutor.analyzePreMove,
+        triggerTaunt: taunt.triggerTaunt,
+        startBlitzTimer: blitz.startBlitzTimer,
+      },
+    });
+    taunt.clearTauntQueue();
+    taunt.resetIdleTimer();
+  }
+
+  function nextTutorLevel() {
+    const nextLvl = Math.min(12, tutor.selectedOpponentLevel() + 1);
+    startTutorMode(nextLvl);
   }
 
   function goToMainMenu() {
@@ -366,8 +426,19 @@ export function createGameStore() {
     setCurrentTurn(BLACK);
 
     soundService.playGameStartSound();
-    const startTaunt = TauntEvaluator.evaluateGameStart(matchCtx.lastGameResult);
-    taunt.triggerTaunt(startTaunt, 200);
+    currentStrategy().onGameStart({
+      lastGameResult: matchCtx.lastGameResult,
+      botConfig: currentLevelConfig(),
+      board: board(),
+      playerColor: newPlayerColor,
+      services: {
+        triggerTutorSpeech: tutor.triggerTutorSpeech,
+        analyzePreMove: tutor.analyzePreMove,
+        resetTutorMatchSession: tutor.resetTutorMatchSession,
+        triggerTaunt: taunt.triggerTaunt,
+        startBlitzTimer: blitz.startBlitzTimer,
+      },
+    });
 
     if (newPlayerColor === WHITE) {
       setIsAiThinking(true);
@@ -448,6 +519,9 @@ export function createGameStore() {
       return;
     }
 
+    // Đánh giá nước đi & ý đồ chiến thuật của Bot đối thủ trong Chế độ Gia Sư
+    tutor.evaluateBotMove(currentBoard, move, ai);
+
     const isBlocking = TauntService.isBotBlockThreat(cloneBoard(currentBoard), playerColor(), move.row, move.col);
 
     currentBoard[move.row][move.col] = ai;
@@ -496,9 +570,14 @@ export function createGameStore() {
 
     setCurrentTurn(playerColor());
     taunt.resetIdleTimer();
-    if (gameMode() === 'blitz') {
-      blitz.startBlitzTimer();
-    }
+    currentStrategy().onPlayerTurnStart({
+      board: currentBoard,
+      playerColor: playerColor(),
+      services: {
+        startBlitzTimer: blitz.startBlitzTimer,
+        analyzePreMove: tutor.analyzePreMove,
+      },
+    });
   }
 
   function makePlayerMove(row: number, col: number) {
@@ -546,6 +625,17 @@ export function createGameStore() {
     currentBoard[row][col] = player;
     setBoard(currentBoard);
     setLastMove({ row, col });
+
+    currentStrategy().onPlayerMove({
+      previousBoard,
+      currentBoard,
+      move: { row, col },
+      playerColor: player,
+      services: {
+        stopBlitzTimer: blitz.stopBlitzTimer,
+        evaluatePostMove: tutor.evaluatePostMove,
+      },
+    });
 
     const newHistory: MoveHistoryItem[] = [
       ...moveHistory(),
@@ -627,10 +717,7 @@ export function createGameStore() {
       }, 700);
     }
 
-    const currentMode = gameMode();
-    if (currentMode === 'puzzle') {
-      StorageService.saveActivePuzzle(null);
-    }
+    const currentMode = currentStrategy().mode;
     const extraInfo = {
       stars: puzzle.currentPuzzle()?.stars,
       botLevel: currentLevelConfig().id,
@@ -647,7 +734,7 @@ export function createGameStore() {
       matchCtx.consecutiveDrawsCount = 0;
 
       setSessionScore(prev => ({ ...prev, playerWins: prev.playerWins + 1 }));
-      const activeStreak = newStats.campaign?.currentStreak ?? newStats.blitz?.currentStreak ?? newStats.currentStreak ?? 0;
+      const activeStreak = currentStrategy().getCurrentStreak(newStats);
       if (activeStreak >= 2) {
         soundService.playStreakWinSound();
       } else {
@@ -655,31 +742,30 @@ export function createGameStore() {
       }
       triggerConfetti();
 
-      const winTaunt = TauntEvaluator.evaluatePlayerWin({
+      currentStrategy().onPlayerWin({
+        botConfig: currentLevelConfig(),
+        oldLevel,
+        prevStats,
+        newStats,
         moveCount,
         hadComeback: matchCtx.hadHighAiAdvantage,
         undoCount: matchCtx.undoCount,
         wasUndoJustUsed: matchCtx.wasUndoJustUsed,
         botEverHadOpenThreat: matchCtx.botEverHadOpenThreat,
-        prevStats,
-        currentLevelId: oldLevel,
+        services: {
+          triggerTutorSpeech: tutor.triggerTutorSpeech,
+          finalizeMatchReview: tutor.finalizeMatchReview,
+          triggerTaunt: taunt.triggerTaunt,
+          playLevelUpSound: soundService.playLevelUpSound,
+          setShowLevelUpAlert: settings.setShowLevelUpAlert,
+          setSafeTimeout,
+          clearActivePuzzle: () => StorageService.saveActivePuzzle(null),
+        },
       });
-      taunt.triggerTaunt(winTaunt, 500);
 
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
         setSafeTimeout(() => taunt.triggerTaunt('PERFECT_CENTURY_GAMES', 400), 1200);
-      }
-
-      if (currentMode === 'campaign') {
-        const newLevel = getLevelConfigByWins(newStats.wins, newStats.manualLevel);
-        if (newLevel.id > oldLevel && newStats.manualLevel === null) {
-          setSafeTimeout(() => {
-            soundService.playLevelUpSound();
-            settings.setShowLevelUpAlert(newLevel);
-            taunt.triggerTaunt('LEVEL_UP_ALERT', 400);
-          }, 800);
-        }
       }
     } else if (winner === aiColor()) {
       soundService.playLossSound();
@@ -690,19 +776,22 @@ export function createGameStore() {
       matchCtx.consecutiveDrawsCount = 0;
       setSessionScore(prev => ({ ...prev, botWins: prev.botWins + 1 }));
 
-      const durationMs = Date.now() - matchCtx.startTime;
-      const lastMoveCoord = lastMove();
-      const botWinTaunt = TauntEvaluator.evaluateBotWin({
+      currentStrategy().onBotWin({
+        botConfig: currentLevelConfig(),
         moveCount,
+        durationMs: Date.now() - matchCtx.startTime,
+        winningMove: lastMove(),
         wasLastGameSpeedLoss: matchCtx.wasLastGameSpeedLoss,
         isHeavyLossStreak: isPlayerInHeavyLossStreak(),
         isImmediateRevenge: matchCtx.wasImmediateRevenge,
-        durationMs,
-        winningMoveRow: lastMoveCoord?.row,
-        winningMoveCol: lastMoveCoord?.col,
+        services: {
+          triggerTutorSpeech: tutor.triggerTutorSpeech,
+          finalizeMatchReview: tutor.finalizeMatchReview,
+          triggerTaunt: taunt.triggerTaunt,
+          clearActivePuzzle: () => StorageService.saveActivePuzzle(null),
+        },
       });
       matchCtx.wasLastGameSpeedLoss = moveCount <= 12;
-      taunt.triggerTaunt(botWinTaunt, 400);
 
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
@@ -722,9 +811,18 @@ export function createGameStore() {
       const newStats = StorageService.recordGame(currentMode, 'draw', extraInfo);
       settings.setStats(newStats);
       setSessionScore(prev => ({ ...prev, draws: prev.draws + 1 }));
-      const drawTaunt = TauntEvaluator.evaluateDraw(matchCtx.consecutiveDrawsCount);
+
+      currentStrategy().onDraw({
+        botConfig: currentLevelConfig(),
+        consecutiveDrawsCount: matchCtx.consecutiveDrawsCount,
+        services: {
+          triggerTutorSpeech: tutor.triggerTutorSpeech,
+          finalizeMatchReview: tutor.finalizeMatchReview,
+          triggerTaunt: taunt.triggerTaunt,
+          clearActivePuzzle: () => StorageService.saveActivePuzzle(null),
+        },
+      });
       matchCtx.wasLastGameDraw = true;
-      taunt.triggerTaunt(drawTaunt, 400);
 
       const totalGames = newStats.wins + newStats.losses + newStats.draws;
       if (totalGames === 100) {
@@ -746,17 +844,18 @@ export function createGameStore() {
       setIsAiThinking(false);
     }
 
-    const isLongThinking = interactionTracker.getTimeSinceLast('PLAYER_MOVE') >= 35000;
-    const hasThreat = TauntService.hasBotActiveThreat(board(), aiColor());
-
-    const getResignTaunt = (): TauntEvent => {
-      if (isAiThinkingWhenResigning) return 'RESIGN_WHILE_AI_THINKING';
-      if (isLongThinking) return 'SURRENDER_AFTER_LONG_THINKING';
-      if (hasThreat) return 'SURRENDER_ON_THREAT';
-      return 'PLAYER_RESIGN';
-    };
-
-    taunt.triggerTaunt(getResignTaunt(), 200);
+    currentStrategy().onResign({
+      botConfig: currentLevelConfig(),
+      board: board(),
+      aiColor: aiColor(),
+      isAiThinking: isAiThinkingWhenResigning,
+      isLongThinking: interactionTracker.getTimeSinceLast('PLAYER_MOVE') >= 35000,
+      services: {
+        triggerTutorSpeech: tutor.triggerTutorSpeech,
+        finalizeMatchReview: tutor.finalizeMatchReview,
+        triggerTaunt: taunt.triggerTaunt,
+      },
+    });
     handleGameOver(aiColor(), null);
   }
 
@@ -826,14 +925,19 @@ export function createGameStore() {
     setCurrentTurn(playerColor());
 
     soundService.playClickSound();
-    const isInstantUndo = interactionTracker.getTimeSinceLast('PLAYER_MOVE') < 350;
-    const recentUndoCount = interactionTracker.record('UNDO', 10000);
 
-    const undoTaunt = TauntEvaluator.evaluateUndo({
-      isInstantUndo,
-      recentUndoCount,
+    currentStrategy().onUndo({
+      board: currentBoard,
+      playerColor: playerColor(),
+      isInstantUndo: interactionTracker.getTimeSinceLast('PLAYER_MOVE') < 350,
+      recentUndoCount: interactionTracker.record('UNDO', 10000),
+      services: {
+        triggerTutorSpeech: tutor.triggerTutorSpeech,
+        analyzePreMove: tutor.analyzePreMove,
+        popLastEvaluation: tutor.popLastEvaluation,
+        triggerTaunt: taunt.triggerTaunt,
+      },
     });
-    taunt.triggerTaunt(undoTaunt, 300);
     taunt.resetIdleTimer();
   }
 
@@ -856,6 +960,7 @@ export function createGameStore() {
     currentLevelConfig,
     campaignLevelConfig,
     nextSeriesPlayerSide,
+    currentStreak,
 
     // Settings Slice Signals & Actions
     stats: settings.stats,
@@ -898,6 +1003,19 @@ export function createGameStore() {
     blitzRemainingTime: blitz.blitzRemainingTime,
     isBlitzTimeout: blitz.isBlitzTimeout,
     setBlitzTimeLimit: blitz.setBlitzTimeLimit,
+
+    // Tutor Slice
+    tutorAnalysis: tutor.tutorAnalysis,
+    tutorFeedback: tutor.tutorFeedback,
+    tutorBotEvaluation: tutor.tutorBotEvaluation,
+    tutorSpeech: tutor.tutorSpeech,
+    tutorMood: tutor.tutorMood,
+    tutorMatchReview: tutor.tutorMatchReview,
+    resetTutorMatchSession: tutor.resetTutorMatchSession,
+    selectedOpponentLevel: tutor.selectedOpponentLevel,
+    setOpponentLevel: tutor.setOpponentLevel,
+    startTutorMode,
+    nextTutorLevel,
 
     // Taunt Slice
     tauntState: taunt.tauntState,

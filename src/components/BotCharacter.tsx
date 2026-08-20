@@ -126,21 +126,7 @@ export const BotCharacter: Component = () => {
     if (typingTimer) clearInterval(typingTimer);
   });
 
-  const streak = () => {
-    const s = store.stats();
-    switch (store.gameMode()) {
-      case 'campaign':
-        return s.campaign?.currentStreak ?? s.currentStreak;
-      case 'blitz':
-        return s.blitz?.currentStreak ?? 0;
-      case 'puzzle':
-        return s.puzzle?.currentStreak ?? 0;
-      case 'custom':
-        return s.custom?.currentStreak ?? 0;
-      default:
-        return 0;
-    }
-  };
+  const streak = () => store.currentStreak();
 
   // Biểu cảm tên sinh động theo tâm trạng cà khịa hiện tại (Name-first)
   const currentMoodName = () => {

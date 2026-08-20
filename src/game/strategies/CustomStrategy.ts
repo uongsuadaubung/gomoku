@@ -1,14 +1,29 @@
-import { GameModeStrategy } from './types';
-import { GameMode, LevelConfig, UserStats, CustomGameConfig } from '../types';
+import { BaseStrategy } from './BaseStrategy';
+import { BotLevelContext, SeriesPlayerSideContext, GameOverPresentationContext } from './types';
+import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
 import { AI_LEVELS } from '../constants';
 
-export class CustomStrategy implements GameModeStrategy {
+export class CustomStrategy extends BaseStrategy {
   public readonly mode: GameMode = 'custom';
 
-  public getBotLevel(_stats: UserStats, customConfig?: CustomGameConfig): LevelConfig {
-    const lvl = customConfig?.botLevel || 3;
+  public getBotLevel(ctx: BotLevelContext | UserStats, customConfig?: { botLevel?: number }): LevelConfig {
+    const config = 'customConfig' in ctx ? ctx.customConfig : customConfig;
+    const lvl = config?.botLevel || 3;
     const clampedIndex = Math.max(0, Math.min(AI_LEVELS.length - 1, lvl - 1));
     return AI_LEVELS[clampedIndex];
+  }
+
+  public override getNextSeriesPlayerSide(ctx: SeriesPlayerSideContext): boolean {
+    // Trong Đấu Tập tùy chỉnh: Giữ nguyên màu quân đã cấu hình
+    return ctx.customConfig?.playerColor === BLACK;
+  }
+
+  public override getCurrentStreak(stats: UserStats): number {
+    return stats.custom?.currentStreak ?? 0;
+  }
+
+  public override getModeSummary(ctx: GameOverPresentationContext): string {
+    return `Đấu Tập (Bot ${ctx.botConfig.vietnameseName})`;
   }
 
   public canUndo(): boolean {

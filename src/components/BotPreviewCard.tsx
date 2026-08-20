@@ -4,16 +4,25 @@ import { BotAvatar } from './BotAvatar';
 
 interface BotPreviewCardProps {
   bot: LevelConfig;
-  theme?: 'indigo' | 'amber' | 'emerald';
+  theme?: 'indigo' | 'amber' | 'emerald' | 'purple' | 'cyan';
 }
 
 export const BotPreviewCard: Component<BotPreviewCardProps> = (props) => {
   const theme = () => props.theme || 'amber';
-  const nameColor = () => (theme() === 'indigo' ? 'text-indigo-300' : 'text-amber-300');
-  const tagBadge = () =>
-    theme() === 'indigo'
-      ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
-      : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+  const nameColor = () => {
+    if (theme() === 'indigo') return 'text-indigo-300';
+    if (theme() === 'purple') return 'text-purple-300';
+    if (theme() === 'emerald') return 'text-emerald-300';
+    if (theme() === 'cyan') return 'text-cyan-300';
+    return 'text-amber-300';
+  };
+  const tagBadge = () => {
+    if (theme() === 'indigo') return 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
+    if (theme() === 'purple') return 'bg-purple-500/10 text-purple-300 border-purple-500/20';
+    if (theme() === 'emerald') return 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20';
+    if (theme() === 'cyan') return 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20';
+    return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+  };
 
   return (
     <div class="p-3 rounded-2xl bg-slate-950/80 border border-slate-800/90 flex items-start gap-3 text-xs shadow-inner">

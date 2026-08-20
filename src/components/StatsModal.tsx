@@ -7,6 +7,7 @@ import {
   Puzzle,
   Swords,
   Zap,
+  GraduationCap,
 } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { ModalBotTaunt } from './ModalBotTaunt';
@@ -14,10 +15,11 @@ import { CampaignStatsTab } from './stats/CampaignStatsTab';
 import { BlitzStatsTab } from './stats/BlitzStatsTab';
 import { PuzzleStatsTab } from './stats/PuzzleStatsTab';
 import { CustomStatsTab } from './stats/CustomStatsTab';
+import { TutorStatsTab } from './stats/TutorStatsTab';
 
 export const StatsModal: Component = () => {
   const store = useGame();
-  const [activeTab, setActiveTab] = createSignal<'campaign' | 'blitz' | 'puzzle' | 'custom'>('campaign');
+  const [activeTab, setActiveTab] = createSignal<'campaign' | 'blitz' | 'puzzle' | 'custom' | 'tutor'>('campaign');
   const [confirmReset, setConfirmReset] = createSignal(false);
 
   return (
@@ -48,7 +50,7 @@ export const StatsModal: Component = () => {
           </div>
 
           {/* Mode Tabs */}
-          <div class="grid grid-cols-4 gap-1 p-2 bg-slate-950 border-b border-slate-800/80 text-xs">
+          <div class="grid grid-cols-5 gap-1 p-2 bg-slate-950 border-b border-slate-800/80 text-[11px]">
             <button
               onClick={() => setActiveTab('campaign')}
               class={`py-2 px-1 rounded-xl font-bold flex items-center justify-center gap-1 transition-all ${
@@ -57,8 +59,20 @@ export const StatsModal: Component = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Trophy size={13} class="text-indigo-400 shrink-0" />
+              <Trophy size={12} class="text-indigo-400 shrink-0" />
               <span class="truncate">Chiến Dịch</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('tutor')}
+              class={`py-2 px-1 rounded-xl font-bold flex items-center justify-center gap-1 transition-all ${
+                activeTab() === 'tutor'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <GraduationCap size={12} class="text-amber-400 shrink-0" />
+              <span class="truncate">Gia Sư</span>
             </button>
 
             <button
@@ -69,7 +83,7 @@ export const StatsModal: Component = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Zap size={13} class="text-rose-400 shrink-0" />
+              <Zap size={12} class="text-rose-400 shrink-0" />
               <span class="truncate">Cờ Chớp</span>
             </button>
 
@@ -81,7 +95,7 @@ export const StatsModal: Component = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Puzzle size={13} class="text-emerald-400 shrink-0" />
+              <Puzzle size={12} class="text-emerald-400 shrink-0" />
               <span class="truncate">Giải Đố</span>
             </button>
 
@@ -93,7 +107,7 @@ export const StatsModal: Component = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Swords size={13} class="text-amber-400 shrink-0" />
+              <Swords size={12} class="text-amber-400 shrink-0" />
               <span class="truncate">Đấu Tập</span>
             </button>
           </div>
@@ -108,17 +122,22 @@ export const StatsModal: Component = () => {
               <CampaignStatsTab />
             </Show>
 
-            {/* TAB 2: THỐNG KÊ CỜ CHỚP SINH TỬ (BLITZ) */}
+            {/* TAB 2: THỐNG KÊ HỌC VIỆN GIA SƯ (TUTOR) */}
+            <Show when={activeTab() === 'tutor'}>
+              <TutorStatsTab />
+            </Show>
+
+            {/* TAB 3: THỐNG KÊ CỜ CHỚP SINH TỬ (BLITZ) */}
             <Show when={activeTab() === 'blitz'}>
               <BlitzStatsTab />
             </Show>
 
-            {/* TAB 3: THỐNG KÊ GIẢI ĐỐ SÁT CỤC (PUZZLE) */}
+            {/* TAB 4: THỐNG KÊ GIẢI ĐỐ SÁT CỤC (PUZZLE) */}
             <Show when={activeTab() === 'puzzle'}>
               <PuzzleStatsTab />
             </Show>
 
-            {/* TAB 4: THỐNG KÊ ĐẤU TÙY CHỌN (CUSTOM) */}
+            {/* TAB 5: THỐNG KÊ ĐẤU TÙY CHỌN (CUSTOM) */}
             <Show when={activeTab() === 'custom'}>
               <CustomStatsTab />
             </Show>

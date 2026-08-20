@@ -12,6 +12,8 @@ import { BotModal } from './components/BotModal';
 import { SettingsModal } from './components/SettingsModal';
 import { RulesModal } from './components/RulesModal';
 import { LevelUpModal } from './components/LevelUpModal';
+import { TutorCompanion } from './components/TutorCompanion';
+import { GameOverBanner } from './components/GameOverBanner';
 
 const AppContent: Component = () => {
   const store = useGame();
@@ -47,8 +49,17 @@ const AppContent: Component = () => {
           <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
             {/* Left Column: Board & Opponent Character (7 cols on large screens) */}
             <div class="lg:col-span-7 flex flex-col items-center gap-2 sm:gap-3 w-full">
-              {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa */}
-              <BotCharacter />
+              {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa (Tự động ẩn trong chế độ Gia Sư, hiển thị trong các chế độ khác) */}
+              <Show when={store.currentStrategy().shouldShowBotCharacter()}>
+                <BotCharacter />
+              </Show>
+
+              {/* Trên Mobile: Hiển thị Gia Sư Thần Cờ đồng hành ngay trên bàn cờ */}
+              <Show when={store.gameMode() === 'tutor'}>
+                <div class="w-full block lg:hidden">
+                  <TutorCompanion />
+                </div>
+              </Show>
 
               {/* 15x15 Interactive Game Board */}
               <div class="w-full flex justify-center py-0.5 sm:py-1">
@@ -63,7 +74,14 @@ const AppContent: Component = () => {
 
             {/* Right Column: Game Controls, AI Live Radar & Move History (5 cols on large screens) */}
             <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
-              {/* 1. Trên Desktop: Game Controls (Chọn lượt đi / Nhận thua / Ván mới) ở trên đầu */}
+              {/* Chế độ Gia Sư trên Desktop: Hiển thị bảng Gia Sư Thần Cờ ở đầu cột Status */}
+              <Show when={store.gameMode() === 'tutor'}>
+                <div class="w-full hidden lg:block">
+                  <TutorCompanion />
+                </div>
+              </Show>
+
+              {/* 1. Trên Desktop: Game Controls (Chọn lượt đi / Nhận thua / Ván mới) */}
               <div class="w-full hidden lg:block">
                 <GameControls />
               </div>
@@ -81,12 +99,13 @@ const AppContent: Component = () => {
         </Show>
       </main>
 
-      {/* Modals */}
+      {/* Modals & Overlays */}
       <StatsModal />
       <BotModal />
       <SettingsModal />
       <RulesModal />
       <LevelUpModal />
+      <GameOverBanner />
     </div>
   );
 };

@@ -1,19 +1,60 @@
-import { GameModeStrategy } from './types';
+import { BaseStrategy } from './BaseStrategy';
+import {
+  BotLevelContext,
+  GameOverPresentationContext,
+  GameStartContext,
+  PlayerTurnStartContext,
+  PlayerMoveContext,
+} from './types';
 import { GameMode, LevelConfig, UserStats } from '../types';
 import { AI_LEVELS } from '../constants';
 
-export class BlitzStrategy implements GameModeStrategy {
+export class BlitzStrategy extends BaseStrategy {
   public readonly mode: GameMode = 'blitz';
 
-  public getBotLevel(stats: UserStats): LevelConfig {
+  public getBotLevel(ctx: BotLevelContext | UserStats): LevelConfig {
+    const stats = 'stats' in ctx ? ctx.stats : ctx;
     const currentLvlId = stats.blitz?.currentLevel || 1;
     const bot = AI_LEVELS.find(l => l.id === currentLvlId);
     return bot || AI_LEVELS[0];
   }
 
+  public override getCurrentStreak(stats: UserStats): number {
+    return stats.blitz?.currentStreak ?? 0;
+  }
+
+  public override getGameOverTitle(ctx: GameOverPresentationContext): { text: string; color: string } {
+    if (ctx.won) return { text: 'Vượt Cấp Cờ Chớp! ⚡🎉', color: 'text-rose-400' };
+    if (ctx.isBlitzTimeout) return { text: 'Cháy Giờ (Timeout)! ⏱️💥', color: 'text-rose-400' };
+    return { text: 'Thất Bại Cờ Chớp! 💥', color: 'text-rose-400' };
+  }
+
+  public override getGameOverDescription(ctx: GameOverPresentationContext): string {
+    if (ctx.won) return `Chúc mừng bạn đã đánh bại Bot ${ctx.botConfig.vietnameseName}! Tiến lên cấp tiếp theo!`;
+    if (ctx.isBlitzTimeout) return `Bạn đã hết ${ctx.blitzTimeLimit || 10}s suy nghĩ! Chuỗi cờ chớp đã dừng lại.`;
+    return `Bot ${ctx.botConfig.vietnameseName} đã chiến thắng! Chuỗi sinh tử kết thúc.`;
+  }
+
+  public override getModeSummary(ctx: GameOverPresentationContext): string {
+    return `Cờ Chớp (${ctx.blitzTimeLimit || 10}s - Cấp ${ctx.botConfig.id})`;
+  }
+
   public canUndo(): boolean {
     // Chế độ Cờ Chớp cấm tuyệt đối đi lại (Undo) để thử thách phản xạ
     return false;
+  }
+
+  public override onGameStart(ctx: GameStartContext): void {
+    super.onGameStart(ctx);
+    ctx.services.startBlitzTimer?.();
+  }
+
+  public override onPlayerTurnStart(ctx: PlayerTurnStartContext): void {
+    ctx.services.startBlitzTimer?.();
+  }
+
+  public override onPlayerMove(ctx: PlayerMoveContext): void {
+    ctx.services.stopBlitzTimer?.();
   }
 
   public recordGame(

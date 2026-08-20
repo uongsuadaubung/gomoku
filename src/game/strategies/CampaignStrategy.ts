@@ -1,17 +1,32 @@
-import { GameModeStrategy } from './types';
+import { BaseStrategy } from './BaseStrategy';
+import { BotLevelContext, GameOverWinContext } from './types';
 import { GameMode, LevelConfig, UserStats } from '../types';
 import { getLevelConfigByWins } from '../constants';
 
-export class CampaignStrategy implements GameModeStrategy {
+export class CampaignStrategy extends BaseStrategy {
   public readonly mode: GameMode = 'campaign';
 
-  public getBotLevel(stats: UserStats): LevelConfig {
+  public getBotLevel(ctx: BotLevelContext | UserStats): LevelConfig {
+    const stats = 'stats' in ctx ? ctx.stats : ctx;
     const campaignWins = stats.campaign?.wins ?? stats.wins;
     return getLevelConfigByWins(campaignWins, stats.manualLevel);
   }
 
   public canUndo(): boolean {
     return true; // Cho phép đi lại trong chiến dịch
+  }
+
+  public override onPlayerWin(ctx: GameOverWinContext): void {
+    super.onPlayerWin(ctx);
+
+    const newLevel = getLevelConfigByWins(ctx.newStats.wins, ctx.newStats.manualLevel);
+    if (newLevel.id > ctx.oldLevel && ctx.newStats.manualLevel === null) {
+      ctx.services.setSafeTimeout?.(() => {
+        ctx.services.playLevelUpSound?.();
+        ctx.services.setShowLevelUpAlert?.(newLevel);
+        ctx.services.triggerTaunt?.('LEVEL_UP_ALERT', 400);
+      }, 800);
+    }
   }
 
   public recordGame(

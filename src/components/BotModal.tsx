@@ -121,10 +121,8 @@ export const BotModal: Component = () => {
                     const isCampaignUnlocked = () => campaignWins() >= level.minWins;
                     const unlocked = isCampaignUnlocked();
                     const isMatchCurrent = () => {
-                      if (!unlocked || store.gameMode() === 'puzzle' || store.gameMode() === 'menu') return false;
-                      if (store.gameMode() === 'campaign') return campaignConfig().id === level.id;
-                      if (store.gameMode() === 'custom') return store.customConfig()?.botLevel === level.id;
-                      return false;
+                      if (!unlocked || store.matchStage() === 'ready') return false;
+                      return store.currentLevelConfig().id === level.id;
                     };
 
                     return (

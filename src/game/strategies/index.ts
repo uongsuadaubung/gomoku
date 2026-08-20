@@ -4,24 +4,29 @@ import { CampaignStrategy } from './CampaignStrategy';
 import { PuzzleStrategy } from './PuzzleStrategy';
 import { CustomStrategy } from './CustomStrategy';
 import { BlitzStrategy } from './BlitzStrategy';
+import { TutorStrategy } from './TutorStrategy';
 
 export * from './types';
+export * from './BaseStrategy';
 export * from './CampaignStrategy';
 export * from './PuzzleStrategy';
 export * from './CustomStrategy';
 export * from './BlitzStrategy';
+export * from './TutorStrategy';
 
 // Singleton instances để tái sử dụng hiệu quả
 const campaignStrategy = new CampaignStrategy();
 const puzzleStrategy = new PuzzleStrategy();
 const customStrategy = new CustomStrategy();
 const blitzStrategy = new BlitzStrategy();
+const tutorStrategy = new TutorStrategy();
 
 const strategyMap: Record<GameMode, GameModeStrategy> = {
   campaign: campaignStrategy,
   puzzle: puzzleStrategy,
   custom: customStrategy,
   blitz: blitzStrategy,
+  tutor: tutorStrategy,
   menu: campaignStrategy, // Mặc định khi ở Menu
 };
 
@@ -31,3 +36,4 @@ const strategyMap: Record<GameMode, GameModeStrategy> = {
 export function getGameStrategy(mode: GameMode): GameModeStrategy {
   return strategyMap[mode] || campaignStrategy;
 }
+

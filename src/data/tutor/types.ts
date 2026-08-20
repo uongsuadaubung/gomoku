@@ -1,0 +1,62 @@
+export type TutorPreMoveEvent =
+  | 'PRE_WIN_IN_ONE_TEASE'
+  | 'PRE_WIN_IN_ONE_DIRECT'
+  | 'PRE_CRITICAL_THREAT_TEASE'
+  | 'PRE_CRITICAL_THREAT_DIRECT'
+  | 'PRE_VCF_TACTIC_TEASE'
+  | 'PRE_VCF_TACTIC_DIRECT'
+  | 'PRE_FORK_TACTIC_TEASE'
+  | 'PRE_FORK_TACTIC_DIRECT'
+  | 'PRE_ENEMY_OPEN_THREE_TEASE'
+  | 'PRE_ENEMY_OPEN_THREE_DIRECT'
+  | 'PRE_DEVELOPMENT_NEUTRAL';
+
+export type TutorPostMoveEvent =
+  | 'POST_WINNING_MOVE'
+  | 'POST_BRILLIANT_MOVE'
+  | 'POST_BRILLIANT_FORK'
+  | 'POST_CREATE_OPEN_FOUR'
+  | 'POST_CREATE_FOUR'
+  | 'POST_CREATE_OPEN_THREE'
+  | 'POST_DEFUSED_CRITICAL_THREAT'
+  | 'POST_BLOCKED_OPEN_THREE'
+  | 'POST_GOOD_MOVE_COMPARISON'
+  | 'POST_MISSED_WIN_IN_ONE'
+  | 'POST_MISSED_FORK_OR_VCF'
+  | 'POST_IGNORED_CRITICAL_THREAT'
+  | 'POST_IGNORED_OPEN_THREE'
+  | 'POST_PASSIVE_MOVE';
+
+export type TutorGeneralEvent =
+  | 'GAME_OVER_PLAYER_WIN'
+  | 'GAME_OVER_PLAYER_LOSS'
+  | 'GAME_OVER_PLAYER_RESIGN'
+  | 'GAME_OVER_DRAW'
+  | 'TUTOR_START_GAME'
+  | 'TUTOR_UNDO_FEEDBACK';
+
+export type TutorBotMoveEvent =
+  | 'BOT_WINNING_FIVE'
+  | 'BOT_BLOCK_WIN'
+  | 'BOT_CREATE_OPEN_FOUR'
+  | 'BOT_FORK_ATTACK'
+  | 'BOT_CREATE_FOUR_PRESSURE'
+  | 'BOT_CREATE_OPEN_THREE'
+  | 'BOT_BLOCK_PLAYER_THREE'
+  | 'BOT_OPENING_CONTROL'
+  | 'BOT_EXPAND_CONNECTION'
+  | 'BOT_POSITIONAL_DEVELOPMENT';
+
+export type TutorDialogueEvent =
+  | TutorPreMoveEvent
+  | TutorPostMoveEvent
+  | TutorGeneralEvent
+  | TutorBotMoveEvent;
+
+export interface TutorDialogueContext {
+  coord?: string;
+  coordAI?: string;
+  botName?: string;
+  level?: number;
+  nextLevel?: number;
+}
