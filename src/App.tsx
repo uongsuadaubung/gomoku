@@ -13,6 +13,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { RulesModal } from './components/RulesModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { TutorCompanion } from './components/TutorCompanion';
+import { GuideMasterView } from './components/guide/GuideMasterView';
 
 const AppContent: Component = () => {
   const store = useGame();
@@ -51,7 +52,7 @@ const AppContent: Component = () => {
           <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
             {/* Left Column: Board & Opponent Character (7 cols on large screens) */}
             <div class="lg:col-span-7 flex flex-col items-center gap-2 sm:gap-3 w-full">
-              {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa (Tự động ẩn trong chế độ Gia Sư, hiển thị trong các chế độ khác) */}
+              {/* Nhân Vật Đối Thủ & Bong Bóng Cà Khịa (Tự động ẩn trong chế độ Gia Sư & Kỳ Viện) */}
               <Show when={store.currentStrategy().shouldShowBotCharacter()}>
                 <BotCharacter />
               </Show>
@@ -68,33 +69,55 @@ const AppContent: Component = () => {
                 <GameBoard />
               </div>
 
-              {/* Trên Mobile: Đặt GameControls ngay dưới bàn cờ để ngón tay thao tác thuận tiện */}
-              <div class="w-full block lg:hidden">
-                <GameControls />
-              </div>
-            </div>
-
-            {/* Right Column: Game Controls, AI Live Radar & Move History (5 cols on large screens) */}
-            <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
-              {/* Chế độ Gia Sư trên Desktop: Hiển thị bảng Gia Sư Thần Cờ ở đầu cột Status */}
-              <Show when={store.gameMode() === 'tutor'}>
-                <div class="w-full hidden lg:block">
-                  <TutorCompanion />
+              {/* Trên Mobile: Đặt GameControls ngay dưới bàn cờ (Ẩn trong chế độ Guide vì Guide có view riêng) */}
+              <Show when={store.gameMode() !== 'guide'}>
+                <div class="w-full block lg:hidden">
+                  <GameControls />
                 </div>
               </Show>
 
-              {/* 1. Trên Desktop: Game Controls (Chọn lượt đi / Nhận thua / Ván mới) */}
-              <div class="w-full hidden lg:block">
-                <GameControls />
-              </div>
+              {/* Trên Mobile: Hiển thị GuideMasterView ngay dưới bàn cờ */}
+              <Show when={store.shouldShowGuideMasterView()}>
+                <div class="w-full block lg:hidden">
+                  <GuideMasterView />
+                </div>
+              </Show>
+            </div>
 
-              {/* 2. AI Status & Radar Panel */}
-              <AIStatusPanel />
+            {/* Right Column: GuideMasterView HOẶC Game Controls + AI Radar + Move History (5 cols on large screens) */}
+            <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
+              {/* 1. CHẾ ĐỘ KỲ VIỆN BÁCH KHOA & GIẢ LẬP (GUIDE MODE) */}
+              <Show
+                when={store.shouldShowGuideMasterView()}
+                fallback={
+                  <>
+                    {/* Chế độ Gia Sư trên Desktop: Hiển thị bảng Gia Sư Thần Cờ ở đầu cột Status */}
+                    <Show when={store.gameMode() === 'tutor'}>
+                      <div class="w-full hidden lg:block">
+                        <TutorCompanion />
+                      </div>
+                    </Show>
 
-              {/* 3. Danh Sách Nước Đi Nằm Ở Dưới Cuối Cùng */}
-              <div class="w-full">
-                <MoveHistory />
-              </div>
+                    {/* Trên Desktop: Game Controls (Chọn lượt đi / Nhận thua / Ván mới) */}
+                    <div class="w-full hidden lg:block">
+                      <GameControls />
+                    </div>
+
+                    {/* AI Status & Radar Panel */}
+                    <AIStatusPanel />
+
+                    {/* Danh Sách Nước Đi */}
+                    <div class="w-full">
+                      <MoveHistory />
+                    </div>
+                  </>
+                }
+              >
+                {/* Desktop Guide Master View */}
+                <div class="w-full hidden lg:block">
+                  <GuideMasterView />
+                </div>
+              </Show>
             </div>
 
           </div>

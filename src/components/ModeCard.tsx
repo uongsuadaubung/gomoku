@@ -1,7 +1,7 @@
 import { type Component, type JSX, Show } from 'solid-js';
 import { ChevronRight } from 'lucide-solid';
 
-export type ModeTheme = 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple';
+export type ModeTheme = 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple' | 'cyan';
 
 export interface ModeCardProps {
   title: string;
@@ -21,6 +21,8 @@ export const ModeCard: Component<ModeCardProps> = (props) => {
 
   const cardContainerStyle = () => {
     switch (theme()) {
+      case 'cyan':
+        return 'from-cyan-950/70 border-cyan-500/30 hover:border-cyan-400/80 hover:shadow-cyan-500/15';
       case 'emerald':
         return 'from-emerald-950/70 border-emerald-500/30 hover:border-emerald-400/70 hover:shadow-emerald-500/10';
       case 'amber':
@@ -37,6 +39,8 @@ export const ModeCard: Component<ModeCardProps> = (props) => {
 
   const iconBadgeStyle = () => {
     switch (theme()) {
+      case 'cyan':
+        return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40';
       case 'emerald':
         return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
       case 'amber':
@@ -53,6 +57,8 @@ export const ModeCard: Component<ModeCardProps> = (props) => {
 
   const pillBadgeStyle = () => {
     switch (theme()) {
+      case 'cyan':
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
       case 'emerald':
         return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
       case 'amber':
@@ -69,6 +75,8 @@ export const ModeCard: Component<ModeCardProps> = (props) => {
 
   const titleHoverStyle = () => {
     switch (theme()) {
+      case 'cyan':
+        return 'group-hover:text-cyan-200';
       case 'emerald':
         return 'group-hover:text-emerald-200';
       case 'amber':
@@ -85,6 +93,8 @@ export const ModeCard: Component<ModeCardProps> = (props) => {
 
   const buttonStyle = () => {
     switch (theme()) {
+      case 'cyan':
+        return 'bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-400 hover:to-teal-500 shadow-cyan-500/25 text-slate-950 font-black';
       case 'emerald':
         return 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-emerald-500/25 text-white';
       case 'amber':

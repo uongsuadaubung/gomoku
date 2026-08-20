@@ -35,6 +35,7 @@ import { createPuzzleSlice } from './slices/puzzleSlice';
 import { createTauntSlice } from './slices/tauntSlice';
 import { createBlitzSlice } from './slices/blitzSlice';
 import { createTutorSlice } from './slices/tutorSlice';
+import { createGuideSlice } from './slices/guideSlice';
 
 export function createGameStore() {
   // 1. Trạng thái Bàn cờ & Ván đấu
@@ -61,6 +62,15 @@ export function createGameStore() {
   const series = createSeriesSlice();
   const puzzle = createPuzzleSlice({ stats: settings.stats });
   const tutor = createTutorSlice({ stats: settings.stats, setStats: settings.setStats });
+  const guide = createGuideSlice({
+    stats: settings.stats,
+    setStats: settings.setStats,
+    syncBoardToMain: (newBoard, turn) => {
+      setBoard(newBoard);
+      setCurrentTurn(turn);
+      setPlayerColor(turn);
+    },
+  });
 
   // Safe timeout helper
   const pendingTimeouts: number[] = [];
@@ -456,6 +466,25 @@ export function createGameStore() {
     startTutorMatch(nextLvl);
   }
 
+  function startGuideMode(tab: 'lessons' | 'sandbox' = 'lessons') {
+    blitz.stopBlitzTimer();
+    setGameMode('guide');
+    series.setIsSeriesActive(false);
+    series.setSeriesGameNumber(0);
+    series.setLastResigned(false);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setGameStatus('playing');
+    setMatchStage('playing');
+    guide.setGuideTab(tab);
+    if (tab === 'lessons') {
+      guide.resumeLatestLesson();
+    } else {
+      guide.startSandboxMode();
+    }
+    soundService.playClickSound();
+  }
+
   function goToMainMenu() {
     blitz.stopBlitzTimer();
     blitz.setIsBlitzTimeout(false);
@@ -463,6 +492,7 @@ export function createGameStore() {
       worker.postMessage({ type: 'CANCEL' });
       setIsAiThinking(false);
     }
+    guide.clearWhatIf();
     matchCtx.lastGameResult = null;
     setGameMode('menu');
     setGameStatus('idle');
@@ -653,7 +683,53 @@ export function createGameStore() {
     });
   }
 
+  const canPlayerMove = () => {
+    return currentStrategy().canPlayerMove({
+      matchStage: matchStage(),
+      isAiThinking: isAiThinking(),
+      currentTurn: currentTurn(),
+      playerColor: playerColor(),
+    });
+  };
+
+  function onCellHover(row: number, col: number, cell: number): boolean {
+    return (
+      currentStrategy().onCellHover?.({
+        row,
+        col,
+        cell,
+        services: {
+          guide: {
+            guideTab: guide.guideTab,
+            setSelectedSandboxCell: guide.setSelectedSandboxCell,
+          },
+        },
+      }) ?? false
+    );
+  }
+
+  const shouldShowGuideOverlay = () => {
+    return currentStrategy().shouldShowGuideOverlay?.() ?? false;
+  };
+
+  const shouldShowGuideMasterView = () => {
+    return currentStrategy().shouldShowGuideMasterView?.() ?? false;
+  };
+
   function makePlayerMove(row: number, col: number) {
+    const customHandled = currentStrategy().handleCustomMove?.({
+      row,
+      col,
+      services: {
+        guide: {
+          guideTab: guide.guideTab,
+          handleLessonMove: guide.handleLessonMove,
+          handleSandboxCellClick: guide.handleSandboxCellClick,
+        },
+      },
+    });
+    if (customHandled) return;
+
     if (gameStatus() !== 'playing' || isAiThinking()) {
       return;
     }
@@ -1096,6 +1172,58 @@ export function createGameStore() {
     tauntState: taunt.tauntState,
     triggerTaunt: taunt.triggerTaunt,
 
+    // Guide Slice (Kỳ Viện Bách Khoa & Sandbox)
+    guideTab: guide.guideTab,
+    setGuideTab: guide.setGuideTab,
+    currentLessonId: guide.currentLessonId,
+    currentLesson: guide.currentLesson,
+    currentStepIndex: guide.currentStepIndex,
+    currentStep: guide.currentStep,
+    lessonFeedback: guide.lessonFeedback,
+    isStepCompleted: guide.isStepCompleted,
+    showHint: guide.showHint,
+    setShowHint: guide.setShowHint,
+    showTheoryModal: guide.showTheoryModal,
+    setShowTheoryModal: guide.setShowTheoryModal,
+    showQuickLessonDrawer: guide.showQuickLessonDrawer,
+    setShowQuickLessonDrawer: guide.setShowQuickLessonDrawer,
+    lessonViewMode: guide.lessonViewMode,
+    setLessonViewMode: guide.setLessonViewMode,
+    lessonIndexInfo: guide.lessonIndexInfo,
+    isLessonUnlocked: guide.isLessonUnlocked,
+    lessonBoard: guide.lessonBoard,
+    sandboxBoard: guide.sandboxBoard,
+    sandboxTurn: guide.sandboxTurn,
+    showHeatmap: guide.showHeatmap,
+    setShowHeatmap: guide.setShowHeatmap,
+    showQualityBadges: guide.showQualityBadges,
+    setShowQualityBadges: guide.setShowQualityBadges,
+    selectedPresetId: guide.selectedPresetId,
+    selectedSandboxCell: guide.selectedSandboxCell,
+    setSelectedSandboxCell: guide.setSelectedSandboxCell,
+    whatIfSteps: guide.whatIfSteps,
+    isSimulatingWhatIf: guide.isSimulatingWhatIf,
+    sandboxHeatmap: guide.sandboxHeatmap,
+    sandboxEval: guide.sandboxEval,
+    selectedCellExplanation: guide.selectedCellExplanation,
+    completedLessonsSet: guide.completedLessonsSet,
+    unlockedChaptersSet: guide.unlockedChaptersSet,
+    progressPercent: guide.progressPercent,
+    selectLesson: guide.selectLesson,
+    resetCurrentLesson: guide.resetCurrentLesson,
+    handleLessonMove: guide.handleLessonMove,
+    nextLessonStep: guide.nextLessonStep,
+    goToPrevLesson: guide.goToPrevLesson,
+    goToNextLesson: guide.goToNextLesson,
+    startSandboxMode: guide.startSandboxMode,
+    handleSandboxCellClick: guide.handleSandboxCellClick,
+    clearSandbox: guide.clearSandbox,
+    toggleSandboxTurn: guide.toggleSandboxTurn,
+    loadPreset: guide.loadPreset,
+    simulateWhatIf: guide.simulateWhatIf,
+    clearWhatIf: guide.clearWhatIf,
+    startGuideMode,
+
     // Setters
     setMatchStage,
     setGameMode,
@@ -1126,6 +1254,10 @@ export function createGameStore() {
     setPlayerSide,
     resignGame,
     makePlayerMove,
+    canPlayerMove,
+    onCellHover,
+    shouldShowGuideOverlay,
+    shouldShowGuideMasterView,
     undoMove,
   };
 }

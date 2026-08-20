@@ -45,6 +45,37 @@ export interface GameStartContext {
   };
 }
 
+export interface CanPlayerMoveContext {
+  matchStage: string;
+  isAiThinking: boolean;
+  currentTurn: ActivePlayer;
+  playerColor: ActivePlayer;
+}
+
+export interface CustomMoveContext {
+  row: number;
+  col: number;
+  services: {
+    guide?: {
+      guideTab: () => 'lessons' | 'sandbox';
+      handleLessonMove: (row: number, col: number) => boolean;
+      handleSandboxCellClick: (row: number, col: number) => void;
+    };
+  };
+}
+
+export interface CellHoverContext {
+  row: number;
+  col: number;
+  cell: number;
+  services: {
+    guide?: {
+      guideTab: () => 'lessons' | 'sandbox';
+      setSelectedSandboxCell: (cell: Move | null) => void;
+    };
+  };
+}
+
 export interface PlayerTurnStartContext {
   board: BoardMatrix;
   playerColor: ActivePlayer;
@@ -181,6 +212,32 @@ export interface GameModeStrategy {
    * Kiểm tra xem có hiển thị BotCharacter (Nhân vật đối thủ & câu thoại cà khịa) trên bàn cờ hay không
    */
   shouldShowBotCharacter(): boolean;
+
+  /**
+   * Kiểm tra xem người chơi có được phép click/hạ quân lúc này không
+   */
+  canPlayerMove(ctx: CanPlayerMoveContext): boolean;
+
+  /**
+   * Xử lý nước đi tùy biến đặc thù của chế độ chơi (ví dụ: Guide/Sandbox).
+   * Trả về true nếu chế độ tự xử lý nước đi, false nếu tiếp tục luồng game tiêu chuẩn.
+   */
+  handleCustomMove?(ctx: CustomMoveContext): boolean;
+
+  /**
+   * Xử lý sự kiện hover qua ô cờ đặc thù (ví dụ: xem thuyết minh Sandbox)
+   */
+  onCellHover?(ctx: CellHoverContext): boolean;
+
+  /**
+   * Kiểm tra xem có hiển thị lớp phủ Guide/Sandbox trên bàn cờ không
+   */
+  shouldShowGuideOverlay?(): boolean;
+
+  /**
+   * Kiểm tra xem có hiển thị bảng điều khiển GuideMasterView hay không
+   */
+  shouldShowGuideMasterView?(): boolean;
 
   /**
    * Cho phép hoặc cấm tính năng Đi Lại (Undo)

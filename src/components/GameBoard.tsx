@@ -6,6 +6,8 @@ import { STAR_POINTS, COL_LETTERS, ROW_NUMBERS } from '../game/constants';
 import { interactionTracker } from '../services/interactionTracker';
 import { StonePiece } from './StonePiece';
 
+import { GuideBoardOverlay } from './guide/GuideBoardOverlay';
+
 interface ThemeConfig {
   board: string;
   line: string;
@@ -88,13 +90,7 @@ export const GameBoard: Component = () => {
     return stepNumberMap().get(`${r},${c}`) ?? null;
   };
 
-  const canPlay = () => {
-    return (
-      store.matchStage() === 'playing' &&
-      !store.isAiThinking() &&
-      store.currentTurn() === store.playerColor()
-    );
-  };
+  const canPlay = () => store.canPlayerMove();
 
   let longHoverTimer: number | null = null;
   let recentHoveredCells: { pos: string; time: number }[] = [];
@@ -111,6 +107,11 @@ export const GameBoard: Component = () => {
   const handleCellMouseEnter = (rIdx: number, cIdx: number, cell: number) => {
     setHoverPos({ row: rIdx, col: cIdx });
     clearHoverTimer();
+
+    // Ủy quyền cho Strategy xử lý hover đặc thù (ví dụ: Sandbox Inspector)
+    if (store.onCellHover(rIdx, cIdx, cell)) {
+      return;
+    }
 
     if (canPlay() && cell === EMPTY) {
       const now = Date.now();
@@ -154,6 +155,7 @@ export const GameBoard: Component = () => {
 
   const handleCellClick = (r: number, c: number) => {
     clearHoverTimer();
+
     // Khi game đã kết thúc, kiểm tra người chơi Thắng hay Thua để phát đúng thoại
     if (store.matchStage() === 'game_over') {
       const status = store.gameStatus();
@@ -340,6 +342,11 @@ export const GameBoard: Component = () => {
                             color={store.playerColor()}
                             isGhost={true}
                           />
+                        </Show>
+
+                        {/* 5. Lớp Phủ Trực Quan Cho Chế Độ Kỳ Viện & Sandbox (Heatmap, Badges, What-If) */}
+                        <Show when={store.shouldShowGuideOverlay()}>
+                          <GuideBoardOverlay row={rIdx} col={cIdx} />
                         </Show>
                       </div>
                     );

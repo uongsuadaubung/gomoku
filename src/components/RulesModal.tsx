@@ -59,7 +59,7 @@ export const RulesModal: Component = () => {
           </h3>
           <ul class="space-y-1.5 list-disc list-inside text-slate-300">
             <li>
-              <strong class="text-white">Chiếm trung tâm sớm:</strong> Hạ quân gần ô Thiên Nguyên (7, 7) ở khai cuộc để kiểm soát tối đa các đường ngang, dọc và chéo.
+              <strong class="text-white">Chiếm trung tâm sớm:</strong> Hạ quân tại hoặc gần ô Thiên Nguyên H8 ở khai cuộc để kiểm soát tối đa các đường ngang, dọc và chéo.
             </li>
             <li>
               <strong class="text-white">Cảnh giác đòn hiểm:</strong> Luôn chú ý các nước tạo <strong class="text-sky-300">3 mở</strong> và <strong class="text-amber-300">bẫy đôi 4-3, 3-3</strong> của đối thủ khi cấp độ nâng cao.

@@ -11,6 +11,9 @@ import {
   GameOverWinContext,
   GameOverLossContext,
   GameOverDrawContext,
+  CanPlayerMoveContext,
+  CustomMoveContext,
+  CellHoverContext,
 } from './types';
 import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
 import { TauntEvent } from '../../data/taunts/types';
@@ -59,6 +62,30 @@ export abstract class BaseStrategy implements GameModeStrategy {
 
   public shouldShowBotCharacter(): boolean {
     return true; // Mặc định hiển thị BotCharacter cho các chế độ chơi
+  }
+
+  public canPlayerMove(ctx: CanPlayerMoveContext): boolean {
+    return (
+      ctx.matchStage === 'playing' &&
+      !ctx.isAiThinking &&
+      ctx.currentTurn === ctx.playerColor
+    );
+  }
+
+  public handleCustomMove?(_ctx: CustomMoveContext): boolean {
+    return false;
+  }
+
+  public onCellHover?(_ctx: CellHoverContext): boolean {
+    return false;
+  }
+
+  public shouldShowGuideOverlay(): boolean {
+    return false;
+  }
+
+  public shouldShowGuideMasterView(): boolean {
+    return false;
   }
 
   public onGameStart(ctx: GameStartContext): void {

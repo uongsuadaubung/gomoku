@@ -8,11 +8,13 @@ import {
   Zap,
   GraduationCap,
   Award,
+  BookOpen,
 } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
 import { BotPreviewCard } from './BotPreviewCard';
 import { ModeCard } from './ModeCard';
+import { GUIDE_CHAPTERS, getAllLessons } from '../data/guide/lessons';
 
 export const MainMenu: Component = () => {
   const store = useGame();
@@ -26,7 +28,7 @@ export const MainMenu: Component = () => {
 
   return (
     <div class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in select-none">
-      {/* 5 Game Mode Cards Grid - 3 items per row on large screens */}
+      {/* 6 Game Mode Cards Grid - 3 items per row on large screens */}
       <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 items-stretch">
         
         {/* 1. CHIẾN DỊCH (CAMPAIGN MODE) */}
@@ -100,7 +102,35 @@ export const MainMenu: Component = () => {
           </div>
         </ModeCard>
 
-        {/* 4. CỜ CHỚP (FLASH / BLITZ CHALLENGE) */}
+        {/* 4. KỲ VIỆN BÁCH KHOA & GIẢ LẬP THẾ CỜ (GUIDE & SANDBOX MODE) */}
+        <ModeCard
+          title="Kỳ Viện Bách Khoa"
+          description={`Cẩm nang ${GUIDE_CHAPTERS.length} chương ${getAllLessons().length} bài từ mở màn tới sát cục & Phòng giả lập Radar toàn diện!`}
+          badgeText="Giáo Trình & Radar"
+          badgeIcon={<BookOpen size={11} />}
+          theme="cyan"
+          icon={<BookOpen size={24} />}
+          buttonText="Vào Kỳ Viện Bách Khoa"
+          buttonIcon={<BookOpen size={14} />}
+          onAction={() => store.startGuideMode('lessons')}
+        >
+          <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-cyan-400 font-bold flex items-center gap-1">
+                <Sparkles size={12} /> Đã hoàn thành:
+              </span>
+              <span class="text-cyan-200 font-extrabold">
+                {store.completedLessonsSet().size} / {getAllLessons().length} Bài
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-800/80">
+              <span class="text-slate-400 font-medium">Phòng Giả Lập:</span>
+              <span class="text-slate-200 font-bold">Heatmap & What-If</span>
+            </div>
+          </div>
+        </ModeCard>
+
+        {/* 5. CỜ CHỚP (FLASH / BLITZ CHALLENGE) */}
         <ModeCard
           title="Cờ Chớp Thử Thách"
           description="Áp lực thời gian mỗi nước. Thắng leo cấp từ Lv 1, thua hoặc hết giờ về Menu!"
@@ -122,7 +152,7 @@ export const MainMenu: Component = () => {
           </div>
         </ModeCard>
 
-        {/* 5. ĐẤU TÙY CHỌN VỚI BOT / CUSTOM (CUSTOM MATCH) */}
+        {/* 6. ĐẤU TÙY CHỌN VỚI BOT / CUSTOM (CUSTOM MATCH) */}
         <ModeCard
           title="Đấu Tùy Chọn Với Bot"
           description="Đấu tập tự do với các đối thủ bạn đã mở khóa từ Chiến Dịch."

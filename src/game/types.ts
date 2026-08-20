@@ -20,7 +20,7 @@ export type MatchStage = 'ready' | 'playing' | 'game_over';
 
 export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw';
 
-export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz' | 'tutor';
+export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz' | 'tutor' | 'guide';
 
 export interface WinInfo {
   winner: ActivePlayer;
@@ -34,6 +34,7 @@ export interface CustomGameConfig {
 }
 
 import type { TutorPreMoveEvent, TutorPostMoveEvent } from '../data/tutor/types';
+import type { GuideStats } from '../data/guide/types';
 
 export interface TutorPreMoveAnalysis {
   suggestedMove: Move;
@@ -170,6 +171,8 @@ export interface UserStats {
   blitz: BlitzStats;
   // 🎓 5. Học viện Gia Sư (Tutor)
   tutor: TutorStats;
+  // 📖 6. Kỳ Viện Bách Khoa (Guide)
+  guide: GuideStats;
 
   // Dữ liệu tương thích cấp cao
   wins: number;

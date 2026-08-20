@@ -61,6 +61,13 @@ const DEFAULT_STATS: UserStats = {
     totalGames: 0,
     byBotLevel: {},
   },
+  guide: {
+    completedLessons: [],
+    unlockedChapters: [1],
+    sandboxPresetLoadedCount: 0,
+    totalLessonsCompleted: 0,
+    lastSelectedLessonId: 'lesson_1_1',
+  },
   wins: 0,
   losses: 0,
   draws: 0,
@@ -101,6 +108,13 @@ export class StorageService {
             ...DEFAULT_STATS.tutor,
             ...(parsed.tutor || {}),
             byBotLevel: { ...(parsed.tutor?.byBotLevel || {}) },
+          },
+          guide: {
+            ...DEFAULT_STATS.guide,
+            ...(parsed.guide || {}),
+            completedLessons: parsed.guide?.completedLessons || [],
+            unlockedChapters: parsed.guide?.unlockedChapters || [1],
+            lastSelectedLessonId: parsed.guide?.lastSelectedLessonId || 'lesson_1_1',
           },
         };
       }
