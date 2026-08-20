@@ -12,6 +12,7 @@ import {
 import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
 import { BotPreviewCard } from './BotPreviewCard';
+import { BotAvatar } from './BotAvatar';
 
 export const MainMenu: Component = () => {
   const store = useGame();
@@ -145,7 +146,9 @@ export const MainMenu: Component = () => {
             {/* Highest Blitz Level Achieved */}
             <div class="p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="text-lg">{highestBlitzBot().avatar}</div>
+                <div class="text-lg">
+                  <BotAvatar name={highestBlitzBot().avatar} />
+                </div>
                 <div>
                   <div class="text-[10px] text-slate-400 font-medium">Kỷ lục cao nhất:</div>
                   <div class="text-xs font-bold text-rose-300">
@@ -257,7 +260,7 @@ export const MainMenu: Component = () => {
                     <For each={AI_LEVELS.filter(lvl => isBotUnlocked(lvl.id))}>
                       {lvl => (
                         <option value={lvl.id} class="bg-slate-900 text-slate-200 py-1">
-                          {lvl.avatar} Bot {lvl.vietnameseName}
+                          Bot {lvl.vietnameseName} (Cấp {lvl.id})
                         </option>
                       )}
                     </For>

@@ -2,6 +2,7 @@ import { Component, Show } from 'solid-js';
 import { Sparkles, Trophy, Swords, Puzzle, Flame, Zap, Crown } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
+import { BotAvatar } from './BotAvatar';
 
 const MODE_BADGES: Record<string, { label: string; Icon: typeof Trophy; colorClass: string }> = {
   campaign: { label: 'Chiến Dịch', Icon: Trophy, colorClass: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
@@ -32,15 +33,15 @@ export const LevelBadge: Component = () => {
     }
   };
 
-  // Biểu cảm khuôn mặt Bot động theo chuỗi thắng thua
+  // Biểu cảm khuôn mặt Bot động theo chuỗi thắng thua (Name-first)
   const dynamicAvatar = () => {
     const s = streak();
     const lastRes = store.lastGameResult();
-    if (s >= 5) return '😱';
-    if (s >= 3) return '😤';
-    if (s >= 2) return '😒';
-    if (lastRes === 'loss') return '😏';
-    return config().avatar;
+    if (s >= 5) return 'panic';
+    if (s >= 3) return 'angry';
+    if (s >= 2) return 'disdain';
+    if (lastRes === 'loss') return 'smug';
+    return config().avatar || 'eye_roll';
   };
 
   // Danh hiệu phong hiệu chuỗi thắng
@@ -82,7 +83,7 @@ export const LevelBadge: Component = () => {
         {/* Left: Level Info & Dynamic Avatar */}
         <div class="flex items-center space-x-3.5">
           <div class={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border transition-transform duration-300 ${config().badgeBg} ${streak() >= 3 ? 'scale-105 ring-2 ring-orange-400/50' : ''}`}>
-            {dynamicAvatar()}
+            <BotAvatar name={dynamicAvatar()} />
           </div>
           <div>
             <div class="flex items-center flex-wrap gap-1.5">

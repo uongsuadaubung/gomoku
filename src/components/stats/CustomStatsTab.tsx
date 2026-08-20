@@ -2,6 +2,7 @@ import { type Component, For, Show } from 'solid-js';
 import { Swords, CircleCheck, CircleX, Equal, Award } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { AI_LEVELS } from '../../game/constants';
+import { BotAvatar } from '../BotAvatar';
 
 export const CustomStatsTab: Component = () => {
   const store = useGame();
@@ -101,7 +102,7 @@ export const CustomStatsTab: Component = () => {
                     : 'bg-slate-950/40 border-slate-900/50 opacity-60'
                 }`}>
                   <div class="flex items-center gap-1.5">
-                    <span>{unlocked() ? lvl.avatar : '🔒'}</span>
+                    {unlocked() ? <BotAvatar name={lvl.avatar} /> : <span>🔒</span>}
                     <span class={`font-bold ${unlocked() ? 'text-slate-200' : 'text-slate-500'}`}>
                       {unlocked() ? `Bot ${lvl.vietnameseName}` : 'Đối Thủ Bí Ẩn'}
                     </span>

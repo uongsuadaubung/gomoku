@@ -2,6 +2,7 @@ import { Component, Show } from 'solid-js';
 import { MessageSquareQuote } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { getMoodEmoji } from '../services/tauntService';
+import { BotAvatar } from './BotAvatar';
 
 export const ModalBotTaunt: Component = () => {
   const store = useGame();
@@ -18,7 +19,7 @@ export const ModalBotTaunt: Component = () => {
         }`}
       >
         <div class="w-10 h-10 rounded-xl bg-slate-950/20 border border-slate-950/30 flex items-center justify-center text-2xl shrink-0">
-          {store.enableTaunts() ? getMoodEmoji(taunt().mood, config().avatar) : '🤐'}
+          <BotAvatar name={store.enableTaunts() ? taunt().mood : 'muted'} />
         </div>
         <span class="leading-snug flex-1">{taunt().text}</span>
       </div>

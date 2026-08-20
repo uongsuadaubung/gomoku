@@ -12,6 +12,7 @@ import { useGame } from '../store/GameContext';
 import { AI_LEVELS } from '../game/constants';
 import { BLACK } from '../game/types';
 import { ModalBotTaunt } from './ModalBotTaunt';
+import { BotAvatar } from './BotAvatar';
 
 export const BotModal: Component = () => {
   const store = useGame();
@@ -139,7 +140,7 @@ export const BotModal: Component = () => {
                         {/* Avatar & Title */}
                         <div class="flex items-start space-x-3">
                           <div class="text-2xl mt-0.5 select-none shrink-0">
-                            {unlocked ? level.avatar : '🔒'}
+                            {unlocked ? <BotAvatar name={level.avatar} /> : '🔒'}
                           </div>
                           <div class="space-y-0.5 min-w-0 flex-1">
                             <div class="flex items-center space-x-2 flex-wrap gap-y-1">

@@ -35,7 +35,7 @@ const MOOD_EMOJI_MAP: Record<BotMood, string> = {
 /**
  * Ánh xạ tâm trạng Bot thành Emoji biểu cảm tương ứng
  */
-export function getMoodEmoji(mood: BotMood, defaultAvatar: string = '🙄'): string {
+export function getMoodEmoji(mood: BotMood, defaultAvatar: string = 'eye_roll'): string {
   return MOOD_EMOJI_MAP[mood] || defaultAvatar;
 }
 

@@ -3,21 +3,22 @@ import { useGame } from '../store/GameContext';
 import { getMoodEmoji, type BotMood } from '../services/tauntService';
 import { soundService } from '../services/soundService';
 import { interactionTracker } from '../services/interactionTracker';
+import { BotAvatar } from './BotAvatar';
 
 const MOOD_ANIMATIONS: Record<string, string> = {
-  rage: 'scale-110 animate-bounce',
-  clown: 'scale-110 animate-bounce',
-  panic: 'scale-110 animate-bounce',
-  party: 'scale-115 rotate-6 animate-pulse',
-  laugh: 'scale-115 rotate-6 animate-pulse',
-  sleepy: 'scale-95 opacity-90',
-  bored: 'scale-95 opacity-90',
-  lightning: 'scale-115 rotate-3 animate-bounce',
-  chill: 'scale-105 rotate-1',
-  cool: 'scale-110 rotate-2 shadow-amber-500/50',
-  evil: 'scale-110 rotate-2 shadow-amber-500/50',
-  smug: 'scale-110 rotate-2 shadow-amber-500/50',
-  disdain: 'scale-110 rotate-2 shadow-amber-500/50',
+  rage: 'shadow-rose-500/40 border-rose-500/50',
+  clown: 'shadow-red-500/40 border-red-500/50',
+  panic: 'shadow-cyan-500/40 border-cyan-500/50',
+  party: 'shadow-pink-500/40 border-pink-500/50',
+  laugh: 'shadow-amber-500/40 border-amber-500/50',
+  sleepy: 'opacity-90',
+  bored: 'opacity-90',
+  lightning: 'shadow-amber-400/40 border-amber-400/50',
+  chill: 'shadow-emerald-500/30 border-emerald-500/40',
+  cool: 'shadow-amber-500/40 border-amber-500/50',
+  evil: 'shadow-purple-500/50 border-purple-500/50',
+  smug: 'shadow-amber-500/40 border-amber-500/50',
+  disdain: 'shadow-slate-500/40 border-slate-500/50',
 };
 
 const BUBBLE_THEMES: Record<string, { box: string; arrow: string }> = {
@@ -141,32 +142,30 @@ export const BotCharacter: Component = () => {
     }
   };
 
-  // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại
-  const moodEmoji = () => {
-    if (!store.enableTaunts()) return '🤐';
+  // Biểu cảm tên sinh động theo tâm trạng cà khịa hiện tại (Name-first)
+  const currentMoodName = () => {
+    if (!store.enableTaunts()) return 'muted';
     if (!taunt().visible) {
       const s = streak();
       const lastRes = store.lastGameResult();
-      if (s >= 5) return '😱';
-      if (s >= 3) return '😤';
-      if (s >= 2) return '😒';
-      if (lastRes === 'loss') return '😏';
-      return config().avatar;
+      if (s >= 5) return 'panic';
+      if (s >= 3) return 'angry';
+      if (s >= 2) return 'disdain';
+      if (lastRes === 'loss') return 'smug';
+      return config().avatar || 'eye_roll';
     }
-    return getMoodEmoji(taunt().mood, config().avatar);
+    return taunt().mood || 'eye_roll';
   };
 
-  // Hiệu ứng chuyển động Avatar theo tâm trạng
+  // Hiệu ứng ánh sáng viền Avatar theo tâm trạng (không rung giật / nảy)
   const moodAnimation = () => {
     if (!store.enableTaunts()) {
-      return taunt().visible ? 'scale-105 animate-bubble-shake' : 'group-hover:scale-105 opacity-80';
+      return taunt().visible ? 'border-rose-500/70 shadow-rose-950/40' : 'opacity-80';
     }
     if (!taunt().visible) {
-      const s = streak();
-      if (s >= 3) return 'scale-105 animate-pulse';
-      return 'group-hover:scale-105';
+      return '';
     }
-    return MOOD_ANIMATIONS[taunt().mood] || 'scale-110 rotate-3';
+    return MOOD_ANIMATIONS[taunt().mood] || '';
   };
 
   // Phong cách & Màu sắc Bong bóng thoại thích ứng theo Mood
@@ -205,7 +204,7 @@ export const BotCharacter: Component = () => {
             config().badgeBg
           } ${moodAnimation()}`}
         >
-          <span>{moodEmoji()}</span>
+          <BotAvatar name={currentMoodName()} />
         </div>
 
         {/* Chấm trạng thái nhỏ xinh */}

@@ -109,6 +109,7 @@ export function createTauntSlice(deps: TauntSliceDeps) {
     if (tauntQueue.length === 0) {
       isProcessingTauntQueue = false;
       setTauntState(prev => ({ ...prev, visible: false }));
+      resetIdleTimer();
       return;
     }
 
@@ -223,6 +224,17 @@ export function createTauntSlice(deps: TauntSliceDeps) {
   function resetIdleTimer() {
     clearIdleTimer();
     const stage = deps.matchStage();
+
+    if (stage === 'ready') {
+      if (deps.gameMode() === 'menu') return;
+      const idlePreGameThreshold = Math.floor(Math.random() * 3000) + 9000; // 9s - 12s
+      idleThinkingTimer = window.setTimeout(() => {
+        if (deps.matchStage() === 'ready' && deps.gameMode() !== 'menu') {
+          triggerTaunt('IDLE_PRE_GAME', 0);
+        }
+      }, idlePreGameThreshold);
+      return;
+    }
 
     if (stage === 'playing') {
       if (deps.currentTurn() !== deps.playerColor()) return;

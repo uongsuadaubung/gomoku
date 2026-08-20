@@ -218,7 +218,7 @@ export function createGameStore() {
     setGameStatus('idle');
     setMatchStage('ready');
     taunt.clearTauntQueue();
-    taunt.clearIdleTimer();
+    taunt.resetIdleTimer();
     soundService.playClickSound();
   }
 
@@ -335,6 +335,7 @@ export function createGameStore() {
     setGameStatus('idle');
     setMatchStage('ready');
     taunt.clearTauntQueue();
+    taunt.clearIdleTimer();
     soundService.playClickSound();
   }
 
@@ -405,6 +406,7 @@ export function createGameStore() {
     setAiStats(null);
     setIsAiThinking(false);
     taunt.clearTauntQueue();
+    taunt.resetIdleTimer();
     soundService.playClickSound();
   }
 
@@ -413,6 +415,7 @@ export function createGameStore() {
       resetSeries();
     }
     setPlayerColor(isBlack ? BLACK : WHITE);
+    taunt.resetIdleTimer();
   }
 
   // 6. Nước Đi & AI Dispatch

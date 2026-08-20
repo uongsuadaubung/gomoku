@@ -1,5 +1,6 @@
 import { type Component } from 'solid-js';
 import type { LevelConfig } from '../game/types';
+import { BotAvatar } from './BotAvatar';
 
 interface BotPreviewCardProps {
   bot: LevelConfig;
@@ -16,9 +17,7 @@ export const BotPreviewCard: Component<BotPreviewCardProps> = (props) => {
 
   return (
     <div class="p-3 rounded-2xl bg-slate-950/80 border border-slate-800/90 flex items-start gap-3 text-xs shadow-inner">
-      <span class="text-2xl shrink-0 mt-0.5 select-none">
-        {props.bot.avatar}
-      </span>
+      <BotAvatar name={props.bot.avatar} class="text-2xl shrink-0 mt-0.5 select-none" />
       <div class="space-y-1 flex-1 min-w-0">
         <div class="flex items-center gap-1.5 flex-wrap">
           <span class={`font-extrabold ${nameColor()}`}>

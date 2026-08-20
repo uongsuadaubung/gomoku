@@ -2,6 +2,7 @@ import { type Component } from 'solid-js';
 import { Zap, Flame, Clock, Trophy } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { AI_LEVELS } from '../../game/constants';
+import { BotAvatar } from '../BotAvatar';
 
 export const BlitzStatsTab: Component = () => {
   const store = useGame();
@@ -38,8 +39,10 @@ export const BlitzStatsTab: Component = () => {
             <span class="text-2xl sm:text-3xl font-black text-rose-400 font-mono">
               Cấp {highestLevelId()}
             </span>
-            <span class="text-xs text-slate-300 font-bold">
-              ({highestBot().vietnameseName} {highestBot().avatar})
+            <span class="text-xs text-slate-300 font-bold flex items-center gap-1">
+              <span>({highestBot().vietnameseName}</span>
+              <BotAvatar name={highestBot().avatar} />
+              <span>)</span>
             </span>
           </div>
           <div class="text-[11px] text-slate-400 mt-1">

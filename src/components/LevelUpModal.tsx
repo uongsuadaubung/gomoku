@@ -2,6 +2,7 @@ import { type Component, Show } from 'solid-js';
 import { Sparkles, ArrowRight } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { BLACK } from '../game/types';
+import { BotAvatar } from './BotAvatar';
 
 export const LevelUpModal: Component = () => {
   const store = useGame();
@@ -17,7 +18,7 @@ export const LevelUpModal: Component = () => {
 
           {/* Level Avatar Banner */}
           <div class="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-amber-500/20 border-2 border-amber-500/40 text-4xl mb-4 shadow-inner">
-            <span>{level()?.avatar}</span>
+            <BotAvatar name={level()?.avatar} />
             <div class="absolute -top-2 -right-2 p-1.5 rounded-full bg-amber-500 text-slate-950 font-bold shadow-md">
               <Sparkles size={16} />
             </div>

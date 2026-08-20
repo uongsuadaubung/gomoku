@@ -1,0 +1,521 @@
+/**
+ * ============================================================================
+ * BOT AVATAR ANIMATION SUITE (EXPRESSIVE VECTOR FACES & MICRO-ANIMATIONS)
+ * ============================================================================
+ * Bộ hoạt ảnh chuyển động sống động cho 100% biểu cảm Bot Gomoku:
+ * Mỗi biểu cảm đều sở hữu micro-animation độc quyền liên tục!
+ */
+
+/* ============================================================================
+ * 1. Hoạt ảnh con ngươi đảo mắt tứ phía 360° (Mặc định eye_roll 🙄)
+ * ============================================================================ */
+@keyframes pupilRollAllDirections {
+  0%, 12% {
+    transform: translate(2.5px, -3.2px);
+  }
+  20%, 28% {
+    transform: translate(0px, -3.6px);
+  }
+  36%, 46% {
+    transform: translate(-2.6px, -3.2px);
+  }
+  54%, 62% {
+    transform: translate(-2.6px, 1.2px);
+  }
+  70%, 78% {
+    transform: translate(0px, 2.4px);
+  }
+  84% {
+    transform: translate(2.5px, 1.2px);
+  }
+  90% {
+    transform: translate(2.8px, -1.0px);
+  }
+  95%, 100% {
+    transform: translate(2.5px, -3.2px);
+  }
+}
+
+.animate-pupil-roll {
+  animation: pupilRollAllDirections 6.5s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+/* Nhịp thở nhún nhẹ của khuôn mặt (Idle Breathing) */
+@keyframes botFaceIdle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.2px);
+  }
+}
+
+.animate-bot-face-idle {
+  animation: botFaceIdle 3.2s ease-in-out infinite;
+}
+
+/* ============================================================================
+ * 2. Micro-Animations chuyên biệt cho từng Biểu Cảm (15 Moods)
+ * ============================================================================ */
+
+/* 🤡 CHÚ HỀ (Clown): Mũi đỏ bóp bíp nhịp nhàng + Tóc xoăn bồng bềnh */
+@keyframes clownNoseHonk {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.22) rotate(4deg);
+  }
+  50% {
+    transform: scale(0.92) rotate(-3deg);
+  }
+  70% {
+    transform: scale(1.1) rotate(2deg);
+  }
+}
+
+.animate-clown-nose {
+  transform-origin: 24px 24px;
+  animation: clownNoseHonk 1.8s ease-in-out infinite;
+}
+
+@keyframes clownHairWobble {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(3.5deg) scale(1.05);
+  }
+}
+
+.animate-clown-hair-left {
+  transform-origin: 5.5px 22px;
+  animation: clownHairWobble 2.2s ease-in-out infinite;
+}
+
+.animate-clown-hair-right {
+  transform-origin: 43px 22px;
+  animation: clownHairWobble 2.2s ease-in-out 0.4s infinite reverse;
+}
+
+/* 😤 TỨC GIẬN (Angry): Mặt rung giần giật cay cú + 2 luồng khói cuồn cuộn */
+@keyframes angryTremble {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-0.7px, 0.5px) rotate(-0.8deg);
+  }
+  40% {
+    transform: translate(0.7px, -0.5px) rotate(0.8deg);
+  }
+  60% {
+    transform: translate(-0.5px, -0.3px) rotate(-0.5deg);
+  }
+  80% {
+    transform: translate(0.5px, 0.3px) rotate(0.5deg);
+  }
+}
+
+.animate-angry-tremble {
+  transform-origin: 24px 24px;
+  animation: angryTremble 0.22s ease-in-out infinite;
+}
+
+@keyframes steamBlastLeft {
+  0% {
+    opacity: 0.2;
+    transform: translate(2px, 0px) scale(0.5);
+  }
+  40% {
+    opacity: 0.95;
+    transform: translate(-3px, 1.5px) scale(1.2);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translate(-5px, 2.5px) scale(1.3);
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(2px, 0px) scale(0.5);
+  }
+}
+
+@keyframes steamBlastRight {
+  0% {
+    opacity: 0.2;
+    transform: translate(-2px, 0px) scale(0.5);
+  }
+  40% {
+    opacity: 0.95;
+    transform: translate(3px, 1.5px) scale(1.2);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translate(5px, 2.5px) scale(1.3);
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(-2px, 0px) scale(0.5);
+  }
+}
+
+.animate-steam-left {
+  transform-origin: 21px 28px;
+  animation: steamBlastLeft 1.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.animate-steam-right {
+  transform-origin: 27px 28px;
+  animation: steamBlastRight 1.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* 😱 HOẢNG HỐT (Panic): Bàn tay ôm má run rẩy + Giọt mồ hôi chảy ròng */
+@keyframes panicHandsTremble {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(-0.8px, 0.6px) rotate(-1deg);
+  }
+  40% {
+    transform: translate(0.8px, -0.6px) rotate(1deg);
+  }
+  60% {
+    transform: translate(-0.6px, -0.4px) rotate(-0.5deg);
+  }
+  80% {
+    transform: translate(0.6px, 0.4px) rotate(0.5deg);
+  }
+}
+
+.animate-panic-jitter {
+  animation: panicHandsTremble 0.28s ease-in-out infinite;
+}
+
+@keyframes sweatDropSlide {
+  0% {
+    opacity: 0;
+    transform: translate(0, -3px) scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  80% {
+    opacity: 0.9;
+    transform: translate(0, 6px) scale(1.1, 0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 8px) scale(0.6);
+  }
+}
+
+.animate-sweat-drop {
+  animation: sweatDropSlide 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 🤔 CHỐNG CẰM SUY TÍNH (Thinking): Ngón tay gõ nhịp nhẹ lên má */
+@keyframes thinkingFingerTap {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  30% {
+    transform: translate(0, -1.8px) rotate(-2deg);
+  }
+  60% {
+    transform: translate(0, 0.4px) rotate(1deg);
+  }
+}
+
+.animate-thinking-hand {
+  transform-origin: 16px 36px;
+  animation: thinkingFingerTap 1.3s ease-in-out infinite;
+}
+
+/* 😎 KÍNH RÂM (Cool): Gật đầu tự tin + Vệt sáng lướt qua tròng kính */
+@keyframes coolHeadNod {
+  0%, 65%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-1.5px) rotate(-2deg);
+  }
+  85% {
+    transform: translateY(0.6px) rotate(1deg);
+  }
+}
+
+.animate-cool-nod {
+  transform-origin: 24px 32px;
+  animation: coolHeadNod 2.6s ease-in-out infinite;
+}
+
+@keyframes sunglassesGlintSweep {
+  0%, 55% {
+    opacity: 0.1;
+    transform: translateX(-6px) skewX(-20deg);
+  }
+  70%, 85% {
+    opacity: 0.95;
+    transform: translateX(6px) skewX(-20deg);
+  }
+  100% {
+    opacity: 0.1;
+    transform: translateX(6px) skewX(-20deg);
+  }
+}
+
+.animate-sunglasses-glint {
+  animation: sunglassesGlintSweep 2.2s ease-in-out infinite;
+}
+
+/* 🤣 CƯỜI NGẢ NGHIÊNG (Laugh): Nghiêng ngả sang 2 bên chuẩn ROFL 🤣 */
+@keyframes laughRocking {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-14deg) translateY(-1.2px);
+  }
+  50% {
+    transform: rotate(0deg) translateY(0.4px);
+  }
+  75% {
+    transform: rotate(14deg) translateY(-1.2px);
+  }
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+}
+
+.animate-laugh-rocking {
+  transform-origin: 24px 24px;
+  animation: laughRocking 0.95s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes laughChuckle {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-0.8px) scale(1.05, 0.95);
+  }
+  70% {
+    transform: translateY(0.5px) scale(0.96, 1.04);
+  }
+}
+
+.animate-laugh-mouth {
+  transform-origin: 24px 34px;
+  animation: laughChuckle 0.45s ease-in-out infinite;
+}
+
+@keyframes tearDrip {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(1.5px) scale(1.15, 0.9);
+    opacity: 1;
+  }
+}
+
+.animate-tear-jiggle {
+  animation: tearDrip 0.9s ease-in-out infinite;
+}
+
+/* 😴 BUỒN NGỦ (Sleepy): Gật gù ngã đầu & giật mình tỉnh dậy + Chữ Zzz bay */
+@keyframes sleepyNodWake {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  35% {
+    transform: translateY(2.2px) rotate(4.5deg);
+  }
+  70% {
+    transform: translateY(3.0px) rotate(6deg);
+  }
+  78% {
+    transform: translateY(-1.2px) rotate(-1.5deg);
+  }
+  85% {
+    transform: translateY(0.4px) rotate(0.5deg);
+  }
+}
+
+.animate-sleepy-nod {
+  transform-origin: 24px 38px;
+  animation: sleepyNodWake 4.2s ease-in-out infinite;
+}
+
+@keyframes floatZzz1 {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(5px, -9px) scale(1.2);
+  }
+}
+
+@keyframes floatZzz2 {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, -11px) scale(1.1);
+  }
+}
+
+.animate-float-zzz-1 {
+  animation: floatZzz1 2.0s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.animate-float-zzz-2 {
+  animation: floatZzz2 2.0s cubic-bezier(0.25, 1, 0.5, 1) 0.7s infinite;
+}
+
+/* 🧐 THÁM TỬ KÍNH ĐƠN (Detective): Vệt sáng quét qua kính Monocle */
+@keyframes monocleShine {
+  0%, 60% {
+    opacity: 0.2;
+    transform: scale(0.95);
+  }
+  75%, 90% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(0.95);
+  }
+}
+
+.animate-monocle-gleam {
+  transform-origin: 31.5px 19px;
+  animation: monocleShine 2.2s ease-in-out infinite;
+}
+
+/* 😈 ÁC QUỶ TÍM (Evil): Sừng quỷ rung rinh tỏa sát khí */
+@keyframes evilHornsPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(1.5deg);
+  }
+}
+
+.animate-evil-horns {
+  transform-origin: 24px 10px;
+  animation: evilHornsPulse 1.8s ease-in-out infinite;
+}
+
+/* 🥳 TIỆC TÙNG (Party): Kèn giấy thổi phồng co giãn liên tục */
+@keyframes partyHornBlow {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  40% {
+    transform: rotate(4deg) scale(1.12, 0.95);
+  }
+  70% {
+    transform: rotate(-2deg) scale(0.96, 1.04);
+  }
+}
+
+.animate-party-horn {
+  transform-origin: 28px 32px;
+  animation: partyHornBlow 1.1s ease-in-out infinite;
+}
+
+/* 🤐 KHÓA KÉO (Muted): Con trượt khóa kéo kim loại đung đưa nhẹ */
+@keyframes zipperPullWiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.animate-zipper-pull {
+  transform-origin: 24px 31px;
+  animation: zipperPullWiggle 2.0s ease-in-out infinite;
+}
+
+/* ☕ THƯ THÁI CÀ PHÊ (Chill): Làn khói bốc lên từ tách cà phê ấm */
+@keyframes coffeeVaporRise {
+  0% {
+    opacity: 0.3;
+    transform: translateY(0) scaleX(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-2px) scaleX(1.1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-4px) scaleX(0.9);
+  }
+}
+
+.animate-coffee-vapor {
+  animation: coffeeVaporRise 1.6s ease-in-out infinite;
+}
+
+/* 😏 CƯỜI KHẨY (Smug): Khóe má nhếch nhịp nhàng */
+@keyframes smugCreasePulse {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.12) translateY(-0.5px);
+  }
+}
+
+.animate-smug-crease {
+  transform-origin: 33px 28px;
+  animation: smugCreasePulse 1.8s ease-in-out infinite;
+}
+
+/* ============================================================================
+ * 3. Chuyển đổi biểu cảm & Cử động xương mặt (Facial Rigging & Morphing)
+ * ============================================================================ */
+.avatar-brow-left,
+.avatar-brow-right {
+  transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.avatar-eye-group {
+  transition: transform 0.12s ease-out;
+}
+
+.avatar-pupil-group {
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.avatar-mouth-path {
+  transition: stroke 0.3s ease, fill 0.3s ease;
+}
+
+.avatar-accessory {
+  transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: 24px 24px;
+}
+
+.avatar-base-head {
+  transition: fill 0.35s ease-in-out;
+}
