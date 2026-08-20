@@ -162,11 +162,11 @@ export const BotCharacter: Component = () => {
   };
 
   return (
-    <div class="w-full max-w-[min(96vw,560px)] md:max-w-[600px] flex items-center justify-start relative select-none h-[54px] sm:h-[60px]">
-      {/* 🤖 ICON BOT TƯƠNG TÁC (Lệch trái, hỗ trợ chế độ Bịt miệng 🤐) */}
+    <div class="w-full max-w-[min(96vw,560px)] md:max-w-[600px] flex items-center justify-start relative select-none h-[54px] sm:h-[60px] z-40">
+      {/* 🤖 ICON BOT TƯƠNG TÁC (Lệch trái, hỗ trợ chế độ Bịt miệng 🤐, nổi đè lên Header) */}
       <button
         onClick={handlePoke}
-        class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-lg transition-all duration-300 active:scale-90 cursor-pointer select-none shrink-0 z-10 ${
+        class={`group relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 backdrop-blur border border-slate-800 hover:border-amber-500/50 shadow-xl transition-all duration-300 active:scale-90 cursor-pointer select-none shrink-0 z-40 ${
           taunt().visible ? 'ring-2 ring-amber-400 shadow-amber-500/30' : ''
         }`}
         title={store.enableTaunts() ? 'Chọc đối thủ để nghe cà khịa' : 'Bot đang bị bịt miệng (Cà khịa đang TẮT)'}
@@ -192,9 +192,9 @@ export const BotCharacter: Component = () => {
         </div>
       </button>
 
-      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA NỔI (Floating Absolute Overlay - không bao giờ đẩy bàn cờ) */}
+      {/* 💬 BONG BÓNG LỜI THOẠI CÀ KHỊA NỔI (Floating Absolute Overlay - z-40 nổi đè lên trên Header) */}
       <Show when={taunt().visible && (displayedText() || taunt().text)}>
-        <div class="absolute left-[62px] sm:left-[72px] top-1/2 -translate-y-1/2 max-w-[calc(100%-66px)] sm:max-w-[480px] z-30 pointer-events-auto animate-bubble-pop">
+        <div class="absolute left-[62px] sm:left-[72px] top-1/2 -translate-y-1/2 max-w-[calc(100%-66px)] sm:max-w-[480px] z-40 pointer-events-auto animate-bubble-pop">
           <div
             onCopy={() => store.triggerTaunt('COPY_TAUNT_TEXT', 100)}
             class={`relative px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl font-black text-xs sm:text-[13px] leading-relaxed shadow-2xl transition-all duration-200 cursor-text select-text ${

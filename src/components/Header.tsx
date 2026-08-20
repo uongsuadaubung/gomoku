@@ -1,4 +1,4 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show, createSignal, onMount, onCleanup } from 'solid-js';
 import {
   Volume2,
   VolumeX,
@@ -15,9 +15,43 @@ import { useGame } from '../store/GameContext';
 
 export const Header: Component = () => {
   const store = useGame();
+  const [isVisible, setIsVisible] = createSignal(true);
+
+  onMount(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          // Luôn hiện khi đang ở gần đỉnh trang
+          if (currentScrollY <= 15) {
+            setIsVisible(true);
+          } else if (currentScrollY > lastScrollY && currentScrollY > 40) {
+            // Cuộn xuống -> Header tự động tụt ẩn lên trên để nhường không gian cho bàn cờ
+            setIsVisible(false);
+          } else if (currentScrollY < lastScrollY) {
+            // Cuộn lên -> Hiện lại Header ngay
+            setIsVisible(true);
+          }
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    onCleanup(() => window.removeEventListener('scroll', handleScroll));
+  });
 
   return (
-    <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-2.5 sm:px-4 py-2 sm:py-2.5 sticky top-0 z-30 select-none">
+    <header
+      class={`w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-2.5 sm:px-4 py-2 sm:py-2.5 sticky top-0 z-30 select-none transition-transform duration-300 ease-out will-change-transform ${
+        isVisible() ? 'translate-y-0' : '-translate-y-full shadow-lg pointer-events-none'
+      }`}
+    >
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
         {/* Logo & Title */}
         <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
