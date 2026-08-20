@@ -40,6 +40,17 @@ const DEFAULT_STATS: UserStats = {
     totalGames: 0,
     byBotLevel: {},
   },
+  blitz: {
+    currentLevel: 1,
+    highestLevel: 1,
+    totalWins: 0,
+    totalLosses: 0,
+    timeoutLosses: 0,
+    bestStreak: 0,
+    currentStreak: 0,
+    totalGames: 0,
+    selectedTimeSeconds: 10,
+  },
   wins: 0,
   losses: 0,
   draws: 0,
@@ -71,6 +82,10 @@ export class StorageService {
             ...DEFAULT_STATS.custom,
             ...(parsed.custom || {}),
             byBotLevel: { ...(parsed.custom?.byBotLevel || {}) },
+          },
+          blitz: {
+            ...DEFAULT_STATS.blitz,
+            ...(parsed.blitz || {}),
           },
         };
       }
@@ -117,7 +132,7 @@ export class StorageService {
   public static recordGame(
     mode: GameMode = 'campaign',
     result: 'win' | 'loss' | 'draw',
-    extra?: { stars?: number; botLevel?: number }
+    extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats {
     const stats = this.getStats();
     const strategy = getGameStrategy(mode);

@@ -41,6 +41,7 @@ import { OPEN_FOUR_BLUNDER } from './openFourBlunder';
 import { OVERCONFIDENT_BLIND_ATTACK } from './overconfidentBlindAttack';
 import { OVERTHINKING_BLUNDER } from './overthinkingBlunder';
 import { PLAYER_RESIGN } from './playerResign';
+import { TIMEOUT_LOSS } from './timeoutLoss';
 import { PLAYER_STREAK_WIN } from './playerStreakWin';
 import { PLAYER_UNDO } from './playerUndo';
 import { PLAYER_WIN } from './playerWin';
@@ -168,6 +169,7 @@ export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
   OVERCONFIDENT_BLIND_ATTACK,
   OVERTHINKING_BLUNDER,
   PLAYER_RESIGN,
+  TIMEOUT_LOSS,
   PLAYER_STREAK_WIN,
   PLAYER_UNDO,
   PLAYER_WIN,

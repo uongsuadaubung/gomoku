@@ -10,8 +10,16 @@ import {
   Trophy,
   Puzzle,
   Swords,
+  Zap,
 } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
+
+const MODE_BADGES: Record<string, { Icon: typeof Trophy; label: (limit: number) => string; iconColor: string; textColor: string }> = {
+  campaign: { Icon: Trophy, label: () => 'Chiến Dịch', iconColor: 'text-indigo-400', textColor: 'text-indigo-300' },
+  blitz: { Icon: Zap, label: (l) => `Cờ Chớp (${l}s)`, iconColor: 'text-rose-400', textColor: 'text-rose-300' },
+  puzzle: { Icon: Puzzle, label: () => 'Thế Cờ', iconColor: 'text-emerald-400', textColor: 'text-emerald-300' },
+  custom: { Icon: Swords, label: () => 'Đấu Tập', iconColor: 'text-amber-400', textColor: 'text-amber-300' },
+};
 
 export const Header: Component = () => {
   const store = useGame();
@@ -102,21 +110,16 @@ export const Header: Component = () => {
         </div>
 
         {/* Current Mode Badge (Khi đang trong ván chơi) */}
-        <Show when={store.gameMode() !== 'menu'}>
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold shadow-inner">
-            <Show when={store.gameMode() === 'campaign'}>
-              <Trophy size={14} class="text-indigo-400" />
-              <span class="text-indigo-300">Chiến Dịch</span>
-            </Show>
-            <Show when={store.gameMode() === 'puzzle'}>
-              <Puzzle size={14} class="text-emerald-400" />
-              <span class="text-emerald-300">Thế Cờ</span>
-            </Show>
-            <Show when={store.gameMode() === 'custom'}>
-              <Swords size={14} class="text-amber-400" />
-              <span class="text-amber-300">Đấu Tập</span>
-            </Show>
-          </div>
+        <Show when={MODE_BADGES[store.gameMode()]}>
+          {badge => {
+            const Icon = badge().Icon;
+            return (
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold shadow-inner">
+                <Icon size={14} class={badge().iconColor} />
+                <span class={badge().textColor}>{badge().label(store.blitzTimeLimit())}</span>
+              </div>
+            );
+          }}
         </Show>
 
         {/* Action Buttons */}

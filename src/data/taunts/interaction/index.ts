@@ -1,6 +1,7 @@
 import type { TauntDefinition } from '../types';
 import { BREAK_LOSS_STREAK } from './breakLossStreak';
 import { CLICK_AFTER_GAME_OVER } from './clickAfterGameOver';
+import { CLICK_AFTER_WIN } from './clickAfterWin';
 import { CLICK_BEFORE_START } from './clickBeforeStart';
 import { CLICK_OWN_STONE } from './clickOwnStone';
 import { COPY_TAUNT_TEXT } from './copyTauntText';
@@ -28,6 +29,8 @@ import { RIGHT_CLICK_INSPECT } from './rightClickInspect';
 import { SCREENSHOT_ATTEMPT } from './screenshotAttempt';
 import { SPACEBAR_SMASH } from './spacebarSmash';
 import { SPAM_POKE_BOT } from './spamPokeBot';
+import { START_AFTER_LOSS } from './startAfterLoss';
+import { START_AFTER_WIN } from './startAfterWin';
 import { STREAK_LOSS } from './streakLoss';
 import { SWAP_SIDE_BOT_FIRST } from './swapSideBotFirst';
 import { SWAP_SIDE_PLAYER_FIRST } from './swapSidePlayerFirst';
@@ -37,6 +40,7 @@ import { WINDOW_RESIZE_PANIC } from './windowResizePanic';
 
 export * from './breakLossStreak';
 export * from './clickAfterGameOver';
+export * from './clickAfterWin';
 export * from './clickBeforeStart';
 export * from './clickOwnStone';
 export * from './copyTauntText';
@@ -45,6 +49,8 @@ export * from './devtoolsInspectHack';
 export * from './doubleClickStone';
 export * from './dragSelectPanic';
 export * from './gameStart';
+export * from './startAfterLoss';
+export * from './startAfterWin';
 export * from './hesitationDance';
 export * from './hoverUndoHesitation';
 export * from './immediateRevengeClick';
@@ -74,6 +80,7 @@ export * from './windowResizePanic';
 export const INTERACTION_TAUNTS: Record<string, TauntDefinition> = {
   BREAK_LOSS_STREAK,
   CLICK_AFTER_GAME_OVER,
+  CLICK_AFTER_WIN,
   CLICK_BEFORE_START,
   CLICK_OWN_STONE,
   COPY_TAUNT_TEXT,
@@ -101,6 +108,8 @@ export const INTERACTION_TAUNTS: Record<string, TauntDefinition> = {
   SCREENSHOT_ATTEMPT,
   SPACEBAR_SMASH,
   SPAM_POKE_BOT,
+  START_AFTER_LOSS,
+  START_AFTER_WIN,
   STREAK_LOSS,
   SWAP_SIDE_BOT_FIRST,
   SWAP_SIDE_PLAYER_FIRST,

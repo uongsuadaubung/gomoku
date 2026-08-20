@@ -125,10 +125,34 @@ export const BotCharacter: Component = () => {
     if (typingTimer) clearInterval(typingTimer);
   });
 
+  const streak = () => {
+    const s = store.stats();
+    switch (store.gameMode()) {
+      case 'campaign':
+        return s.campaign?.currentStreak ?? s.currentStreak;
+      case 'blitz':
+        return s.blitz?.currentStreak ?? 0;
+      case 'puzzle':
+        return s.puzzle?.currentStreak ?? 0;
+      case 'custom':
+        return s.custom?.currentStreak ?? 0;
+      default:
+        return 0;
+    }
+  };
+
   // Biểu cảm emoji sinh động theo tâm trạng cà khịa hiện tại
   const moodEmoji = () => {
     if (!store.enableTaunts()) return '🤐';
-    if (!taunt().visible) return config().avatar;
+    if (!taunt().visible) {
+      const s = streak();
+      const lastRes = store.lastGameResult();
+      if (s >= 5) return '😱';
+      if (s >= 3) return '😤';
+      if (s >= 2) return '😒';
+      if (lastRes === 'loss') return '😏';
+      return config().avatar;
+    }
     return getMoodEmoji(taunt().mood, config().avatar);
   };
 
@@ -137,7 +161,11 @@ export const BotCharacter: Component = () => {
     if (!store.enableTaunts()) {
       return taunt().visible ? 'scale-105 animate-bubble-shake' : 'group-hover:scale-105 opacity-80';
     }
-    if (!taunt().visible) return 'group-hover:scale-105';
+    if (!taunt().visible) {
+      const s = streak();
+      if (s >= 3) return 'scale-105 animate-pulse';
+      return 'group-hover:scale-105';
+    }
     return MOOD_ANIMATIONS[taunt().mood] || 'scale-110 rotate-3';
   };
 

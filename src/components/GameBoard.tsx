@@ -8,6 +8,52 @@ import { interactionTracker } from '../services/interactionTracker';
 const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
 const ROW_NUMBERS = Array.from({ length: 15 }, (_, i) => 15 - i); // 15 down to 1
 
+interface ThemeConfig {
+  board: string;
+  line: string;
+  cellBorder: string;
+  starPoint: string;
+  coordText: string;
+}
+
+const THEME_CONFIG: Record<string, ThemeConfig> = {
+  paper: {
+    board: 'board-paper border-stone-400/90 shadow-stone-900/40',
+    line: 'bg-slate-400/80',
+    cellBorder: 'border-slate-300 hover:bg-sky-500/10 active:bg-sky-500/20',
+    starPoint: 'bg-slate-900',
+    coordText: 'text-slate-800 font-extrabold',
+  },
+  jade: {
+    board: 'board-jade border-emerald-600/70 shadow-emerald-950/60',
+    line: 'bg-emerald-300/60',
+    cellBorder: 'border-emerald-500/25 hover:bg-emerald-500/10 active:bg-emerald-500/20',
+    starPoint: 'bg-emerald-300 shadow-[0_0_6px_#34d399]',
+    coordText: 'text-emerald-300/80 font-bold',
+  },
+  cyber: {
+    board: 'board-cyber border-cyan-500/60 shadow-cyan-950/80',
+    line: 'bg-cyan-400/40',
+    cellBorder: 'border-cyan-500/25 hover:bg-cyan-500/10 active:bg-cyan-500/20',
+    starPoint: 'bg-cyan-300 shadow-[0_0_6px_#38bdf8]',
+    coordText: 'text-cyan-400/70',
+  },
+  slate: {
+    board: 'board-slate border-slate-700/80 shadow-slate-950/70',
+    line: 'bg-slate-400/40',
+    cellBorder: 'border-slate-500/25 hover:bg-slate-500/10 active:bg-slate-500/20',
+    starPoint: 'bg-slate-200',
+    coordText: 'text-slate-400',
+  },
+  wood: {
+    board: 'board-wood border-amber-950/60 shadow-amber-950/70',
+    line: 'bg-amber-950/60',
+    cellBorder: 'border-amber-950/30 hover:bg-amber-950/10 active:bg-amber-950/20',
+    starPoint: 'bg-amber-950',
+    coordText: 'text-amber-950/70 font-bold',
+  },
+};
+
 export const GameBoard: Component = () => {
   const store = useGame();
   const [hoverPos, setHoverPos] = createSignal<{ row: number; col: number } | null>(null);
@@ -98,9 +144,12 @@ export const GameBoard: Component = () => {
 
   const handleCellClick = (r: number, c: number) => {
     clearHoverTimer();
-    // Khi game đã kết thúc (không quan tâm bên nào thắng), nếu người chơi cố ấn thêm vào bàn cờ -> cà khịa
+    // Khi game đã kết thúc, kiểm tra người chơi Thắng hay Thua để phát đúng thoại
     if (store.matchStage() === 'game_over') {
-      store.triggerTaunt('CLICK_AFTER_GAME_OVER', 0);
+      const status = store.gameStatus();
+      const player = store.playerColor();
+      const isWin = (status === 'black_win' && player === BLACK) || (status === 'white_win' && player === WHITE);
+      store.triggerTaunt(isWin ? 'CLICK_AFTER_WIN' : 'CLICK_AFTER_GAME_OVER', 0);
       return;
     }
 
@@ -125,53 +174,6 @@ export const GameBoard: Component = () => {
     }
 
     store.makePlayerMove(r, c);
-  };
-
-
-  interface ThemeConfig {
-    board: string;
-    line: string;
-    cellBorder: string;
-    starPoint: string;
-    coordText: string;
-  }
-
-  const THEME_CONFIG: Record<string, ThemeConfig> = {
-    paper: {
-      board: 'board-paper border-stone-400/90 shadow-stone-900/40',
-      line: 'bg-slate-400/80',
-      cellBorder: 'border-slate-300 hover:bg-sky-500/10 active:bg-sky-500/20',
-      starPoint: 'bg-slate-900',
-      coordText: 'text-slate-800 font-extrabold',
-    },
-    jade: {
-      board: 'board-jade border-emerald-600/70 shadow-emerald-950/60',
-      line: 'bg-emerald-300/60',
-      cellBorder: 'border-emerald-500/25 hover:bg-emerald-500/10 active:bg-emerald-500/20',
-      starPoint: 'bg-emerald-300 shadow-[0_0_6px_#34d399]',
-      coordText: 'text-emerald-300/80 font-bold',
-    },
-    cyber: {
-      board: 'board-cyber border-cyan-500/60 shadow-cyan-950/80',
-      line: 'bg-cyan-400/40',
-      cellBorder: 'border-cyan-500/25 hover:bg-cyan-500/10 active:bg-cyan-500/20',
-      starPoint: 'bg-cyan-300 shadow-[0_0_6px_#38bdf8]',
-      coordText: 'text-cyan-400/70',
-    },
-    slate: {
-      board: 'board-slate border-slate-700/80 shadow-slate-950/70',
-      line: 'bg-slate-400/40',
-      cellBorder: 'border-slate-500/25 hover:bg-slate-500/10 active:bg-slate-500/20',
-      starPoint: 'bg-slate-200',
-      coordText: 'text-slate-400',
-    },
-    wood: {
-      board: 'board-wood border-amber-950/60 shadow-amber-950/70',
-      line: 'bg-amber-950/60',
-      cellBorder: 'border-amber-950/30 hover:bg-amber-950/10 active:bg-amber-950/20',
-      starPoint: 'bg-amber-950',
-      coordText: 'text-amber-950/70 font-bold',
-    },
   };
 
   const currentThemeConfig = () => THEME_CONFIG[store.theme()] || THEME_CONFIG.wood;
@@ -330,9 +332,10 @@ export const GameBoard: Component = () => {
                               <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500 shadow-sm animate-pulse" />
                             </Show>
 
-                            {/* Vòng phát sáng cho 5 quân chiến thắng */}
+                            {/* Vòng phát sáng Neon cho 5 quân chiến thắng */}
                             <Show when={winCell()}>
                               <div class="absolute inset-0 rounded-full border-2 border-emerald-400 animate-ping opacity-75 pointer-events-none" />
+                              <div class="absolute -inset-1 rounded-full border-2 border-amber-300 shadow-lg shadow-amber-400/70 animate-pulse pointer-events-none z-10" />
                             </Show>
                           </div>
                         </Show>

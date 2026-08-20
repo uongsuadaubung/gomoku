@@ -122,7 +122,7 @@ export const BotModal: Component = () => {
                     const isMatchCurrent = () => {
                       if (!unlocked || store.gameMode() === 'puzzle' || store.gameMode() === 'menu') return false;
                       if (store.gameMode() === 'campaign') return campaignConfig().id === level.id;
-                      if (store.gameMode() === 'custom') return store.customConfig().botLevel === level.id;
+                      if (store.gameMode() === 'custom') return store.customConfig()?.botLevel === level.id;
                       return false;
                     };
 

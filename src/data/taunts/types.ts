@@ -21,6 +21,7 @@ export type TauntEvent =
   | 'CLEAN_SWEEP_DOMINATION'
   | 'IRON_CURTAIN_WIN'
   | 'PLAYER_RESIGN'
+  | 'TIMEOUT_LOSS'
   | 'PLAYER_UNDO'
   | 'BLUNDER_MOVE'
   | 'BOT_TRAP'
@@ -63,18 +64,20 @@ export type TauntEvent =
   | 'UNLUCKY_THIRTEEN_MOVES'
   | 'SPEED_REVENGE_FAIL'
 
-  // 2. Idle (6 sự kiện)
+  // 2. Idle (7 sự kiện)
   | 'STARE_AT_WIN_LINE'
   | 'IDLE_THINKING'
   | 'IDLE_IN_GAME'
   | 'IDLE_PRE_GAME'
   | 'IDLE_AFTER_LOSS'
+  | 'IDLE_AFTER_WIN'
   | 'SUPER_SLOW_MOVE'
 
-  // 3. Interaction (35 sự kiện)
+  // 3. Interaction (38 sự kiện)
   | 'HOVER_UNDO_HESITATION'
   | 'RESIGN_WHILE_AI_THINKING'
   | 'CLICK_OWN_STONE'
+  | 'CLICK_AFTER_WIN'
   | 'MOUSE_LEAVE_VIEWPORT'
   | 'IMMEDIATE_REVENGE_CLICK'
   | 'UNDO_BEFORE_AI_MOVES'
@@ -83,6 +86,8 @@ export type TauntEvent =
   | 'WINDOW_RESIZE_PANIC'
   | 'DRAG_SELECT_PANIC'
   | 'GAME_START'
+  | 'START_AFTER_WIN'
+  | 'START_AFTER_LOSS'
   | 'PLAYER_GOOD_MOVE'
   | 'HESITATION_DANCE'
   | 'RAGE_DOWNGRADE_AFTER_LOSS'

@@ -19,6 +19,6 @@ export interface GameModeStrategy {
   recordGame(
     stats: UserStats,
     result: 'win' | 'loss' | 'draw',
-    extra?: { stars?: number; botLevel?: number }
+    extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats;
 }

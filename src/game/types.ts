@@ -20,7 +20,7 @@ export type MatchStage = 'ready' | 'playing' | 'game_over';
 
 export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw';
 
-export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom';
+export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz';
 
 export interface WinInfo {
   winner: ActivePlayer;
@@ -93,6 +93,18 @@ export interface CustomStats extends ModeStats {
   byBotLevel: Record<number, { wins: number; losses: number; draws: number }>;
 }
 
+export interface BlitzStats {
+  currentLevel: number;        // Cấp Bot hiện tại trong chuỗi đang chạy (1 - 12)
+  highestLevel: number;        // Kỷ lục cấp cao nhất từng vượt qua (1 - 12)
+  totalWins: number;
+  totalLosses: number;
+  timeoutLosses: number;       // Số lần thua do cháy giờ
+  bestStreak: number;
+  currentStreak: number;
+  totalGames: number;
+  selectedTimeSeconds: 5 | 10 | 15;
+}
+
 export interface UserStats {
   // 🏆 1. Chiến dịch (Campaign)
   campaign: ModeStats;
@@ -100,6 +112,8 @@ export interface UserStats {
   puzzle: PuzzleStats;
   // ⚔️ 3. Đấu tùy chọn (Custom)
   custom: CustomStats;
+  // ⚡ 4. Cờ chớp sinh tử (Blitz)
+  blitz: BlitzStats;
 
   // Dữ liệu tương thích cấp cao
   wins: number;

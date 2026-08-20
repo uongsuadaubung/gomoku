@@ -120,6 +120,63 @@ class SoundService {
   }
 
   /**
+   * Âm thanh chiến thắng liên hoàn (Streak Triumph Fanfare)
+   */
+  public playStreakWinSound(): void {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    // Chùm hợp âm vinh quang (Major Chord Sequence + Shimmer)
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C5, E5, G5, C6, E6
+    notes.forEach((freq, index) => {
+      const now = ctx.currentTime + index * 0.09;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.45);
+    });
+  }
+
+  /**
+   * Âm thanh còi báo tử khi cháy giờ cờ chớp (Timeout Alarm)
+   */
+  public playTimeoutAlarmSound(): void {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    [0, 0.14, 0.28].forEach(offset => {
+      const now = ctx.currentTime + offset;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.1);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.11);
+    });
+  }
+
+  /**
    * Âm thanh thăng cấp Level AI
    */
   public playLevelUpSound(): void {
@@ -150,6 +207,33 @@ class SoundService {
         osc.start(now);
         osc.stop(now + 0.4);
       });
+    });
+  }
+
+  /**
+   * Âm thanh bắt đầu ván cờ mới (Game Start Fanfare)
+   */
+  public playGameStartSound(): void {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    const notes = [330, 440, 550, 660]; // E4, A4, C#5, E5
+    notes.forEach((freq, idx) => {
+      const now = ctx.currentTime + idx * 0.07;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.18);
     });
   }
 

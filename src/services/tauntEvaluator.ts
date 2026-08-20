@@ -60,6 +60,7 @@ export interface IdleContext {
   isPlaying: boolean;
   isAiThinking: boolean;
   isPlayerLastGameLost: boolean;
+  isPlayerLastGameWon?: boolean;
   hasTriggeredStareAtWinLine: boolean;
 }
 
@@ -306,22 +307,16 @@ const PLAYER_WIN_RULES: Rule<PlayerWinContext>[] = [
     taunt: 'WIN_RIGHT_AFTER_UNDO',
   },
   {
-    id: 'speed_win_quick',
+    id: 'clean_sweep_domination',
     priority: 90,
-    match: ctx => ctx.moveCount <= 10,
-    taunt: 'SPEED_WIN_QUICK',
+    match: ctx => !ctx.botEverHadOpenThreat && ctx.moveCount >= 8,
+    taunt: 'CLEAN_SWEEP_DOMINATION',
   },
   {
     id: 'iron_curtain_win',
     priority: 80,
     match: ctx => ctx.moveCount >= 50,
     taunt: 'IRON_CURTAIN_WIN',
-  },
-  {
-    id: 'clean_sweep_domination',
-    priority: 70,
-    match: ctx => !ctx.botEverHadOpenThreat && ctx.moveCount >= 10,
-    taunt: 'CLEAN_SWEEP_DOMINATION',
   },
   {
     id: 'comeback_win',
@@ -493,6 +488,10 @@ export class TauntEvaluator {
     }
 
     // Ngoài trận đấu (idle, sau khi thắng/thua)
+    if (ctx.isPlayerLastGameWon) {
+      return { event: 'IDLE_AFTER_WIN' };
+    }
+
     if (ctx.isPlayerLastGameLost) {
       if (!ctx.hasTriggeredStareAtWinLine) {
         return { event: 'STARE_AT_WIN_LINE', consumeStareAtWinLine: true };
@@ -501,5 +500,14 @@ export class TauntEvaluator {
     }
 
     return { event: 'IDLE_PRE_GAME' };
+  }
+
+  /**
+   * Đánh giá kịch bản mở màn ván đấu (dựa trên kết quả ván trước đó)
+   */
+  static evaluateGameStart(lastGameResult: 'win' | 'loss' | 'draw' | null): TauntEvent {
+    if (lastGameResult === 'win') return 'START_AFTER_WIN';
+    if (lastGameResult === 'loss') return 'START_AFTER_LOSS';
+    return 'GAME_START';
   }
 }

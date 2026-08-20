@@ -1,5 +1,5 @@
-import { Component, Show, createSignal, createEffect } from 'solid-js';
-import { Trophy, Bot, Equal, X, Play, Eye } from 'lucide-solid';
+import { Component, Show, createSignal, createEffect, createMemo } from 'solid-js';
+import { Trophy, Bot, Equal, X, Play, RotateCcw } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { BLACK, WHITE } from '../game/types';
 
@@ -7,15 +7,13 @@ export const GameOverBanner: Component = () => {
   const store = useGame();
   const [dismissed, setDismissed] = createSignal(false);
 
-  // Reset trạng thái dismissed khi ván cờ mới bắt đầu
   createEffect(() => {
     if (store.matchStage() === 'playing') {
       setDismissed(false);
     }
   });
 
-  const isGameOver = () =>
-    store.matchStage() === 'game_over' && !dismissed();
+  const isGameOver = () => store.matchStage() === 'game_over' && !dismissed();
 
   const isPlayerWinner = () => {
     const status = store.gameStatus();
@@ -25,15 +23,68 @@ export const GameOverBanner: Component = () => {
 
   const isDraw = () => store.gameStatus() === 'draw';
 
-  const handleNextGame = () => {
-    setDismissed(false);
-    store.startNextGame();
-  };
+  // Tiêu đề kết quả trận đấu
+  const titleInfo = createMemo<{ text: string; color: string }>(() => {
+    const mode = store.gameMode();
+    const won = isPlayerWinner();
+    const draw = isDraw();
+
+    if (mode === 'blitz') {
+      if (won) return { text: 'Vượt Cấp Cờ Chớp! ⚡🎉', color: 'text-rose-400' };
+      if (store.isBlitzTimeout()) return { text: 'Cháy Giờ (Timeout)! ⏱️💥', color: 'text-rose-400' };
+      return { text: 'Thất Bại Cờ Chớp! 💥', color: 'text-rose-400' };
+    }
+
+    if (mode === 'puzzle') {
+      if (won) return { text: 'Giải Thế Cờ Thành Công! 🎉', color: 'text-emerald-400' };
+      return { text: 'Chưa Giải Được Thế Cờ! 💥', color: 'text-rose-400' };
+    }
+
+    if (won) return { text: 'Xuất Sắc! Bạn Đã Thắng! 🎉', color: 'text-emerald-400' };
+    if (draw) return { text: 'Trận Đấu Hòa Cờ! 🤝', color: 'text-slate-200' };
+    if (store.lastResigned()) return { text: 'Bạn Đã Nhận Thua 🏳️', color: 'text-rose-400' };
+    return { text: 'Bot Đã Giành Chiến Thắng! 💥', color: 'text-rose-400' };
+  });
+
+  // Nội dung mô tả chi tiết
+  const descriptionText = createMemo<string>(() => {
+    const mode = store.gameMode();
+    const won = isPlayerWinner();
+    const botName = store.currentLevelConfig().vietnameseName;
+
+    if (mode === 'blitz') {
+      if (won) return `Chúc mừng bạn đã đánh bại Bot ${botName}! Tiến lên cấp tiếp theo!`;
+      if (store.isBlitzTimeout()) return `Bạn đã hết ${store.blitzTimeLimit()}s suy nghĩ! Chuỗi cờ chớp đã dừng lại.`;
+      return `Bot ${botName} đã chiến thắng! Chuỗi sinh tử kết thúc.`;
+    }
+
+    if (mode === 'puzzle') {
+      if (won) return 'Xuất sắc! Bạn đã giải mã thành công thế cờ hóc búa này.';
+      return 'Chưa giải được thế cờ! Hãy thử lại hoặc chuyển sang thế cờ mới.';
+    }
+
+    if (won) return 'Bạn đã hoàn thành chuỗi 5 quân cờ liên tiếp thành công!';
+    if (store.lastResigned()) return 'Bạn đã đầu hàng ván đấu này. Hãy phục thù ở ván tiếp theo!';
+    return 'Bot đã hoàn thành chuỗi 5 quân cờ liên tiếp!';
+  });
+
+  // Tên chế độ tóm tắt
+  const modeSummaryText = createMemo<string>(() => {
+    switch (store.gameMode()) {
+      case 'blitz':
+        return `Cờ Chớp (${store.blitzTimeLimit()}s - Cấp ${store.currentLevelConfig().id})`;
+      case 'puzzle':
+        return store.currentPuzzle()?.name || 'Thế Cờ Giữa Trận';
+      case 'custom':
+        return `Đấu Tập (Bot ${store.currentLevelConfig().vietnameseName})`;
+      default:
+        return `Chiến Dịch (Bot ${store.currentLevelConfig().vietnameseName})`;
+    }
+  });
 
   return (
     <Show when={isGameOver()}>
       <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in select-none">
-        {/* Backdrop che mờ nền (không ẩn khi ấn ra ngoài) */}
         <div class="absolute inset-0" />
 
         {/* Thẻ Modal thông báo kết thúc trận đấu */}
@@ -69,59 +120,13 @@ export const GameOverBanner: Component = () => {
             </Show>
           </div>
 
-          {/* Tiêu đề kết quả */}
+          {/* Tiêu đề & Mô tả */}
           <div>
-            <h3 class="text-xl sm:text-2xl font-black text-white">
-              <Show
-                when={store.gameMode() === 'puzzle'}
-                fallback={
-                  <Show
-                    when={isPlayerWinner()}
-                    fallback={
-                      <Show
-                        when={isDraw()}
-                        fallback={
-                          <span class="text-rose-400">
-                            {store.lastResigned() ? 'Bạn Đã Nhận Thua' : 'Bot Đã Giành Chiến Thắng!'}
-                          </span>
-                        }
-                      >
-                        <span class="text-slate-200">Trận Đấu Hòa Cờ!</span>
-                      </Show>
-                    }
-                  >
-                    <span class="text-emerald-400">Xuất Sắc! Bạn Đã Thắng! 🎉</span>
-                  </Show>
-                }
-              >
-                <Show
-                  when={isPlayerWinner()}
-                  fallback={<span class="text-rose-400">Chưa Giải Được Thế Cờ! 💥</span>}
-                >
-                  <span class="text-emerald-400">
-                    Giải Thế Cờ Thành Công! 🎉
-                  </span>
-                </Show>
-              </Show>
+            <h3 class={`text-xl sm:text-2xl font-black ${titleInfo().color}`}>
+              {titleInfo().text}
             </h3>
             <p class="text-xs sm:text-sm text-slate-400 mt-1">
-              <Show
-                when={store.gameMode() === 'puzzle'}
-                fallback={
-                  isPlayerWinner()
-                    ? 'Bạn đã hoàn thành chuỗi 5 quân cờ liên tiếp thành công!'
-                    : store.lastResigned()
-                    ? 'Bạn đã đầu hàng ván đấu này. Hãy phục thù ở ván tiếp theo!'
-                    : 'Bot đã hoàn thành chuỗi 5 quân cờ liên tiếp!'
-                }
-              >
-                <Show
-                  when={isPlayerWinner()}
-                  fallback={'Chưa giải được thế cờ! Hãy thử lại hoặc chuyển sang thế cờ mới.'}
-                >
-                  {'Xuất sắc! Bạn đã giải mã thành công thế cờ hóc búa này.'}
-                </Show>
-              </Show>
+              {descriptionText()}
             </p>
           </div>
 
@@ -139,31 +144,56 @@ export const GameOverBanner: Component = () => {
             <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/60 border border-slate-800/50">
               <span class="text-[11px] text-slate-400 font-medium">Chế độ</span>
               <span class="text-xs font-bold text-slate-200 mt-0.5 truncate max-w-[120px]">
-                {store.gameMode() === 'puzzle'
-                  ? (store.currentPuzzle()?.name || 'Thế Cờ Giữa Trận')
-                  : store.gameMode() === 'custom'
-                  ? `Đấu Tập (Bot ${store.currentLevelConfig().vietnameseName})`
-                  : `Chiến Dịch (Bot ${store.currentLevelConfig().vietnameseName})`}
+                {modeSummaryText()}
               </span>
             </div>
           </div>
 
           {/* Các nút hành động */}
           <div class="w-full flex flex-col gap-2 pt-1">
-            <Show
-              when={store.gameMode() === 'puzzle'}
-              fallback={
+            {/* Chế độ Cờ Chớp */}
+            <Show when={store.gameMode() === 'blitz'}>
+              <Show
+                when={isPlayerWinner()}
+                fallback={
+                  <div class="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setDismissed(true);
+                        store.startBlitzMode(store.blitzTimeLimit(), 1);
+                      }}
+                      class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-rose-500/20 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <RotateCcw size={15} />
+                      <span>Chơi Lại (Cấp 1)</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDismissed(true);
+                        store.goToMainMenu();
+                      }}
+                      class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-slate-700 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <span>🏠 Về Menu</span>
+                    </button>
+                  </div>
+                }
+              >
                 <button
-                  onClick={handleNextGame}
-                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
+                  onClick={() => {
+                    setDismissed(true);
+                    store.nextBlitzLevel();
+                  }}
+                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 text-white font-black text-sm sm:text-base shadow-lg shadow-rose-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
                 >
                   <Play size={18} fill="currentColor" />
-                  <span>
-                    {store.gameMode() === 'campaign' ? 'Ván Tiếp Theo' : 'Chơi Lại Ván Mới'}
-                  </span>
+                  <span>⚡ Đấu Cấp Tiếp Theo (Cấp {store.currentLevelConfig().id})</span>
                 </button>
-              }
-            >
+              </Show>
+            </Show>
+
+            {/* Chế độ Thế Cờ */}
+            <Show when={store.gameMode() === 'puzzle'}>
               <div class="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => {
@@ -181,21 +211,40 @@ export const GameOverBanner: Component = () => {
                   }}
                   class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs sm:text-sm border border-slate-700 active:scale-95 transition-all cursor-pointer"
                 >
-                  <span>🔄 Chơi Lại</span>
+                  <RotateCcw size={15} />
+                  <span>Chơi Lại</span>
                 </button>
               </div>
             </Show>
 
+            {/* Chế độ Chiến Dịch & Đấu Tập */}
+            <Show when={store.gameMode() === 'campaign' || store.gameMode() === 'custom'}>
+              <button
+                onClick={() => {
+                  setDismissed(false);
+                  store.startNextGame();
+                }}
+                class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer animate-subtle-glow"
+              >
+                <Play size={18} fill="currentColor" />
+                <span>
+                  {store.gameMode() === 'campaign' ? 'Ván Tiếp Theo' : 'Chơi Lại Ván Mới'}
+                </span>
+              </button>
+            </Show>
+
             {/* Nút Về Menu Chính */}
-            <button
-              onClick={() => {
-                setDismissed(true);
-                store.goToMainMenu();
-              }}
-              class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-slate-700/60 active:scale-95 transition-all cursor-pointer"
-            >
-              <span>🏠 Về Menu Chính</span>
-            </button>
+            <Show when={store.gameMode() !== 'blitz' || isPlayerWinner()}>
+              <button
+                onClick={() => {
+                  setDismissed(true);
+                  store.goToMainMenu();
+                }}
+                class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-slate-700/60 active:scale-95 transition-all cursor-pointer"
+              >
+                <span>🏠 Về Menu Chính</span>
+              </button>
+            </Show>
           </div>
         </div>
       </div>
