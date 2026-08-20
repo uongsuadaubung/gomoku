@@ -148,7 +148,26 @@ export class TutorEngine {
   ): TutorPostMoveFeedback {
     const oppPlayer: ActivePlayer = playerColor === BLACK ? WHITE : BLACK;
     const playerCoordLabel = formatCoord(playerMove.row, playerMove.col);
-    const resolvedBest = bestMove || { row: 7, col: 7 };
+
+    // Đảm bảo resolvedBest LUÔN LUÔN là một ô cờ TRỐNG (EMPTY) hợp lệ trên boardBeforeMove
+    let resolvedBest = bestMove;
+    if (
+      !resolvedBest ||
+      resolvedBest.row < 0 ||
+      resolvedBest.row >= 15 ||
+      resolvedBest.col < 0 ||
+      resolvedBest.col >= 15 ||
+      boardBeforeMove[resolvedBest.row][resolvedBest.col] !== EMPTY
+    ) {
+      const aiRes = this.aiEngine.findBestMove(boardBeforeMove, playerColor, 6);
+      if (aiRes?.move && boardBeforeMove[aiRes.move.row]?.[aiRes.move.col] === EMPTY) {
+        resolvedBest = aiRes.move;
+      } else {
+        const candidates = getCandidateMoves(boardBeforeMove, 2);
+        resolvedBest = candidates.length > 0 ? candidates[0] : playerMove;
+      }
+    }
+
     const bestCoordLabel = formatCoord(resolvedBest.row, resolvedBest.col);
 
     // 0. Kiểm tra nếu nước đi tạo 5 quân dứt điểm thắng ván cờ
@@ -167,10 +186,11 @@ export class TutorEngine {
         event,
         speech,
         quality: 'brilliant',
+        tacticName: 'Sát Cục Ngũ Liên (Five in a Row)',
       };
     }
 
-    const isMatchBest = bestMove ? (playerMove.row === bestMove.row && playerMove.col === bestMove.col) : false;
+    const isMatchBest = (playerMove.row === resolvedBest.row && playerMove.col === resolvedBest.col);
 
     // 1. Đi đúng nước cờ vàng của Gia Sư
     if (isMatchBest) {
@@ -184,6 +204,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'brilliant',
+        tacticName: 'Nước Cờ Vàng (Brilliant Move)',
       };
     }
 
@@ -201,6 +222,7 @@ export class TutorEngine {
           event,
           speech,
           quality: 'brilliant',
+          tacticName: 'Khóa Tử Huyệt (Critical Defense)',
         };
       } else {
         const event: TutorPostMoveEvent = 'POST_IGNORED_CRITICAL_THREAT';
@@ -213,6 +235,7 @@ export class TutorEngine {
           event,
           speech,
           quality: 'blunder',
+          tacticName: 'Sơ Hở Chí Mạng (Blunder)',
         };
       }
     }
@@ -231,6 +254,7 @@ export class TutorEngine {
           event,
           speech,
           quality: 'good',
+          tacticName: 'Bịt Ngòi Nổ (Block Open Three)',
         };
       }
     }
@@ -249,14 +273,15 @@ export class TutorEngine {
           event,
           speech,
           quality: 'missed_win',
+          tacticName: 'Bỏ Lỡ Sát Cục (Missed Win in 1)',
         };
       }
     }
 
     // 5. Người chơi tự tạo đòn bẫy đôi 4-3 hoặc 3-3 đỉnh cao
-    const isPlayerFork = isFourThreeFork(boardBeforeMove, playerMove.row, playerMove.col, playerColor) ||
-                         isDoubleThree(boardBeforeMove, playerMove.row, playerMove.col, playerColor);
-    if (isPlayerFork) {
+    const isPlayerFourThree = isFourThreeFork(boardBeforeMove, playerMove.row, playerMove.col, playerColor);
+    const isPlayerThreeThree = isDoubleThree(boardBeforeMove, playerMove.row, playerMove.col, playerColor);
+    if (isPlayerFourThree || isPlayerThreeThree) {
       const event: TutorPostMoveEvent = 'POST_BRILLIANT_FORK';
       const speech = getTutorDialogue(event, { coord: playerCoordLabel });
       return {
@@ -267,6 +292,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'brilliant',
+        tacticName: isPlayerFourThree ? 'Bẫy Tứ Tam (4-3 Fork)' : 'Bẫy Song Tam (3-3 Fork)',
       };
     }
 
@@ -283,6 +309,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'brilliant',
+        tacticName: 'Thế Tứ Liên (Open Four)',
       };
     }
 
@@ -299,6 +326,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'good',
+        tacticName: 'Tấn Công Hàng 4 (Four Attack)',
       };
     }
 
@@ -315,6 +343,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'good',
+        tacticName: 'Thế Tam Hở (Open Three)',
       };
     }
 
@@ -332,6 +361,7 @@ export class TutorEngine {
           event,
           speech,
           quality: 'missed_fork',
+          tacticName: 'Bỏ Lỡ Đòn Bẫy 4-3 / VCF',
         };
       }
     }
@@ -350,6 +380,7 @@ export class TutorEngine {
           event,
           speech,
           quality: 'blunder',
+          tacticName: 'Bỏ Quên Tam Hở Địch',
         };
       }
     }
@@ -367,6 +398,7 @@ export class TutorEngine {
         event,
         speech,
         quality: 'passive',
+        tacticName: 'Lạc Nhịp Biên (Passive Move)',
       };
     }
 
@@ -381,6 +413,7 @@ export class TutorEngine {
       event,
       speech,
       quality: 'good',
+      tacticName: 'Chiếm Trung Tuyến (Center Control)',
     };
   }
 
@@ -399,71 +432,70 @@ export class TutorEngine {
     if (isFive(boardBeforeMove, botMove.row, botMove.col, botColor)) {
       const event: TutorBotMoveEvent = 'BOT_WINNING_FIVE';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Sát Cục Ngũ Liên' };
     }
 
     // 2. Kiểm tra nếu Bot vừa chặn nước 5 thắng của Người chơi
     if (isFive(boardBeforeMove, botMove.row, botMove.col, oppPlayer)) {
       const event: TutorBotMoveEvent = 'BOT_BLOCK_WIN';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Khóa Đòn Dứt Điểm' };
     }
 
     // 3. Kiểm tra nếu Bot vừa tạo 4 mở (100% thắng ở nước tiếp theo)
     if (isOpenFour(boardBeforeMove, botMove.row, botMove.col, botColor)) {
       const event: TutorBotMoveEvent = 'BOT_CREATE_OPEN_FOUR';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Thế Tứ Liên (Open Four)' };
     }
 
     // 4. Kiểm tra nếu Bot vừa gài bẫy đôi 4-3 hoặc 3-3 (Fork)
-    if (
-      isFourThreeFork(boardBeforeMove, botMove.row, botMove.col, botColor) ||
-      isDoubleThree(boardBeforeMove, botMove.row, botMove.col, botColor)
-    ) {
+    const isBotFourThree = isFourThreeFork(boardBeforeMove, botMove.row, botMove.col, botColor);
+    const isBotThreeThree = isDoubleThree(boardBeforeMove, botMove.row, botMove.col, botColor);
+    if (isBotFourThree || isBotThreeThree) {
       const event: TutorBotMoveEvent = 'BOT_FORK_ATTACK';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: isBotFourThree ? 'Bẫy Tứ Tam (4-3 Fork)' : 'Bẫy Song Tam (3-3 Fork)' };
     }
 
     // 5. Kiểm tra nếu Bot vừa tạo hàng 4 ép người chơi phải đỡ
     if (isFourOrFive(boardBeforeMove, botMove.row, botMove.col, botColor)) {
       const event: TutorBotMoveEvent = 'BOT_CREATE_FOUR_PRESSURE';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Kỹ Thuật Ép Nước VCF' };
     }
 
     // 6. Kiểm tra nếu Bot vừa tạo hàng 3 mở
     if (isOpenThree(boardBeforeMove, botMove.row, botMove.col, botColor)) {
       const event: TutorBotMoveEvent = 'BOT_CREATE_OPEN_THREE';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Khai Mào Thế Tam Hở' };
     }
 
     // 7. Kiểm tra nếu Bot vừa chặn hàng 3 mở của Người chơi
     if (isOpenThree(boardBeforeMove, botMove.row, botMove.col, oppPlayer)) {
       const event: TutorBotMoveEvent = 'BOT_BLOCK_PLAYER_THREE';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Bịt Mũi Giáp Công' };
     }
 
     // 8. Kiểm tra giai đoạn khai cuộc kiểm soát trung tâm
     if (isOpeningCenterMove(boardBeforeMove, botMove.row, botMove.col)) {
       const event: TutorBotMoveEvent = 'BOT_OPENING_CONTROL';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Chiếm Tâm Khai Cuộc' };
     }
 
     // 9. Kiểm tra xem nước đi có mở rộng liên kết mạng lưới với các quân đồng minh không
     if (countFriendlyNeighbors(boardBeforeMove, botMove.row, botMove.col, botColor, 2) >= 2) {
       const event: TutorBotMoveEvent = 'BOT_EXPAND_CONNECTION';
       const speech = getTutorDialogue(event, { coord: botCoordLabel });
-      return { botMove, botCoordLabel, speech };
+      return { botMove, botCoordLabel, speech, tacticName: 'Đan Lưới Quân' };
     }
 
     // 10. Mặc định: Bố trí thế trận linh hoạt
     const event: TutorBotMoveEvent = 'BOT_POSITIONAL_DEVELOPMENT';
     const speech = getTutorDialogue(event, { coord: botCoordLabel });
-    return { botMove, botCoordLabel, speech };
+    return { botMove, botCoordLabel, speech, tacticName: 'Bố Trí Thế Trận' };
   }
 }

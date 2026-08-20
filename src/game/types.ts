@@ -52,12 +52,14 @@ export interface TutorPostMoveFeedback {
   event: TutorPostMoveEvent;
   speech: string;
   quality: 'brilliant' | 'good' | 'missed_win' | 'missed_fork' | 'blunder' | 'passive';
+  tacticName?: string;
 }
 
 export interface TutorBotEvaluation {
   botMove: Move;
   botCoordLabel: string;
   speech: string;
+  tacticName?: string;
 }
 
 export interface TutorMatchReview {

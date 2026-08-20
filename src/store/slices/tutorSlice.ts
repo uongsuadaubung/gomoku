@@ -150,6 +150,7 @@ export function createTutorSlice(props: TutorSliceProps) {
     playerColor: ActivePlayer
   ): TutorPostMoveFeedback | null {
     const pre = tutorAnalysis();
+    setTutorAnalysis(null); // Xóa ngay kết quả phân tích cũ để không bị rò rỉ sang nước kế tiếp
 
     try {
       const feedback = TutorEngine.evaluatePostMove(

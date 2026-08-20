@@ -1,4 +1,4 @@
-import { Component, createSignal, createEffect, onCleanup } from 'solid-js';
+import { Component, createSignal, createEffect, onCleanup, Show } from 'solid-js';
 import { Award, User, Bot } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { BotAvatar } from './BotAvatar';
@@ -127,10 +127,17 @@ export const TutorCompanion: Component = () => {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         {/* 1. CỘT TRÁI: Đánh Giá Nước Cờ Của Bạn */}
         <div class="relative rounded-2xl bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-amber-950/30 border border-amber-500/30 p-2.5 sm:p-3 flex flex-col justify-between min-h-[95px] shadow-inner">
-          <div class="flex items-center justify-between gap-1 mb-1.5">
+          <div class="flex items-center justify-between gap-1 mb-1.5 flex-wrap">
             <span class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
               <User size={13} class="text-amber-400" /> Đánh Giá Nước Cờ Của Bạn
             </span>
+            <Show when={store.tutorFeedback()?.tacticName}>
+              {name => (
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm animate-fade-in">
+                  🎯 {name()}
+                </span>
+              )}
+            </Show>
           </div>
 
           <div class="flex-1 flex items-center">
@@ -143,10 +150,17 @@ export const TutorCompanion: Component = () => {
 
         {/* 2. CỘT PHẢI: Đánh Giá Nước Đi Của Bot / Đối Thủ */}
         <div class="relative rounded-2xl bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-sky-950/30 border border-sky-500/30 p-2.5 sm:p-3 flex flex-col justify-between min-h-[95px] shadow-inner">
-          <div class="flex items-center justify-between gap-1 mb-1.5">
+          <div class="flex items-center justify-between gap-1 mb-1.5 flex-wrap">
             <span class="text-[11px] font-bold text-sky-300 flex items-center gap-1">
               <Bot size={13} class="text-sky-400" /> Nước Đi Của Đối Thủ
             </span>
+            <Show when={store.tutorBotEvaluation()?.tacticName}>
+              {name => (
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm animate-fade-in">
+                  ⚡ {name()}
+                </span>
+              )}
+            </Show>
           </div>
 
           <div class="flex-1 flex items-center">
