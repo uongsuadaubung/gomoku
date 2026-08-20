@@ -13,6 +13,8 @@ import {
   Zap,
 } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
+import { GameLogo } from './GameLogo';
+import { HeaderIconButton } from './HeaderIconButton';
 
 const MODE_BADGES: Record<string, { Icon: typeof Trophy; label: (limit: number) => string; iconColor: string; textColor: string }> = {
   campaign: { Icon: Trophy, label: () => 'Chiến Dịch', iconColor: 'text-indigo-400', textColor: 'text-indigo-300' },
@@ -65,48 +67,17 @@ export const Header: Component = () => {
         <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
           <Show when={store.gameMode() !== 'menu'}>
             <button
+              type="button"
               onClick={() => store.goToMainMenu()}
               title="Quay về Trang Chủ / Menu"
-              class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-400 hover:text-amber-300 border border-slate-700/80 flex items-center gap-1 text-xs font-bold transition-all shadow-sm"
+              class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-400 hover:text-amber-300 border border-slate-700/80 flex items-center gap-1 text-xs font-bold transition-all shadow-sm cursor-pointer"
             >
               <House size={16} />
               <span class="hidden sm:inline">Menu</span>
             </button>
           </Show>
 
-          <button
-            onClick={() => store.goToMainMenu()}
-            class="flex items-center space-x-2 hover:opacity-90 transition-opacity text-left"
-          >
-            <div class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-md shadow-amber-500/20 p-1">
-              <svg viewBox="0 0 512 512" class="w-full h-full drop-shadow">
-                <defs>
-                  <radialGradient id="headerBlackStone" cx="35%" cy="35%" r="65%">
-                    <stop offset="0%" stop-color="#64748b"/>
-                    <stop offset="30%" stop-color="#334155"/>
-                    <stop offset="70%" stop-color="#0f172a"/>
-                    <stop offset="100%" stop-color="#020617"/>
-                  </radialGradient>
-                  <radialGradient id="headerWhiteStone" cx="35%" cy="35%" r="65%">
-                    <stop offset="0%" stop-color="#ffffff"/>
-                    <stop offset="50%" stop-color="#f8fafc"/>
-                    <stop offset="80%" stop-color="#cbd5e1"/>
-                    <stop offset="100%" stop-color="#94a3b8"/>
-                  </radialGradient>
-                </defs>
-                <circle cx="190" cy="320" r="75" fill="url(#headerBlackStone)"/>
-                <ellipse cx="170" cy="295" rx="28" ry="16" fill="#ffffff" opacity="0.3" transform="rotate(-30 170 295)"/>
-                <circle cx="320" cy="190" r="75" fill="url(#headerWhiteStone)"/>
-                <ellipse cx="300" cy="165" rx="30" ry="19" fill="#ffffff" opacity="0.8" transform="rotate(-30 300 165)"/>
-                <path d="M256 210 Q260 245 295 256 Q260 267 256 302 Q252 267 217 256 Q252 245 256 210Z" fill="#fbbf24"/>
-                <circle cx="256" cy="256" r="7" fill="#ffffff"/>
-              </svg>
-            </div>
-            <h1 class="hidden sm:flex text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-white items-center gap-0.5">
-              <span class="tracking-tight">GoMock</span>
-              <span class="text-amber-400 font-black">U</span>
-            </h1>
-          </button>
+          <GameLogo onClick={() => store.goToMainMenu()} />
         </div>
 
         {/* Current Mode Badge (Khi đang trong ván chơi) */}
@@ -125,69 +96,61 @@ export const Header: Component = () => {
         {/* Action Buttons */}
         <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
           {/* Sound Toggle */}
-          <button
-            onClick={() => store.toggleSound()}
+          <HeaderIconButton
             title={store.isMuted() ? 'Bật âm thanh' : 'Tắt âm thanh'}
-            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60"
-          >
-            <Show when={!store.isMuted()} fallback={<VolumeX size={16} class="text-rose-400 sm:w-[18px] sm:h-[18px]" />}>
-              <Volume2 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
-            </Show>
-          </button>
+            onClick={() => store.toggleSound()}
+            icon={
+              <Show when={!store.isMuted()} fallback={<VolumeX size={16} class="text-rose-400 sm:w-[18px] sm:h-[18px]" />}>
+                <Volume2 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
+              </Show>
+            }
+          />
 
           {/* Rules / Help */}
-          <button
+          <HeaderIconButton
+            title="Hướng dẫn luật chơi"
+            label="Luật"
             onClick={() => {
               store.setShowRulesModal(true);
               if (store.gameMode() !== 'menu') {
                 store.triggerTaunt('OPEN_RULES', 200);
               }
             }}
-            title="Hướng dẫn luật chơi"
-            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 text-xs font-medium"
-          >
-            <CircleQuestionMark size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />
-            <span class="hidden md:inline">Luật</span>
-          </button>
+            icon={<CircleQuestionMark size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />}
+          />
 
           {/* Stats Modal */}
-          <button
+          <HeaderIconButton
+            title="Thống kê kết quả ván đấu"
+            label="Thống Kê"
             onClick={() => {
               store.setShowStatsModal(true);
               if (store.gameMode() !== 'menu') {
                 store.triggerTaunt('OPEN_STATS', 200);
               }
             }}
-            title="Thống kê kết quả ván đấu"
-            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
-          >
-            <ChartColumn size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
-            <span class="hidden md:inline">Thống Kê</span>
-          </button>
+            icon={<ChartColumn size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />}
+          />
 
           {/* Bot Level Modal */}
-          <button
+          <HeaderIconButton
+            title="Danh sách đối thủ Bot"
+            label="Đối Thủ"
             onClick={() => {
               store.setShowBotModal(true);
               if (store.gameMode() !== 'menu') {
                 store.triggerTaunt('OPEN_BOT_MODAL', 200);
               }
             }}
-            title="Danh sách đối thủ Bot"
-            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60 flex items-center gap-1 sm:gap-1.5 text-xs font-medium"
-          >
-            <Bot size={16} class="text-amber-400 sm:w-[18px] sm:h-[18px]" />
-            <span class="hidden md:inline">Đối Thủ</span>
-          </button>
+            icon={<Bot size={16} class="text-amber-400 sm:w-[18px] sm:h-[18px]" />}
+          />
 
           {/* Settings */}
-          <button
-            onClick={() => store.setShowSettingsModal(true)}
+          <HeaderIconButton
             title="Cài đặt trò chơi"
-            class="p-2 sm:p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white transition-all border border-slate-700/60"
-          >
-            <Settings size={16} class="text-slate-300 sm:w-[18px] sm:h-[18px] hover:rotate-45 transition-transform" />
-          </button>
+            onClick={() => store.setShowSettingsModal(true)}
+            icon={<Settings size={16} class="text-slate-300 sm:w-[18px] sm:h-[18px] hover:rotate-45 transition-transform" />}
+          />
         </div>
       </div>
     </header>

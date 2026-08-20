@@ -1,6 +1,7 @@
 import { type Component, For } from 'solid-js';
 import { Puzzle, CircleCheck, Flame, Sparkles } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
+import { StatHeroCard } from './StatHeroCard';
 
 export const PuzzleStatsTab: Component = () => {
   const store = useGame();
@@ -25,24 +26,13 @@ export const PuzzleStatsTab: Component = () => {
   return (
     <div class="space-y-4 animate-fade-in">
       {/* Hero Card */}
-      <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border border-emerald-500/30 flex items-center justify-between">
-        <div>
-          <span class="text-xs text-emerald-300 font-semibold block mb-1">
-            Cấp Độ Sát Cục: Mức {puzzleStats().currentLevel || 1}⭐
-          </span>
-          <div class="flex items-baseline space-x-2">
-            <span class="text-3xl font-black text-emerald-400 font-mono">
-              {puzzleSolveRate()}%
-            </span>
-            <span class="text-xs text-slate-400 font-medium">
-              (Đã giải {puzzleStats().totalSolved} / {puzzleStats().totalGames} câu)
-            </span>
-          </div>
-        </div>
-        <div class="p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
-          <Puzzle size={28} />
-        </div>
-      </div>
+      <StatHeroCard
+        title={`Cấp Độ Sát Cục: Mức ${puzzleStats().currentLevel || 1}⭐`}
+        value={`${puzzleSolveRate()}%`}
+        subtext={`(Đã giải ${puzzleStats().totalSolved} / ${puzzleStats().totalGames} câu)`}
+        theme="emerald"
+        icon={<Puzzle size={28} />}
+      />
 
       {/* Solved vs Streaks */}
       <div class="grid grid-cols-2 gap-2">

@@ -1,7 +1,9 @@
 import { type Component, For } from 'solid-js';
-import { Award, Flame, GraduationCap, Trophy } from 'lucide-solid';
+import { Award, GraduationCap } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { AI_LEVELS } from '../../game/constants';
+import { StatHeroCard } from './StatHeroCard';
+import { StreakStatsGrid } from './StreakStatsGrid';
 
 export const TutorStatsTab: Component = () => {
   const store = useGame();
@@ -32,28 +34,27 @@ export const TutorStatsTab: Component = () => {
   return (
     <div class="space-y-4 animate-fade-in">
       {/* Hero Card */}
-      <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-950/60 to-slate-900 border border-amber-500/30 flex items-center justify-between">
-        <div>
-          <span class="text-xs text-amber-300 font-semibold block mb-1">
-            Học Viện Gomo (Gomo Academy)
-          </span>
-          <div class="flex items-baseline space-x-2">
-            <span class="text-3xl font-black text-amber-400 font-mono">
-              {tutorWinRate()}%
-            </span>
-            <span class="text-xs text-slate-400 font-medium">
-              (Thắng {tutorStats().totalWins} / {tutorStats().totalGames} trận)
-            </span>
+      <StatHeroCard
+        title="Học Viện Gomo (Gomo Academy)"
+        theme="amber"
+        icon={<GraduationCap size={28} />}
+        customValueElement={
+          <div>
+            <div class="flex items-baseline space-x-2">
+              <span class="text-3xl font-black text-amber-400 font-mono">
+                {tutorWinRate()}%
+              </span>
+              <span class="text-xs text-slate-400 font-medium">
+                (Thắng {tutorStats().totalWins} / {tutorStats().totalGames} trận)
+              </span>
+            </div>
+            <div class="mt-2 text-xs font-bold text-amber-200/90 flex items-center gap-1.5">
+              <Award size={14} class="text-amber-400" />
+              <span>Kỷ lục cao nhất: Cấp {tutorStats().highestLevel} - {highestBot().vietnameseName}</span>
+            </div>
           </div>
-          <div class="mt-2 text-xs font-bold text-amber-200/90 flex items-center gap-1.5">
-            <Award size={14} class="text-amber-400" />
-            <span>Kỷ lục cao nhất: Cấp {tutorStats().highestLevel} - {highestBot().vietnameseName}</span>
-          </div>
-        </div>
-        <div class="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400">
-          <GraduationCap size={28} />
-        </div>
-      </div>
+        }
+      />
 
       {/* Wins, Losses */}
       <div class="grid grid-cols-2 gap-2 text-center">
@@ -68,24 +69,10 @@ export const TutorStatsTab: Component = () => {
       </div>
 
       {/* Streaks */}
-      <div class="grid grid-cols-2 gap-2">
-        <div class="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
-            <Flame size={14} class="text-amber-400" /> Chuỗi thắng hiện tại
-          </span>
-          <span class="font-black text-amber-400 font-mono text-sm">
-            {tutorStats().currentStreak}
-          </span>
-        </div>
-        <div class="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
-            <Flame size={14} class="text-amber-500" /> Chuỗi thắng dài nhất
-          </span>
-          <span class="font-black text-amber-500 font-mono text-sm">
-            {tutorStats().bestStreak}
-          </span>
-        </div>
-      </div>
+      <StreakStatsGrid
+        currentStreak={tutorStats().currentStreak}
+        bestStreak={tutorStats().bestStreak}
+      />
 
       {/* Breakdown per Bot Level */}
       <div class="space-y-1.5">

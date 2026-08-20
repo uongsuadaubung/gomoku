@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "check": "tsc -p tsconfig.app.json --noEmit",
     "test": "bun test",
     "test:seeds": "bun test test/seeds.test.ts",
     "taunts:stats": "bun scripts/stats_taunts.ts",

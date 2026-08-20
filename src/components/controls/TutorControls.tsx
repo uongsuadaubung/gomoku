@@ -2,7 +2,6 @@ import { type Component, Show, Switch, Match, createMemo } from 'solid-js';
 import {
   RotateCcw,
   Play,
-  Flag,
   Sparkles,
   ChevronRight,
   GraduationCap,
@@ -14,6 +13,7 @@ import { GameOverPresentationContext } from '../../game/strategies/types';
 import { AI_LEVELS } from '../../game/constants';
 import { BotPreviewCard } from '../BotPreviewCard';
 import { OpponentSelect } from '../OpponentSelect';
+import { ResignUndoControls } from './ResignUndoControls';
 
 export const TutorControls: Component = () => {
   const store = useGame();
@@ -25,15 +25,6 @@ export const TutorControls: Component = () => {
   };
 
   const isDraw = () => store.gameStatus() === 'draw';
-
-  const canUndo = () => {
-    return (
-      store.matchStage() === 'playing' &&
-      !store.isAiThinking() &&
-      store.currentStrategy().canUndo() &&
-      store.moveHistory().some(m => m.player === store.playerColor())
-    );
-  };
 
   const highestUnlockedLevel = () => store.stats().tutor?.highestLevel || 1;
 
@@ -107,32 +98,7 @@ export const TutorControls: Component = () => {
       {/* ========================================================================= */}
       <Match when={store.matchStage() === 'playing'}>
         <div class="flex flex-col gap-2.5 animate-fade-in select-none">
-          <div class="grid grid-cols-2 gap-2.5">
-            {/* Nút Nhận Thua */}
-            <button
-              onClick={() => store.resignGame()}
-              class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-sm shadow-md shadow-rose-950/40 active:scale-95 transition-all cursor-pointer"
-              title="Đầu hàng và nhận thua ván đấu"
-            >
-              <Flag size={16} />
-              <span>Nhận Thua</span>
-            </button>
-
-            {/* Nút Đi Lại (Undo) */}
-            <button
-              onClick={() => store.undoMove()}
-              disabled={!canUndo()}
-              class={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all border ${
-                canUndo()
-                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:scale-95 cursor-pointer'
-                  : 'bg-slate-800/40 text-slate-500 border-slate-800 cursor-not-allowed'
-              }`}
-              title="Đi lại nước cờ để sửa sai cùng Gia sư"
-            >
-              <RotateCcw size={16} />
-              <span>Đi Lại (Undo)</span>
-            </button>
-          </div>
+          <ResignUndoControls undoTitle="Đi lại nước cờ để sửa sai cùng Gia sư" />
 
           {/* Dòng trạng thái đối thủ hiện tại */}
           <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 font-medium">

@@ -1,8 +1,10 @@
 import { type Component, For, Show } from 'solid-js';
-import { Swords, CircleCheck, CircleX, Equal, Award } from 'lucide-solid';
+import { Swords, Award } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { AI_LEVELS } from '../../game/constants';
 import { BotAvatar } from '../BotAvatar';
+import { StatHeroCard } from './StatHeroCard';
+import { WinLossStatGrid } from './WinLossStatGrid';
 
 export const CustomStatsTab: Component = () => {
   const store = useGame();
@@ -33,54 +35,20 @@ export const CustomStatsTab: Component = () => {
   return (
     <div class="space-y-4 animate-fade-in">
       {/* Hero Card */}
-      <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-950/60 to-slate-900 border border-amber-500/30 flex items-center justify-between">
-        <div>
-          <span class="text-xs text-amber-300 font-semibold block mb-1">
-            Tỷ Lệ Thắng Đấu Tập
-          </span>
-          <div class="flex items-baseline space-x-2">
-            <span class="text-3xl font-black text-amber-400 font-mono">
-              {customWinRate()}%
-            </span>
-            <span class="text-xs text-slate-400 font-medium">
-              ({customStats().wins} / {customStats().totalGames} ván)
-            </span>
-          </div>
-        </div>
-        <div class="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400">
-          <Swords size={28} />
-        </div>
-      </div>
+      <StatHeroCard
+        title="Tỷ Lệ Thắng Đấu Tập"
+        value={`${customWinRate()}%`}
+        subtext={`(${customStats().wins} / ${customStats().totalGames} ván)`}
+        theme="amber"
+        icon={<Swords size={28} />}
+      />
 
       {/* Metrics */}
-      <div class="grid grid-cols-3 gap-2">
-        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center">
-          <span class="text-[11px] text-emerald-400 font-semibold mb-0.5 flex items-center gap-1">
-            <CircleCheck size={12} /> Thắng
-          </span>
-          <span class="text-lg font-black text-emerald-400 font-mono">
-            {customStats().wins}
-          </span>
-        </div>
-
-        <div class="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex flex-col items-center justify-center">
-          <span class="text-[11px] text-rose-400 font-semibold mb-0.5 flex items-center gap-1">
-            <CircleX size={12} /> Thua
-          </span>
-          <span class="text-lg font-black text-rose-400 font-mono">
-            {customStats().losses}
-          </span>
-        </div>
-
-        <div class="p-3 rounded-2xl bg-slate-500/10 border border-slate-500/20 flex flex-col items-center justify-center">
-          <span class="text-[11px] text-slate-400 font-semibold mb-0.5 flex items-center gap-1">
-            <Equal size={12} /> Hòa
-          </span>
-          <span class="text-lg font-black text-slate-300 font-mono">
-            {customStats().draws}
-          </span>
-        </div>
-      </div>
+      <WinLossStatGrid
+        wins={customStats().wins}
+        losses={customStats().losses}
+        draws={customStats().draws}
+      />
 
       {/* Đối Đầu Theo Từng Level Bot */}
       <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">

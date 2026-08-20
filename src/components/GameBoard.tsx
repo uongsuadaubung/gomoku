@@ -1,9 +1,10 @@
 import { type Component, For, Show, createSignal, createMemo, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
 import { useGame } from '../store/GameContext';
-import { BOARD_SIZE, EMPTY, BLACK, WHITE } from '../game/types';
+import { BOARD_SIZE, EMPTY, BLACK, WHITE, type Player } from '../game/types';
 import { STAR_POINTS, COL_LETTERS, ROW_NUMBERS } from '../game/constants';
 import { interactionTracker } from '../services/interactionTracker';
+import { StonePiece } from './StonePiece';
 
 interface ThemeConfig {
   board: string;
@@ -322,39 +323,22 @@ export const GameBoard: Component = () => {
                           />
                         </Show>
 
-                        {/* 3. Quân cờ thực tế đã đánh - Căn tâm tuyệt đối */}
+                        {/* 3. Quân cờ thực tế đã đánh */}
                         <Show when={cell !== EMPTY}>
-                          <div
-                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88%] h-[88%] rounded-full transition-all duration-200 flex items-center justify-center z-10 ${
-                              cell === BLACK ? 'stone-black text-slate-200' : 'stone-white text-slate-800'
-                            } ${winCell() ? 'animate-win-glow scale-110' : ''}`}
-                          >
-                            {/* Hiển thị số thứ tự nước đi nếu bật */}
-                            <Show when={store.showStepNumbers() && stepNum() !== null}>
-                              <span class="text-[8px] sm:text-[10px] md:text-xs font-bold font-mono select-none">
-                                {stepNum()}
-                              </span>
-                            </Show>
-
-                            {/* Đánh dấu nước đi cuối (Last move dot) */}
-                            <Show when={last() && !winCell() && !store.showStepNumbers()}>
-                              <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500 shadow-sm animate-pulse" />
-                            </Show>
-
-                            {/* Vòng phát sáng Neon cho 5 quân chiến thắng */}
-                            <Show when={winCell()}>
-                              <div class="absolute inset-0 rounded-full border-2 border-emerald-400 animate-ping opacity-75 pointer-events-none" />
-                              <div class="absolute -inset-1 rounded-full border-2 border-amber-300 shadow-lg shadow-amber-400/70 animate-pulse pointer-events-none z-10" />
-                            </Show>
-                          </div>
+                          <StonePiece
+                            color={cell}
+                            isWinning={winCell()}
+                            isLastMove={last()}
+                            stepNumber={stepNum()}
+                            showStepNumber={store.showStepNumbers()}
+                          />
                         </Show>
 
-                        {/* 4. Ghost Stone khi Hover - Căn tâm tuyệt đối đè lên điểm sao */}
+                        {/* 4. Ghost Stone khi Hover */}
                         <Show when={isHovered()}>
-                          <div
-                            class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88%] h-[88%] rounded-full opacity-40 transition-opacity pointer-events-none z-10 ${
-                              store.playerColor() === BLACK ? 'stone-black' : 'stone-white'
-                            }`}
+                          <StonePiece
+                            color={store.playerColor()}
+                            isGhost={true}
                           />
                         </Show>
                       </div>

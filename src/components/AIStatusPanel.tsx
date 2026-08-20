@@ -1,7 +1,9 @@
 import { Component, Show } from 'solid-js';
-import { Cpu, Zap, Activity, Clock, ShieldAlert } from 'lucide-solid';
+import { Cpu, Zap, Activity, Clock } from 'lucide-solid';
 import { useGame } from '../store/GameContext';
 import { BLACK, WHITE } from '../game/types';
+import { WinProbabilityBar } from './WinProbabilityBar';
+import { TacticalAlert } from './TacticalAlert';
 
 export const AIStatusPanel: Component = () => {
   const store = useGame();
@@ -61,7 +63,7 @@ export const AIStatusPanel: Component = () => {
   };
 
   return (
-    <div class="w-full bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5">
+    <div class="w-full bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5 select-none">
       {/* Top: Current Turn Indicator */}
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
@@ -145,37 +147,13 @@ export const AIStatusPanel: Component = () => {
       </div>
 
       {/* Sát cục Alert */}
-      <Show when={store.aiStats()?.tacticalType === 'vcf'}>
-        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold animate-bounce">
-          <ShieldAlert size={14} class="text-red-400" />
-          <span>Bot kích hoạt chuỗi Sát Cục VCF kết liễu!</span>
-        </div>
-      </Show>
-      <Show when={store.aiStats()?.tacticalType === 'vct'}>
-        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-bold animate-bounce">
-          <ShieldAlert size={14} class="text-purple-400" />
-          <span>Bot kích hoạt chuỗi Đòn Bẫy VCT kết liễu!</span>
-        </div>
-      </Show>
+      <TacticalAlert tacticalType={store.aiStats()?.tacticalType} />
 
       {/* Win Probability Bar */}
-      <div>
-        <div class="flex justify-between items-center text-[11px] text-slate-400 mb-1 font-semibold">
-          <span class="text-emerald-400">Bạn: {playerWinRate()}%</span>
-          <span class="text-slate-500 font-mono text-[10px]">TƯƠNG QUAN THẾ TRẬN</span>
-          <span class="text-rose-400">Bot: {botWinRate()}%</span>
-        </div>
-        <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden flex">
-          <div
-            class="h-full bg-emerald-500 transition-all duration-300"
-            style={{ width: `${playerWinRate()}%` }}
-          />
-          <div
-            class="h-full bg-rose-500 transition-all duration-300"
-            style={{ width: `${botWinRate()}%` }}
-          />
-        </div>
-      </div>
+      <WinProbabilityBar
+        playerWinRate={playerWinRate()}
+        botWinRate={botWinRate()}
+      />
     </div>
   );
 };

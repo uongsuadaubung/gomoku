@@ -3,14 +3,13 @@ import {
   Zap,
   Flag,
   RotateCcw,
-  User,
-  Bot,
   Timer,
   ChevronRight,
 } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { BLACK, WHITE } from '../../game/types';
 import { BotPreviewCard } from '../BotPreviewCard';
+import { SideSelector } from '../SideSelector';
 
 export const BlitzControls: Component = () => {
   const store = useGame();
@@ -72,6 +71,7 @@ export const BlitzControls: Component = () => {
               <For each={[5, 10, 15] as const}>
                 {sec => (
                   <button
+                    type="button"
                     onClick={() => handleSelectTime(sec)}
                     class={`py-2 px-1 rounded-2xl font-mono text-xs font-extrabold transition-all border flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                       selectedTime() === sec
@@ -90,35 +90,16 @@ export const BlitzControls: Component = () => {
           </div>
 
           {/* 2. Chọn bên đi trước & Bắt đầu trận đấu */}
-          <div class="flex flex-col gap-1.5 pt-1 border-t border-slate-800/80">
-            <span class="text-[11px] font-bold text-slate-300">Chọn bên đi trước để bắt đầu:</span>
-            <div class="grid grid-cols-2 gap-2.5">
-              <button
-                onClick={() => store.startBlitzMatch(selectedTime(), true)}
-                class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-emerald cursor-pointer"
-              >
-                <div class="flex items-center gap-1.5">
-                  <User size={15} class="group-hover:scale-110 transition-transform text-emerald-400 group-hover:text-slate-950" />
-                  <span>Bạn Đi Trước</span>
-                </div>
-                <span class="text-[10px] opacity-75 font-normal">Quân Đen (●)</span>
-              </button>
-
-              <button
-                onClick={() => store.startBlitzMatch(selectedTime(), false)}
-                class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800/90 hover:bg-rose-500 hover:text-slate-950 text-slate-200 border border-rose-500/50 hover:border-rose-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-purple cursor-pointer"
-              >
-                <div class="flex items-center gap-1.5">
-                  <Bot size={15} class="group-hover:scale-110 transition-transform text-rose-400 group-hover:text-slate-950" />
-                  <span>Bot Đi Trước</span>
-                </div>
-                <span class="text-[10px] opacity-75 font-normal">Bot cầm Đen (●)</span>
-              </button>
-            </div>
+          <div class="border-t border-slate-800/80 pt-0.5">
+            <SideSelector
+              onSelectSide={(isBlack) => store.startBlitzMatch(selectedTime(), isBlack)}
+              theme="rose"
+            />
           </div>
 
           {/* Nút Trở Về Menu */}
           <button
+            type="button"
             onClick={() => store.goToMainMenu()}
             class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition-all cursor-pointer mt-0.5"
           >
@@ -188,6 +169,7 @@ export const BlitzControls: Component = () => {
                   fallback={
                     <div class="grid grid-cols-2 gap-2">
                       <button
+                        type="button"
                         onClick={() => store.enterBlitzMode(1)}
                         class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 text-white font-extrabold text-xs shadow-md shadow-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
                       >
@@ -195,6 +177,7 @@ export const BlitzControls: Component = () => {
                         <span>Thử Thách Lại (Cấp 1)</span>
                       </button>
                       <button
+                        type="button"
                         onClick={() => store.goToMainMenu()}
                         class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
                       >
@@ -204,6 +187,7 @@ export const BlitzControls: Component = () => {
                   }
                 >
                   <button
+                    type="button"
                     onClick={() => store.nextBlitzLevel()}
                     class="py-3 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 text-white font-extrabold text-xs shadow-lg shadow-rose-500/25 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer animate-subtle-glow"
                   >
@@ -216,6 +200,7 @@ export const BlitzControls: Component = () => {
             }
           >
             <button
+              type="button"
               onClick={() => store.resignGame()}
               class="py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/40 font-bold text-xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
             >
