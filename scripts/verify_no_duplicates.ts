@@ -36,9 +36,10 @@ const UNNATURAL_PATTERNS = [
   { regex: /\b(người dùng)\b/i, desc: 'Dùng từ "người dùng" (cần xưng "bạn")' },
   { regex: /\b(quý khách)\b/i, desc: 'Dùng từ "quý khách" (quá thương mại)' },
   { regex: /\b(chúng tôi)\b/i, desc: 'Dùng từ "chúng tôi" (cần xưng "tôi")' },
-  { regex: /\b(thuật toán|mã nguồn|database|source code|chương trình|phần mềm|ứng dụng|code|bug|cpu|ram)\b/i, desc: 'Dùng thuật ngữ máy tính khô khan' },
+  { regex: /\b(thuật toán|mã nguồn|database|source code|chương trình|phần mềm|ứng dụng|code|bug|cpu|ram|minimax)\b/i, desc: 'Dùng thuật ngữ máy tính / thuật toán khô khan' },
   { regex: /\b(bot|gomoku ai)\b/i, desc: 'Tự nhận mình là Bot' },
   { regex: /\bAI\b/, desc: 'Tự nhận mình là AI' },
+  { regex: /\bminimax\b/i, desc: 'Dùng từ "minimax" (thuật toán máy tính)' },
   { regex: /\b(tư duy)\b/i, desc: 'Dùng từ "tư duy" (mang tính phán xét cá nhân, cần đổi sang nước cờ / thế trận / toan tính)' },
 ];
 

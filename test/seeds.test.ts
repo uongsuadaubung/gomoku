@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'bun:test';
 import { createEmptyBoard } from '../src/game/board';
-import { getVCFSolutionTrace, getVCTSolutionTrace, hasImmediateWhiteThreat } from '../src/game/puzzles/utils/validator';
+import {
+  getVCFSolutionTrace,
+  getVCTSolutionTrace,
+  hasImmediateWhiteThreat,
+  hasUnstoppableWhiteThreat,
+  countWinningMoves,
+} from '../src/game/puzzles/utils/validator';
 import {
   BASE_VCF_SKELETON_POOLS,
   BASE_VCT_SKELETON_POOLS,
@@ -192,6 +198,26 @@ describe('Kiểm Định Kho Hạt Giống Chiến Thuật (Tactical Seeds)', ()
         expect(history[i].stepNumber).toBe(i + 1);
         if (i > 0) {
           expect(history[i].timestamp).toBeGreaterThanOrEqual(history[i - 1].timestamp);
+        }
+      }
+    });
+
+    it('Tuyệt đối KHÔNG BAO GIỜ sinh map có 4 mở hoặc đòn thắng không thể cản phá cho Bot (Trắng)', () => {
+      for (let i = 0; i < 6; i++) {
+        const scenarioVCF = generateTacticalScenario({ stars: (i % 3) + 1, type: 'VCF' });
+        const scenarioVCT = generateTacticalScenario({ stars: (i % 2) + 1, type: 'VCT' });
+        const scenarioDEF = generateTacticalScenario({ stars: 1, type: 'DEFENSE' });
+
+        expect(hasUnstoppableWhiteThreat(scenarioVCF.initialBoard)).toBeFalse();
+        expect(hasUnstoppableWhiteThreat(scenarioVCT.initialBoard)).toBeFalse();
+        expect(hasUnstoppableWhiteThreat(scenarioDEF.initialBoard)).toBeFalse();
+
+        // Đối với thế cờ DEFENSE: Nước đầu tiên của người chơi phải hóa giải hoàn toàn nước thắng của Bot
+        if (scenarioDEF.solutionMoves && scenarioDEF.solutionMoves.length > 0) {
+          const m = scenarioDEF.solutionMoves[0];
+          const b = scenarioDEF.initialBoard.map(row => [...row]);
+          b[m.row][m.col] = 1; // BLACK
+          expect(countWinningMoves(b, 2)).toBe(0); // WHITE (Bot) không còn bất kỳ nước thắng nào
         }
       }
     });

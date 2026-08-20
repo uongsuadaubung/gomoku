@@ -4,7 +4,14 @@ import { PuzzleScenario, PuzzleType, PuzzleGeneratorOptions, PuzzleDensity } fro
 import { BASE_VCF_SKELETON_POOLS, BASE_VCT_SKELETON_POOLS, BASE_DEFENSE_SKELETON_POOLS } from '../skeletons';
 import { REALISTIC_SKIRMISH_TEMPLATES, PUZZLE_TITLES } from '../templates';
 import { applyRandomSymmetry } from '../utils/symmetry';
-import { getVCFSolutionTrace, getVCTSolutionTrace, hasImmediateWhiteThreat } from '../utils/validator';
+import {
+  getVCFSolutionTrace,
+  getVCTSolutionTrace,
+  hasImmediateWhiteThreat,
+  hasUnstoppableWhiteThreat,
+  hasOpenFour,
+  countWinningMoves,
+} from '../utils/validator';
 import { generateFallbackScenario } from './fallback';
 
 type StoneItem = { r: number; c: number; player: ActivePlayer };
@@ -66,6 +73,15 @@ function applyProximityNoise(
     if (canPlace) {
       for (const cs of candidate) {
         workingBoard[cs.r][cs.c] = cs.player;
+      }
+      // Bảo đảm nhiễu không vô tình tạo ra 4 mở hoặc đòn sát cục không thể cản cho Trắng
+      if (hasOpenFour(workingBoard, WHITE) || countWinningMoves(workingBoard, WHITE) >= 2 || checkWin(workingBoard)) {
+        for (const cs of candidate) {
+          workingBoard[cs.r][cs.c] = EMPTY;
+        }
+        continue;
+      }
+      for (const cs of candidate) {
         addedStones.push(cs);
       }
       proximityAdded++;
@@ -118,6 +134,15 @@ function applyOuterNoise(
     if (canPlace) {
       for (const cs of candidate) {
         workingBoard[cs.r][cs.c] = cs.player;
+      }
+      // Bảo đảm nhiễu không tạo ra 4 mở hoặc đòn sát cục không thể cản cho Trắng
+      if (hasOpenFour(workingBoard, WHITE) || countWinningMoves(workingBoard, WHITE) >= 2 || checkWin(workingBoard)) {
+        for (const cs of candidate) {
+          workingBoard[cs.r][cs.c] = EMPTY;
+        }
+        continue;
+      }
+      for (const cs of candidate) {
         addedStones.push(cs);
       }
       outerAdded++;
@@ -160,6 +185,12 @@ function applyBackgroundDensity(
     if (workingBoard[c1.r][c1.c] === EMPTY && workingBoard[c2.r][c2.c] === EMPTY) {
       workingBoard[c1.r][c1.c] = BLACK;
       workingBoard[c2.r][c2.c] = WHITE;
+      // Nếu việc rải quân nền vô tình tạo đòn sát cục hoặc 4 mở cho Trắng, lập tức hủy bỏ cặp ô này
+      if (hasOpenFour(workingBoard, WHITE) || countWinningMoves(workingBoard, WHITE) >= 2 || checkWin(workingBoard)) {
+        workingBoard[c1.r][c1.c] = EMPTY;
+        workingBoard[c2.r][c2.c] = EMPTY;
+        continue;
+      }
       addedStones.push({ r: c1.r, c: c1.c, player: BLACK });
       addedStones.push({ r: c2.r, c: c2.c, player: WHITE });
       totalCount += 2;
@@ -313,6 +344,11 @@ export function generateTacticalScenario(
       continue;
     }
 
+    // Tuyệt đối không để Trắng có đòn sát cục không thể cản phá (4 mở, Tứ Đôi, >= 2 nước thắng 5)
+    if (hasUnstoppableWhiteThreat(workingBoard)) {
+      continue;
+    }
+
     if (puzzleType === 'DEFENSE') {
       if (!hasImmediateWhiteThreat(workingBoard)) {
         continue;
@@ -329,6 +365,17 @@ export function generateTacticalScenario(
 
     if (!finalTrace.success || finalTrace.moves !== targetStars) {
       continue;
+    }
+
+    // Đối với thế cờ DEFENSE: Đảm bảo nước cờ đầu tiên của Đen hóa giải hoàn toàn nước thắng của Trắng
+    if (puzzleType === 'DEFENSE' && finalTrace.attackMoves.length > 0) {
+      const fMove = finalTrace.attackMoves[0];
+      workingBoard[fMove.r][fMove.c] = BLACK;
+      const whiteWinsAfterDefense = countWinningMoves(workingBoard, WHITE);
+      workingBoard[fMove.r][fMove.c] = EMPTY;
+      if (whiteWinsAfterDefense > 0) {
+        continue;
+      }
     }
 
     if (firstMove && finalTrace.attackMoves.length > 0) {

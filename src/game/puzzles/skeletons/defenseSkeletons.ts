@@ -20,16 +20,16 @@ export const BASE_DEFENSE_SKELETON_POOLS: SkeletonPoolByStars = {
       { r: 0, c: -3, player: BLACK }, { r: 0, c: -2, player: BLACK }, { r: 0, c: -1, player: BLACK }, { r: 0, c: 1, player: BLACK },
       { r: 0, c: -4, player: WHITE }, { r: 0, c: 2, player: WHITE },
     ],
-    // Def-1C: Trắng dọa chéo, Đen chặn tại (2,2) tạo 4 quân ngang và 3 mở dọc
+    // Def-1C: Trắng dọa 4 chéo (đã bị chặn đầu -3,-3), Đen chặn đầu còn lại tại (2,2) tạo 4 quân ngang và 3 mở dọc
     [
-      { r: -2, c: -2, player: WHITE }, { r: -1, c: -1, player: WHITE }, { r: 0, c: 0, player: WHITE }, { r: 1, c: 1, player: WHITE },
+      { r: -3, c: -3, player: BLACK }, { r: -2, c: -2, player: WHITE }, { r: -1, c: -1, player: WHITE }, { r: 0, c: 0, player: WHITE }, { r: 1, c: 1, player: WHITE },
       { r: 2, c: -1, player: BLACK }, { r: 2, c: 0, player: BLACK }, { r: 2, c: 1, player: BLACK }, { r: 2, c: -2, player: WHITE },
       { r: 0, c: 2, player: BLACK }, { r: 1, c: 2, player: BLACK },
       { r: -2, c: 2, player: WHITE }, { r: 4, c: 2, player: WHITE },
     ],
-    // Def-1D: Trắng dọa dọc, Đen chặn tại (2,0) tạo 4 quân ngang và 3 mở chéo phụ
+    // Def-1D: Trắng dọa 4 dọc (đã bị chặn đầu -3,0), Đen chặn đầu còn lại tại (2,0) tạo 4 quân ngang và 3 mở chéo phụ
     [
-      { r: -2, c: 0, player: WHITE }, { r: -1, c: 0, player: WHITE }, { r: 0, c: 0, player: WHITE }, { r: 1, c: 0, player: WHITE },
+      { r: -3, c: 0, player: BLACK }, { r: -2, c: 0, player: WHITE }, { r: -1, c: 0, player: WHITE }, { r: 0, c: 0, player: WHITE }, { r: 1, c: 0, player: WHITE },
       { r: 2, c: -3, player: BLACK }, { r: 2, c: -2, player: BLACK }, { r: 2, c: -1, player: BLACK }, { r: 2, c: -4, player: WHITE },
       { r: 3, c: 1, player: BLACK }, { r: 4, c: 2, player: BLACK },
       { r: 0, c: -2, player: WHITE }, { r: 6, c: 4, player: WHITE },

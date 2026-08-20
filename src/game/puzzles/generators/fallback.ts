@@ -3,7 +3,7 @@ import { createEmptyBoard, cloneBoard } from '../../board';
 import { PuzzleScenario, PuzzleType } from '../types';
 import { BASE_VCF_SKELETON_POOLS, BASE_VCT_SKELETON_POOLS, BASE_DEFENSE_SKELETON_POOLS } from '../skeletons';
 import { PUZZLE_TITLES } from '../templates';
-import { getVCFSolutionTrace, getVCTSolutionTrace } from '../utils/validator';
+import { getVCFSolutionTrace, getVCTSolutionTrace, hasUnstoppableWhiteThreat } from '../utils/validator';
 
 /**
  * Sinh thế cờ dự phòng chuẩn xác theo từng cấp sao (1 - 7 sao) và thể loại khi quá trình tạo ngẫu nhiên đạt giới hạn số lần thử
@@ -34,7 +34,23 @@ export function generateFallbackScenario(
     }
   }
 
-
+  // Bảo đảm hạt giống dự phòng tuyệt đối không có 4 mở hoặc đòn sát cục không thể cản phá cho Trắng
+  if (hasUnstoppableWhiteThreat(board)) {
+    // Khôi phục về hạt giống an toàn tuyệt đối
+    const safeSeed = BASE_VCF_SKELETON_POOLS[1]?.[0] ?? [];
+    for (let r = 0; r < BOARD_SIZE; r++) {
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        board[r][c] = 0;
+      }
+    }
+    placedStones.length = 0;
+    for (const s of safeSeed) {
+      const r = 7 + s.r;
+      const c = 7 + s.c;
+      board[r][c] = s.player;
+      placedStones.push({ r, c, player: s.player });
+    }
+  }
 
   const trace = (puzzleType === 'VCT' || puzzleType === 'DEFENSE')
     ? getVCTSolutionTrace(board, targetStars)
