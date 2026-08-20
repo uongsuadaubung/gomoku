@@ -1,4 +1,4 @@
-import { Component, onMount, Show } from 'solid-js';
+import { Component, onMount, onCleanup, Show } from 'solid-js';
 import { GameProvider, useGame } from './store/GameContext';
 import { Header } from './components/Header';
 import { MainMenu } from './components/MainMenu';
@@ -33,6 +33,9 @@ const AppContent: Component = () => {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    onCleanup(() => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    });
   });
 
   return (

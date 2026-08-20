@@ -1,5 +1,14 @@
 import { LevelConfig } from './types';
 
+export const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'] as const;
+export const ROW_NUMBERS = Array.from({ length: 15 }, (_, i) => 15 - i); // 15 down to 1
+
+export function formatCoord(row: number, col: number): string {
+  const colLetter = COL_LETTERS[col] || '?';
+  const rowNumber = 15 - row;
+  return `${colLetter}${rowNumber}`;
+}
+
 export const STAR_POINTS: [number, number][] = [
   [3, 3],
   [3, 11],

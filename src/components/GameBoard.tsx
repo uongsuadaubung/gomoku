@@ -1,12 +1,9 @@
-import { type Component, For, Show, createSignal, onCleanup } from 'solid-js';
+import { type Component, For, Show, createSignal, createMemo, onCleanup } from 'solid-js';
 import type { GameStore } from '../store/gameStore';
 import { useGame } from '../store/GameContext';
 import { BOARD_SIZE, EMPTY, BLACK, WHITE } from '../game/types';
-import { STAR_POINTS } from '../game/constants';
+import { STAR_POINTS, COL_LETTERS, ROW_NUMBERS } from '../game/constants';
 import { interactionTracker } from '../services/interactionTracker';
-
-const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
-const ROW_NUMBERS = Array.from({ length: 15 }, (_, i) => 15 - i); // 15 down to 1
 
 interface ThemeConfig {
   board: string;
@@ -62,10 +59,23 @@ export const GameBoard: Component = () => {
     return STAR_POINTS.some(([sr, sc]) => sr === r && sc === c);
   };
 
-  const isWinningCell = (r: number, c: number) => {
+  // O(1) Pre-computed Lookups
+  const winningCellsSet = createMemo(() => {
     const win = store.winInfo();
-    if (!win) return false;
-    return win.line.some(([wr, wc]) => wr === r && wc === c);
+    if (!win) return new Set<string>();
+    return new Set(win.line.map(([wr, wc]) => `${wr},${wc}`));
+  });
+
+  const stepNumberMap = createMemo(() => {
+    const map = new Map<string, number>();
+    for (const m of store.moveHistory()) {
+      map.set(`${m.row},${m.col}`, m.stepNumber);
+    }
+    return map;
+  });
+
+  const isWinningCell = (r: number, c: number) => {
+    return winningCellsSet().has(`${r},${c}`);
   };
 
   const isLastMove = (r: number, c: number) => {
@@ -74,8 +84,7 @@ export const GameBoard: Component = () => {
   };
 
   const getStepNumber = (r: number, c: number) => {
-    const item = store.moveHistory().find(m => m.row === r && m.col === c);
-    return item ? item.stepNumber : null;
+    return stepNumberMap().get(`${r},${c}`) ?? null;
   };
 
   const canPlay = () => {

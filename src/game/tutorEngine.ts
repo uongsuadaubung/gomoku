@@ -26,14 +26,8 @@ import {
   TutorBotMoveEvent,
   getTutorDialogue,
 } from '../data/tutor';
-
-const COL_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
-
-export function formatCoord(row: number, col: number): string {
-  const colLetter = COL_LETTERS[col] || '?';
-  const rowNumber = 15 - row;
-  return `${colLetter}${rowNumber}`;
-}
+import { formatCoord } from './constants';
+export { formatCoord };
 
 export class TutorEngine {
   private static aiEngine = new AIEngine();

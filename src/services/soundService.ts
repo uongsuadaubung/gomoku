@@ -6,6 +6,20 @@ class SoundService {
 
   constructor() {
     this.isMuted = StorageService.getMuted();
+    this.unlockAudio();
+  }
+
+  private unlockAudio(): void {
+    if (typeof window === 'undefined') return;
+    const unlock = () => {
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
   }
 
   private initContext(): AudioContext | null {
@@ -16,7 +30,7 @@ class SoundService {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
     return this.ctx;
   }

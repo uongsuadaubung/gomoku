@@ -13,33 +13,32 @@ export const BOARD_DIRECTIONS = [
 export function isFive(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let isWin = false;
+  try {
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r = row + dir.dr;
+      let c = col + dir.dc;
+      while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+        count++;
+        r += dir.dr;
+        c += dir.dc;
+      }
+      r = row - dir.dr;
+      c = col - dir.dc;
+      while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+        count++;
+        r -= dir.dr;
+        c -= dir.dc;
+      }
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r = row + dir.dr;
-    let c = col + dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r += dir.dr;
-      c += dir.dc;
+      if (count >= 5) {
+        return true;
+      }
     }
-    r = row - dir.dr;
-    c = col - dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r -= dir.dr;
-      c -= dir.dc;
-    }
-
-    if (count >= 5) {
-      isWin = true;
-      break;
-    }
+    return false;
+  } finally {
+    board[row][col] = original;
   }
-
-  board[row][col] = original;
-  return isWin;
 }
 
 /**
@@ -48,33 +47,32 @@ export function isFive(board: BoardMatrix, row: number, col: number, player: Act
 export function isFourOrFive(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let makesThreat = false;
+  try {
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r = row + dir.dr;
+      let c = col + dir.dc;
+      while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+        count++;
+        r += dir.dr;
+        c += dir.dc;
+      }
+      r = row - dir.dr;
+      c = col - dir.dc;
+      while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+        count++;
+        r -= dir.dr;
+        c -= dir.dc;
+      }
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r = row + dir.dr;
-    let c = col + dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r += dir.dr;
-      c += dir.dc;
+      if (count >= 4) {
+        return true;
+      }
     }
-    r = row - dir.dr;
-    c = col - dir.dc;
-    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
-      count++;
-      r -= dir.dr;
-      c -= dir.dc;
-    }
-
-    if (count >= 4) {
-      makesThreat = true;
-      break;
-    }
+    return false;
+  } finally {
+    board[row][col] = original;
   }
-
-  board[row][col] = original;
-  return makesThreat;
 }
 
 /**
@@ -83,37 +81,36 @@ export function isFourOrFive(board: BoardMatrix, row: number, col: number, playe
 export function isOpenFour(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let createsOpenFour = false;
+  try {
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r1 = row + dir.dr;
+      let c1 = col + dir.dc;
+      while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
+        count++;
+        r1 += dir.dr;
+        c1 += dir.dc;
+      }
+      let r2 = row - dir.dr;
+      let c2 = col - dir.dc;
+      while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
+        count++;
+        r2 -= dir.dr;
+        c2 -= dir.dc;
+      }
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r1 = row + dir.dr;
-    let c1 = col + dir.dc;
-    while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
-      count++;
-      r1 += dir.dr;
-      c1 += dir.dc;
-    }
-    let r2 = row - dir.dr;
-    let c2 = col - dir.dc;
-    while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
-      count++;
-      r2 -= dir.dr;
-      c2 -= dir.dc;
-    }
-
-    if (count === 4) {
-      const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
-      const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
-      if (openHead1 && openHead2) {
-        createsOpenFour = true;
-        break;
+      if (count === 4) {
+        const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
+        const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
+        if (openHead1 && openHead2) {
+          return true;
+        }
       }
     }
+    return false;
+  } finally {
+    board[row][col] = original;
   }
-
-  board[row][col] = original;
-  return createsOpenFour;
 }
 
 /**
@@ -122,37 +119,36 @@ export function isOpenFour(board: BoardMatrix, row: number, col: number, player:
 export function isOpenThree(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let createsOpenThree = false;
+  try {
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r1 = row + dir.dr;
+      let c1 = col + dir.dc;
+      while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
+        count++;
+        r1 += dir.dr;
+        c1 += dir.dc;
+      }
+      let r2 = row - dir.dr;
+      let c2 = col - dir.dc;
+      while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
+        count++;
+        r2 -= dir.dr;
+        c2 -= dir.dc;
+      }
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r1 = row + dir.dr;
-    let c1 = col + dir.dc;
-    while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
-      count++;
-      r1 += dir.dr;
-      c1 += dir.dc;
-    }
-    let r2 = row - dir.dr;
-    let c2 = col - dir.dc;
-    while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
-      count++;
-      r2 -= dir.dr;
-      c2 -= dir.dc;
-    }
-
-    if (count === 3) {
-      const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
-      const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
-      if (openHead1 && openHead2) {
-        createsOpenThree = true;
-        break;
+      if (count === 3) {
+        const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
+        const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
+        if (openHead1 && openHead2) {
+          return true;
+        }
       }
     }
+    return false;
+  } finally {
+    board[row][col] = original;
   }
-
-  board[row][col] = original;
-  return createsOpenThree;
 }
 
 /**
@@ -161,39 +157,42 @@ export function isOpenThree(board: BoardMatrix, row: number, col: number, player
 export function isFourThreeFork(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let fourCount = 0;
-  let openThreeCount = 0;
+  try {
+    let fourCount = 0;
+    let openThreeCount = 0;
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r1 = row + dir.dr;
-    let c1 = col + dir.dc;
-    while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
-      count++;
-      r1 += dir.dr;
-      c1 += dir.dc;
-    }
-    let r2 = row - dir.dr;
-    let c2 = col - dir.dc;
-    while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
-      count++;
-      r2 -= dir.dr;
-      c2 -= dir.dc;
-    }
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r1 = row + dir.dr;
+      let c1 = col + dir.dc;
+      while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
+        count++;
+        r1 += dir.dr;
+        c1 += dir.dc;
+      }
+      let r2 = row - dir.dr;
+      let c2 = col - dir.dc;
+      while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
+        count++;
+        r2 -= dir.dr;
+        c2 -= dir.dc;
+      }
 
-    if (count >= 4) {
-      fourCount++;
-    } else if (count === 3) {
-      const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
-      const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
-      if (openHead1 && openHead2) {
-        openThreeCount++;
+      if (count >= 4) {
+        fourCount++;
+      } else if (count === 3) {
+        const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
+        const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
+        if (openHead1 && openHead2) {
+          openThreeCount++;
+        }
       }
     }
-  }
 
-  board[row][col] = original;
-  return fourCount >= 1 && openThreeCount >= 1;
+    return fourCount >= 1 && openThreeCount >= 1;
+  } finally {
+    board[row][col] = original;
+  }
 }
 
 /**
@@ -202,36 +201,39 @@ export function isFourThreeFork(board: BoardMatrix, row: number, col: number, pl
 export function isDoubleThree(board: BoardMatrix, row: number, col: number, player: ActivePlayer): boolean {
   const original = board[row][col];
   board[row][col] = player;
-  let openThreeCount = 0;
+  try {
+    let openThreeCount = 0;
 
-  for (const dir of BOARD_DIRECTIONS) {
-    let count = 1;
-    let r1 = row + dir.dr;
-    let c1 = col + dir.dc;
-    while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
-      count++;
-      r1 += dir.dr;
-      c1 += dir.dc;
-    }
-    let r2 = row - dir.dr;
-    let c2 = col - dir.dc;
-    while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
-      count++;
-      r2 -= dir.dr;
-      c2 -= dir.dc;
-    }
+    for (const dir of BOARD_DIRECTIONS) {
+      let count = 1;
+      let r1 = row + dir.dr;
+      let c1 = col + dir.dc;
+      while (r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === player) {
+        count++;
+        r1 += dir.dr;
+        c1 += dir.dc;
+      }
+      let r2 = row - dir.dr;
+      let c2 = col - dir.dc;
+      while (r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === player) {
+        count++;
+        r2 -= dir.dr;
+        c2 -= dir.dc;
+      }
 
-    if (count === 3) {
-      const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
-      const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
-      if (openHead1 && openHead2) {
-        openThreeCount++;
+      if (count === 3) {
+        const openHead1 = r1 >= 0 && r1 < BOARD_SIZE && c1 >= 0 && c1 < BOARD_SIZE && board[r1][c1] === EMPTY;
+        const openHead2 = r2 >= 0 && r2 < BOARD_SIZE && c2 >= 0 && c2 < BOARD_SIZE && board[r2][c2] === EMPTY;
+        if (openHead1 && openHead2) {
+          openThreeCount++;
+        }
       }
     }
-  }
 
-  board[row][col] = original;
-  return openThreeCount >= 2;
+    return openThreeCount >= 2;
+  } finally {
+    board[row][col] = original;
+  }
 }
 
 /**
