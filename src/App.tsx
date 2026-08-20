@@ -13,7 +13,6 @@ import { SettingsModal } from './components/SettingsModal';
 import { RulesModal } from './components/RulesModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { TutorCompanion } from './components/TutorCompanion';
-import { GameOverBanner } from './components/GameOverBanner';
 
 const AppContent: Component = () => {
   const store = useGame();
@@ -108,7 +107,6 @@ const AppContent: Component = () => {
       <SettingsModal />
       <RulesModal />
       <LevelUpModal />
-      <GameOverBanner />
     </div>
   );
 };

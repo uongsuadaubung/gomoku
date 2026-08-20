@@ -46,7 +46,7 @@ export const BotModal: Component = () => {
 
   const handleStartCustomMatchWithBot = (levelId: number) => {
     store.setShowBotModal(false);
-    store.startCustomMatch(levelId);
+    store.enterCustomMode(levelId);
   };
 
   return (

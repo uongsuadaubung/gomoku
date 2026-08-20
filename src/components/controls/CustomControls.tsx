@@ -1,12 +1,17 @@
 import { type Component, Show, Switch, Match } from 'solid-js';
 import {
   RotateCcw,
-  Play,
   Flag,
   Sparkles,
+  Swords,
+  User,
+  Bot,
 } from 'lucide-solid';
 import { useGame } from '../../store/GameContext';
 import { BLACK, WHITE } from '../../game/types';
+import { AI_LEVELS } from '../../game/constants';
+import { BotPreviewCard } from '../BotPreviewCard';
+import { OpponentSelect } from '../OpponentSelect';
 
 export const CustomControls: Component = () => {
   const store = useGame();
@@ -50,9 +55,88 @@ export const CustomControls: Component = () => {
     undoHoverStartTime = 0;
   };
 
+  const currentBotLevel = () => {
+    return store.customConfig()?.botLevel || store.currentLevelConfig().id;
+  };
+
+  const maxUnlockedLevel = () => {
+    return store.campaignLevelConfig().id || 1;
+  };
+
   return (
     <Switch>
-      {/* GIAI ĐOẠN 1: PLAYING (Đang trong trận đấu tùy chọn) */}
+      {/* ========================================================================= */}
+      {/* GIAI ĐOẠN 1: READY (Thiết lập Đấu Tập - Chọn đối thủ & Chọn bên đi trước) */}
+      {/* ========================================================================= */}
+      <Match when={store.matchStage() === 'ready'}>
+        <div class="w-full flex flex-col gap-3 p-4 rounded-3xl bg-slate-900/95 border border-purple-500/30 shadow-xl animate-fade-in select-none">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+              <Swords size={14} class="text-purple-400" />
+              <span>Thiết lập ván Đấu Tập:</span>
+            </span>
+          </div>
+
+          {/* Chọn đối thủ đã mở khóa */}
+          <OpponentSelect
+            value={currentBotLevel()}
+            onChange={lvl => store.setCustomBotLevel(lvl)}
+            maxUnlockedLevel={maxUnlockedLevel()}
+            theme="purple"
+            label="Chọn đối thủ đã mở:"
+            icon={<Swords size={13} />}
+            layout="stacked"
+            size="md"
+            optionFormat="full"
+          />
+
+          {/* Thẻ xem trước đối thủ được chọn */}
+          <BotPreviewCard
+            bot={AI_LEVELS[currentBotLevel() - 1] || AI_LEVELS[0]}
+            theme="purple"
+          />
+
+          {/* Chọn bên đi trước & Bắt đầu trận đấu */}
+          <div class="flex flex-col gap-1.5 pt-1">
+            <span class="text-[11px] font-bold text-slate-300">Chọn bên đi trước để bắt đầu:</span>
+            <div class="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => store.startCustomMatch(currentBotLevel(), true)}
+                class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-emerald cursor-pointer"
+              >
+                <div class="flex items-center gap-1.5">
+                  <User size={15} class="group-hover:scale-110 transition-transform text-emerald-400 group-hover:text-slate-950" />
+                  <span>Bạn Đi Trước</span>
+                </div>
+                <span class="text-[10px] opacity-75 font-normal">Quân Đen (●)</span>
+              </button>
+
+              <button
+                onClick={() => store.startCustomMatch(currentBotLevel(), false)}
+                class="flex flex-col items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-slate-800/90 hover:bg-purple-500 hover:text-slate-950 text-slate-200 border border-purple-500/50 hover:border-purple-400 text-xs font-bold shadow-md active:scale-95 transition-all group animate-glow-purple cursor-pointer"
+              >
+                <div class="flex items-center gap-1.5">
+                  <Bot size={15} class="group-hover:scale-110 transition-transform text-purple-400 group-hover:text-slate-950" />
+                  <span>Bot Đi Trước</span>
+                </div>
+                <span class="text-[10px] opacity-75 font-normal">Bot cầm Đen (●)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Nút Trở Về Menu */}
+          <button
+            onClick={() => store.goToMainMenu()}
+            class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition-all cursor-pointer mt-0.5"
+          >
+            <span>🏠 Trở Về Menu</span>
+          </button>
+        </div>
+      </Match>
+
+      {/* ========================================================================= */}
+      {/* GIAI ĐOẠN 2: PLAYING (Đang trong trận đấu tùy chọn) */}
+      {/* ========================================================================= */}
       <Match when={store.matchStage() === 'playing'}>
         <div class="flex flex-col gap-3 animate-fade-in">
           <div class="grid grid-cols-2 gap-2.5">
@@ -87,24 +171,26 @@ export const CustomControls: Component = () => {
           </div>
 
           {/* Thông tin ván đấu */}
-          <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium px-1">
-            <span class="flex items-center gap-1.5 text-amber-400/90">
-              <Sparkles size={13} />
-              <span>Đấu Tập (Bot {store.currentLevelConfig().vietnameseName})</span>
+          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 font-medium">
+            <span class="flex items-center gap-1.5 text-purple-300">
+              <Swords size={13} />
+              <span>Đối thủ: Bot {store.currentLevelConfig().vietnameseName}</span>
             </span>
-            <span>
-              {store.playerColor() === BLACK ? 'Bạn cầm Đen' : 'Bạn cầm Trắng'}
+            <span class="font-bold text-purple-400/90 font-mono">
+              {store.playerColor() === BLACK ? 'Bạn cầm Đen (●)' : 'Bạn cầm Trắng (○)'}
             </span>
           </div>
         </div>
       </Match>
 
-      {/* GIAI ĐOẠN 2: GAME_OVER (Ván đấu kết thúc) */}
+      {/* ========================================================================= */}
+      {/* GIAI ĐOẠN 3: GAME_OVER (Ván đấu kết thúc) */}
+      {/* ========================================================================= */}
       <Match when={store.matchStage() === 'game_over'}>
-        <div class="flex flex-col gap-2.5 animate-fade-in">
+        <div class="flex flex-col gap-2.5 animate-fade-in p-3 rounded-2xl bg-slate-950/80 border border-purple-500/20 shadow-xl">
           {/* Huy hiệu thông báo kết quả inline */}
           <div
-            class={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm ${
+            class={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm ${
               isPlayerWinner()
                 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-emerald-950/30'
                 : isDraw()
@@ -124,20 +210,31 @@ export const CustomControls: Component = () => {
             </Show>
           </div>
 
+          {/* Đấu lại cùng cấu hình */}
           <button
-            onClick={() => store.startNextGame()}
-            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer animate-start-pulse"
+            onClick={() => store.startCustomMatch(currentBotLevel(), store.playerColor() === BLACK)}
+            class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-purple-500/20 active:scale-95 transition-all cursor-pointer"
           >
-            <Play size={16} fill="currentColor" />
-            <span>Chơi Lại Ván Mới</span>
+            <RotateCcw size={15} />
+            <span>Đấu Lại Trận Này</span>
           </button>
 
-          <button
-            onClick={() => store.goToMainMenu()}
-            class="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/60 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
-          >
-            <span>🏠 Về Menu Chính</span>
-          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => store.enterCustomMode(currentBotLevel())}
+              class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 hover:text-purple-200 font-bold text-xs border border-slate-700 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Swords size={13} />
+              <span>Đổi Đối Thủ</span>
+            </button>
+
+            <button
+              onClick={() => store.goToMainMenu()}
+              class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            >
+              <span>🏠 Về Menu</span>
+            </button>
+          </div>
         </div>
       </Match>
     </Switch>

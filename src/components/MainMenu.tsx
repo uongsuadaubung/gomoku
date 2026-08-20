@@ -22,11 +22,6 @@ export const MainMenu: Component = () => {
   const campaignLevel = () => store.campaignLevelConfig();
   const campaignWins = () => store.stats().campaign?.wins ?? store.stats().wins;
 
-  // Cấu hình cục bộ cho chế độ Cờ Chớp (5s / 10s / 15s - Mặc định 10s)
-  const [selectedBlitzTime, setSelectedBlitzTime] = createSignal<5 | 10 | 15>(
-    store.blitzTimeLimit() || 10
-  );
-
   const highestBlitzLevelId = () => store.stats().blitz?.highestLevel || 1;
   const highestBlitzBot = () => AI_LEVELS.find(l => l.id === highestBlitzLevelId()) || AI_LEVELS[0];
 
@@ -34,25 +29,7 @@ export const MainMenu: Component = () => {
   const tutorOpponentLevelId = () => store.stats().tutor?.currentLevel || 1;
   const tutorOpponentBot = () => AI_LEVELS.find(l => l.id === tutorOpponentLevelId()) || AI_LEVELS[0];
 
-  // Cấu hình cục bộ cho chế độ Đấu Tùy Chọn (Mặc định chọn cấp độ cao nhất đã mở khóa hoặc Lv 1)
-  const isBotUnlocked = (lvlId: number) => {
-    const lvl = AI_LEVELS.find(l => l.id === lvlId);
-    return lvl ? campaignWins() >= lvl.minWins : false;
-  };
 
-  const initialBotLevel = () => {
-    const current = campaignLevel().id;
-    return Math.min(current, 3); // Mặc định Lv 3 nếu đã mở, hoặc cấp hiện tại
-  };
-
-  const [customBotLevel, setCustomBotLevel] = createSignal<number>(initialBotLevel());
-
-  // Đảm bảo customBotLevel luôn nằm trong phạm vi đã mở khóa
-  const effectiveCustomBotLevel = () => {
-    const selected = customBotLevel();
-    if (isBotUnlocked(selected)) return selected;
-    return campaignLevel().id; // Fallback về cấp cao nhất đã mở
-  };
 
   return (
     <div class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in select-none">
@@ -224,55 +201,23 @@ export const MainMenu: Component = () => {
               </p>
             </div>
 
-            {/* Time Selection Buttons: 5s / 10s / 15s */}
-            <div>
-              <div class="text-[11px] font-bold text-slate-400 mb-1.5 flex justify-between items-center">
-                <span>Thời gian / nước:</span>
-                <span class="text-rose-400 font-mono text-[10px]">Mặc định 10s</span>
-              </div>
-              <div class="grid grid-cols-3 gap-1.5">
-                <For each={[5, 10, 15] as const}>
-                  {sec => (
-                    <button
-                      onClick={() => {
-                        setSelectedBlitzTime(sec);
-                        store.setBlitzTimeLimit(sec);
-                      }}
-                      class={`py-1.5 rounded-xl font-mono text-xs font-bold transition-all border cursor-pointer ${
-                        selectedBlitzTime() === sec
-                          ? 'bg-rose-500 text-white border-rose-400 shadow-md shadow-rose-500/30'
-                          : 'bg-slate-950/80 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
-                      }`}
-                    >
-                      {sec}s
-                    </button>
-                  )}
-                </For>
-              </div>
-            </div>
-
-            {/* Highest Blitz Level Achieved */}
-            <div class="p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="text-lg">
-                  <BotAvatar name={highestBlitzBot().avatar} />
-                </div>
-                <div>
-                  <div class="text-[10px] text-slate-400 font-medium">Kỷ lục cao nhất:</div>
-                  <div class="text-xs font-bold text-rose-300">
-                    Cấp {highestBlitzLevelId()} - {highestBlitzBot().vietnameseName}
-                  </div>
-                </div>
-              </div>
+            {/* Info Preview */}
+            <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <span class="text-rose-400 font-bold flex items-center gap-1.5 text-xs">
+                <Zap size={13} /> Kỷ lục cao nhất:
+              </span>
+              <span class="text-rose-200 font-extrabold text-xs">
+                Cấp {highestBlitzLevelId()} - {highestBlitzBot().vietnameseName}
+              </span>
             </div>
           </div>
 
           <button
-            onClick={() => store.startBlitzMode(selectedBlitzTime(), 1)}
+            onClick={() => store.enterBlitzMode()}
             class="w-full mt-4 py-3 px-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-rose-500/25 transition-all cursor-pointer"
           >
             <Zap size={14} class="fill-white" />
-            <span>Thách Đấu Cờ Chớp</span>
+            <span>Vào Thách Đấu Cờ Chớp</span>
             <ChevronRight size={14} />
           </button>
         </div>
@@ -301,45 +246,23 @@ export const MainMenu: Component = () => {
               </p>
             </div>
 
-            {/* Select Bot Level & Side */}
-            <div class="space-y-2">
-              <div>
-                <label class="text-[10px] font-bold text-slate-400 block mb-1">
-                  Chọn đối thủ đã mở:
-                </label>
-                <div class="relative">
-                  <select
-                    value={effectiveCustomBotLevel()}
-                    onChange={e => setCustomBotLevel(Number(e.currentTarget.value))}
-                    class="w-full py-2 px-3 pr-8 rounded-xl bg-slate-950/90 hover:bg-slate-950 text-slate-100 font-bold text-xs border border-slate-800 hover:border-purple-500/50 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all appearance-none cursor-pointer shadow-inner"
-                  >
-                    <For each={AI_LEVELS.filter(lvl => isBotUnlocked(lvl.id))}>
-                      {lvl => (
-                        <option value={lvl.id} class="bg-slate-900 text-slate-200 py-1">
-                          Bot {lvl.vietnameseName} (Cấp {lvl.id})
-                        </option>
-                      )}
-                    </For>
-                  </select>
-                  <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <ChevronDown size={14} />
-                  </div>
-                </div>
-
-                {/* Selected Bot Details & Description */}
-                <div class="mt-2">
-                  <BotPreviewCard bot={AI_LEVELS[effectiveCustomBotLevel() - 1]} theme="purple" />
-                </div>
-              </div>
+            {/* Info Preview */}
+            <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <span class="text-purple-400 font-bold flex items-center gap-1.5 text-xs">
+                <Swords size={13} /> Số đối thủ đã mở:
+              </span>
+              <span class="text-purple-200 font-extrabold text-xs">
+                {campaignLevel().id} / {AI_LEVELS.length} Bot
+              </span>
             </div>
           </div>
 
           <button
-            onClick={() => store.startCustomMatch(effectiveCustomBotLevel())}
+            onClick={() => store.enterCustomMode()}
             class="w-full mt-4 py-3 px-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-purple-500/25 transition-all cursor-pointer"
           >
             <Swords size={14} />
-            <span>Bắt Đầu Đấu Tập</span>
+            <span>Vào Đấu Tùy Chọn</span>
             <ChevronRight size={14} />
           </button>
         </div>

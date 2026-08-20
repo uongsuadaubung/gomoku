@@ -290,22 +290,107 @@ export function createGameStore() {
     startPuzzleMode(stars, true);
   }
 
-  function startCustomMatch(botLevel: number, playAsBlack?: boolean) {
+  function enterCustomMode(botLevel?: number) {
+    const highestUnlocked = Math.max(1, campaignLevelConfig().id);
+    const selectedLevel = botLevel || series.customConfig()?.botLevel || Math.min(3, highestUnlocked);
+
     setGameMode('custom');
     series.setCustomConfig({
-      botLevel,
-      playerColor: playAsBlack !== undefined ? (playAsBlack ? BLACK : WHITE) : BLACK,
+      botLevel: selectedLevel,
+      playerColor: BLACK,
     });
     series.setIsSeriesActive(false);
     series.setSeriesGameNumber(0);
     series.setLastResigned(false);
-    startNewGame(playAsBlack !== undefined ? playAsBlack : true);
+    setBoard(createEmptyBoard());
+    setMoveHistory([]);
+    setLastMove(null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setAiThinkingProgress({ depth: 0, nodes: 0 });
+    setGameStatus('idle');
+    setMatchStage('ready');
+    setCurrentTurn(BLACK);
+    setPlayerColor(BLACK);
+    taunt.clearTauntQueue();
+    taunt.resetIdleTimer();
+    soundService.playClickSound();
+  }
+
+  function startCustomMode(botLevel?: number) {
+    enterCustomMode(botLevel);
+  }
+
+  function setCustomBotLevel(lvl: number) {
+    series.setCustomConfig(prev => ({
+      botLevel: lvl,
+      playerColor: prev?.playerColor || BLACK,
+    }));
+  }
+
+  function startCustomMatch(botLevel?: number, playAsBlack: boolean = true) {
+    const lvl = botLevel || series.customConfig()?.botLevel || 1;
+    setGameMode('custom');
+    series.setCustomConfig({
+      botLevel: lvl,
+      playerColor: playAsBlack ? BLACK : WHITE,
+    });
+    series.setIsSeriesActive(false);
+    series.setSeriesGameNumber(0);
+    series.setLastResigned(false);
+    startNewGame(playAsBlack);
+  }
+
+  function enterBlitzMode(startLevel?: number) {
+    if (startLevel !== undefined) {
+      blitz.setupBlitzLevel(blitz.blitzTimeLimit(), startLevel);
+    }
+    blitz.stopBlitzTimer();
+    blitz.setIsBlitzTimeout(false);
+    setGameMode('blitz');
+    series.setIsSeriesActive(false);
+    series.setSeriesGameNumber(0);
+    series.setLastResigned(false);
+    setBoard(createEmptyBoard());
+    setMoveHistory([]);
+    setLastMove(null);
+    setWinInfo(null);
+    setAiStats(null);
+    setIsAiThinking(false);
+    setAiThinkingProgress({ depth: 0, nodes: 0 });
+    setGameStatus('idle');
+    setMatchStage('ready');
+    setCurrentTurn(BLACK);
+    setPlayerColor(BLACK);
+    taunt.clearTauntQueue();
+    taunt.resetIdleTimer();
+    soundService.playClickSound();
+  }
+
+  function startBlitzMatch(timeSeconds?: 5 | 10 | 15, playAsBlack: boolean = true, startLevel?: number) {
+    blitz.setupBlitzLevel(timeSeconds, startLevel);
+    setGameMode('blitz');
+    series.setIsSeriesActive(false);
+    series.setSeriesGameNumber(0);
+    series.setLastResigned(false);
+    startNewGame(playAsBlack);
   }
 
   function startBlitzMode(timeSeconds?: 5 | 10 | 15, startLevel?: number) {
-    blitz.setupBlitzLevel(timeSeconds, startLevel);
+    enterBlitzMode(startLevel);
+  }
 
-    setGameMode('blitz');
+  function nextBlitzLevel() {
+    startBlitzMatch(blitz.blitzTimeLimit(), true);
+  }
+
+  function enterTutorMode(startLevel?: number) {
+    if (startLevel) {
+      tutor.setOpponentLevel(startLevel);
+    }
+    tutor.resetTutorMatchSession();
+    setGameMode('tutor');
     series.setIsSeriesActive(false);
     series.setSeriesGameNumber(0);
     series.setLastResigned(false);
@@ -316,32 +401,13 @@ export function createGameStore() {
     setWinInfo(null);
     setAiStats(null);
     setIsAiThinking(false);
-    setAiThinkingProgress({ depth: 0, nodes: 0 });
-    setGameStatus('playing');
-    setMatchStage('playing');
+    setGameStatus('idle');
+    setMatchStage('ready');
     setCurrentTurn(BLACK);
-
-    soundService.playGameStartSound();
-    currentStrategy().onGameStart({
-      lastGameResult: matchCtx.lastGameResult,
-      botConfig: currentLevelConfig(),
-      board: board(),
-      playerColor: BLACK,
-      services: {
-        triggerTutorSpeech: tutor.triggerTutorSpeech,
-        analyzePreMove: tutor.analyzePreMove,
-        triggerTaunt: taunt.triggerTaunt,
-        startBlitzTimer: blitz.startBlitzTimer,
-      },
-    });
-    taunt.resetIdleTimer();
+    soundService.playClickSound();
   }
 
-  function nextBlitzLevel() {
-    startBlitzMode(blitz.blitzTimeLimit());
-  }
-
-  function startTutorMode(startLevel?: number) {
+  function startTutorMatch(startLevel?: number) {
     if (startLevel) {
       tutor.setOpponentLevel(startLevel);
     }
@@ -380,10 +446,14 @@ export function createGameStore() {
     taunt.resetIdleTimer();
   }
 
+  function startTutorMode(startLevel?: number) {
+    enterTutorMode(startLevel);
+  }
+
   function nextTutorLevel() {
     const nextLvl = Math.min(12, tutor.selectedOpponentLevel() + 1);
     tutor.setOpponentLevel(nextLvl);
-    startTutorMode(nextLvl);
+    startTutorMatch(nextLvl);
   }
 
   function goToMainMenu() {
@@ -1018,6 +1088,8 @@ export function createGameStore() {
     selectedOpponentLevel: tutor.selectedOpponentLevel,
     setOpponentLevel: tutor.setOpponentLevel,
     startTutorMode,
+    enterTutorMode,
+    startTutorMatch,
     nextTutorLevel,
 
     // Taunt Slice
@@ -1038,7 +1110,12 @@ export function createGameStore() {
     startPuzzleMode,
     restartCurrentPuzzle,
     nextPuzzleScenario,
+    enterCustomMode,
+    startCustomMode,
+    setCustomBotLevel,
     startCustomMatch,
+    enterBlitzMode,
+    startBlitzMatch,
     startBlitzMode,
     nextBlitzLevel,
     goToMainMenu,

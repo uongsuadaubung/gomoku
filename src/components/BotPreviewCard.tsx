@@ -4,7 +4,7 @@ import { BotAvatar } from './BotAvatar';
 
 interface BotPreviewCardProps {
   bot: LevelConfig;
-  theme?: 'indigo' | 'amber' | 'emerald' | 'purple' | 'cyan';
+  theme?: 'indigo' | 'amber' | 'emerald' | 'purple' | 'cyan' | 'rose';
 }
 
 export const BotPreviewCard: Component<BotPreviewCardProps> = (props) => {
@@ -14,6 +14,7 @@ export const BotPreviewCard: Component<BotPreviewCardProps> = (props) => {
     if (theme() === 'purple') return 'text-purple-300';
     if (theme() === 'emerald') return 'text-emerald-300';
     if (theme() === 'cyan') return 'text-cyan-300';
+    if (theme() === 'rose') return 'text-rose-300';
     return 'text-amber-300';
   };
   const tagBadge = () => {
@@ -21,6 +22,7 @@ export const BotPreviewCard: Component<BotPreviewCardProps> = (props) => {
     if (theme() === 'purple') return 'bg-purple-500/10 text-purple-300 border-purple-500/20';
     if (theme() === 'emerald') return 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20';
     if (theme() === 'cyan') return 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20';
+    if (theme() === 'rose') return 'bg-rose-500/10 text-rose-300 border-rose-500/20';
     return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
   };
 

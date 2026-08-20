@@ -6,7 +6,7 @@ import {
   PlayerTurnStartContext,
   PlayerMoveContext,
 } from './types';
-import { GameMode, LevelConfig, UserStats } from '../types';
+import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
 import { AI_LEVELS } from '../constants';
 
 export class BlitzStrategy extends BaseStrategy {
@@ -46,7 +46,9 @@ export class BlitzStrategy extends BaseStrategy {
 
   public override onGameStart(ctx: GameStartContext): void {
     super.onGameStart(ctx);
-    ctx.services.startBlitzTimer?.();
+    if (ctx.playerColor === BLACK) {
+      ctx.services.startBlitzTimer?.();
+    }
   }
 
   public override onPlayerTurnStart(ctx: PlayerTurnStartContext): void {
