@@ -77,7 +77,7 @@ export * from './undoBeforeAiMoves';
 export * from './wheelZoomAttempt';
 export * from './windowResizePanic';
 
-export const INTERACTION_TAUNTS: Record<string, TauntDefinition> = {
+export const INTERACTION_TAUNTS = {
   BREAK_LOSS_STREAK,
   CLICK_AFTER_GAME_OVER,
   CLICK_AFTER_WIN,

@@ -126,7 +126,7 @@ export * from './unluckyThirteenMoves';
 export * from './winRightAfterUndo';
 export * from './zigzagLightning';
 
-export const GAMEPLAY_TAUNTS: Record<string, TauntDefinition> = {
+export const GAMEPLAY_TAUNTS = {
   ACCIDENTAL_SELF_BLOCK,
   BLOCK_AND_COUNTER_FOUR,
   BLOCK_WRONG_END,

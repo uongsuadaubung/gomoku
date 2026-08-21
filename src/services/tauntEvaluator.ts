@@ -1,4 +1,4 @@
-import { ActivePlayer, BoardMatrix, MoveHistoryItem, UserStats } from '../game/types';
+import { ActivePlayer, BoardMatrix, MoveHistoryItem, UserStats, GameResult } from '../game/types';
 import { AI_LEVELS } from '../game/constants';
 import { TauntEvent } from '../data/taunts/types';
 import { TauntService } from './tauntService';
@@ -505,7 +505,7 @@ export class TauntEvaluator {
   /**
    * Đánh giá kịch bản mở màn ván đấu (dựa trên kết quả ván trước đó)
    */
-  static evaluateGameStart(lastGameResult: 'win' | 'loss' | 'draw' | null): TauntEvent {
+  static evaluateGameStart(lastGameResult: GameResult | null): TauntEvent {
     if (lastGameResult === 'win') return 'START_AFTER_WIN';
     if (lastGameResult === 'loss') return 'START_AFTER_LOSS';
     return 'GAME_START';

@@ -15,7 +15,7 @@ export * from './idleThinking';
 export * from './stareAtWinLine';
 export * from './superSlowMove';
 
-export const IDLE_TAUNTS: Record<string, TauntDefinition> = {
+export const IDLE_TAUNTS = {
   IDLE_AFTER_LOSS,
   IDLE_AFTER_WIN,
   IDLE_IN_GAME,

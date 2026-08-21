@@ -128,7 +128,6 @@ export type TauntEvent =
   | 'CHANGE_BOT_LEVEL_UP'
   | 'TAB_BLUR'
   | 'TAB_FOCUS'
-  | 'OPEN_RULES'
   | 'CLICK_OCCUPIED_CELL'
   | 'RESET_STATS'
   | 'OPEN_BOT_MODAL'

@@ -87,9 +87,10 @@ export function generateFallbackScenario(
   const titles = PUZZLE_TITLES[targetStars] || ['Thế Cờ Tuyệt Kỹ'];
   const title = titles[0] || 'Nhất Kích Tất Sát';
 
-  const solutionMoves = trace.success && trace.attackMoves.length > 0
-    ? trace.attackMoves.map(m => ({ row: m.r, col: m.c, player: BLACK as ActivePlayer }))
-    : [{ row: 7, col: 7, player: BLACK as ActivePlayer }];
+  const solutionMoves: Array<{ row: number; col: number; player: ActivePlayer }> =
+    trace.success && trace.attackMoves.length > 0
+      ? trace.attackMoves.map(m => ({ row: m.r, col: m.c, player: BLACK }))
+      : [{ row: 7, col: 7, player: BLACK }];
 
   const firstMove = solutionMoves[0];
 

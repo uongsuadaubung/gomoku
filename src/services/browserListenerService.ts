@@ -34,8 +34,9 @@ export class BrowserListenerService {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isGamePlaying()) return;
 
-      const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (e.target instanceof HTMLElement) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      }
 
       // Bắt phím tắt DevTools (F12, Ctrl+Shift+I/J/C, Ctrl+U)
       if (

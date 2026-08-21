@@ -1,20 +1,45 @@
 import { BaseStrategy } from './BaseStrategy';
 import {
+  ModeInitContext,
   BotLevelContext,
   GameOverPresentationContext,
   GameStartContext,
   PlayerTurnStartContext,
   PlayerMoveContext,
+  BlitzEnterParams,
+  BlitzStartMatchParams,
 } from './types';
-import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
+import { GameMode, LevelConfig, UserStats, BLACK, GameResult } from '../types';
 import { AI_LEVELS } from '../constants';
 
-export class BlitzStrategy extends BaseStrategy {
+export class BlitzStrategy extends BaseStrategy<BlitzEnterParams, BlitzStartMatchParams> {
   public readonly mode: GameMode = 'blitz';
 
-  public getBotLevel(ctx: BotLevelContext | UserStats): LevelConfig {
-    const stats = 'stats' in ctx ? ctx.stats : ctx;
-    const currentLvlId = stats.blitz?.currentLevel || 1;
+  public override enterMode(ctx: ModeInitContext, params?: BlitzEnterParams): void {
+    if (params?.startLevel !== undefined) {
+      ctx.blitz.setupBlitzLevel(ctx.blitz.blitzTimeLimit(), params.startLevel);
+    }
+    ctx.blitz.stopBlitzTimer();
+    ctx.blitz.setIsBlitzTimeout(false);
+    super.enterMode(ctx);
+    ctx.setPlayerColor(BLACK);
+    ctx.setCurrentTurn(BLACK);
+  }
+
+  public override startMatch(
+    ctx: ModeInitContext,
+    params?: BlitzStartMatchParams
+  ): void {
+    ctx.blitz.setupBlitzLevel(params?.timeSeconds, params?.startLevel);
+    ctx.setGameMode('blitz');
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.startNewGame(params?.playAsBlack ?? true);
+  }
+
+  public getBotLevel(ctx: BotLevelContext): LevelConfig {
+    const currentLvlId = ctx.stats.blitz?.currentLevel || 1;
     const bot = AI_LEVELS.find(l => l.id === currentLvlId);
     return bot || AI_LEVELS[0];
   }
@@ -61,7 +86,7 @@ export class BlitzStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats {
     if (!stats.blitz) {

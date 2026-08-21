@@ -1,5 +1,6 @@
 import { BaseStrategy } from './BaseStrategy';
 import {
+  ModeInitContext,
   BotLevelContext,
   GameOverPresentationContext,
   GameStartContext,
@@ -10,17 +11,66 @@ import {
   GameOverWinContext,
   GameOverLossContext,
   GameOverDrawContext,
+  TutorEnterParams,
+  TutorStartMatchParams,
 } from './types';
-import { GameMode, LevelConfig, UserStats } from '../types';
+import { GameMode, LevelConfig, UserStats, BLACK, GameResult } from '../types';
 import { AI_LEVELS } from '../constants';
+import { createEmptyBoard } from '../board';
 
-export class TutorStrategy extends BaseStrategy {
+export class TutorStrategy extends BaseStrategy<TutorEnterParams, TutorStartMatchParams> {
   public readonly mode: GameMode = 'tutor';
 
-  public getBotLevel(ctx: BotLevelContext | UserStats, customConfig?: { botLevel?: number }): LevelConfig {
-    const stats = 'stats' in ctx ? ctx.stats : ctx;
-    const tutorLvl = 'tutorLevel' in ctx ? ctx.tutorLevel : customConfig?.botLevel;
-    const currentLvlId = tutorLvl || stats.tutor?.currentLevel || 1;
+  public override enterMode(ctx: ModeInitContext, params?: TutorEnterParams): void {
+    if (params?.startLevel) {
+      ctx.tutor.setOpponentLevel(params.startLevel);
+    }
+    ctx.tutor.resetTutorMatchSession();
+    super.enterMode(ctx);
+    ctx.setPlayerColor(BLACK);
+    ctx.setCurrentTurn(BLACK);
+  }
+
+  public override startMatch(ctx: ModeInitContext, params?: TutorStartMatchParams): void {
+    if (params?.startLevel) {
+      ctx.tutor.setOpponentLevel(params.startLevel);
+    }
+    ctx.tutor.resetTutorMatchSession();
+    ctx.setGameMode('tutor');
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.setPlayerColor(BLACK);
+    ctx.setBoard(createEmptyBoard());
+    ctx.setMoveHistory([]);
+    ctx.setLastMove(null);
+    ctx.setWinInfo(null);
+    ctx.setAiStats(null);
+    ctx.setIsAiThinking(false);
+    ctx.setAiThinkingProgress({ depth: 0, nodes: 0 });
+    ctx.setGameStatus('playing');
+    ctx.setMatchStage('playing');
+    ctx.setCurrentTurn(BLACK);
+
+    ctx.soundService.playGameStartSound();
+    this.onGameStart({
+      lastGameResult: ctx.lastGameResult(),
+      botConfig: ctx.currentLevelConfig(),
+      board: ctx.board(),
+      playerColor: BLACK,
+      services: {
+        resetTutorMatchSession: ctx.tutor.resetTutorMatchSession,
+        triggerTutorSpeech: ctx.tutor.triggerTutorSpeech,
+        analyzePreMove: ctx.tutor.analyzePreMove,
+        triggerTaunt: ctx.taunt.triggerTaunt,
+      },
+    });
+    ctx.taunt.clearTauntQueue();
+    ctx.taunt.resetIdleTimer();
+  }
+
+  public getBotLevel(ctx: BotLevelContext): LevelConfig {
+    const currentLvlId = ctx.tutorLevel || ctx.stats.tutor?.currentLevel || 1;
     const bot = AI_LEVELS.find(l => l.id === currentLvlId);
     return bot || AI_LEVELS[0];
   }
@@ -117,7 +167,7 @@ export class TutorStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { botLevel?: number }
   ): UserStats {
     if (!stats.tutor) {

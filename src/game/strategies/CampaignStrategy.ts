@@ -1,15 +1,14 @@
 import { BaseStrategy } from './BaseStrategy';
-import { BotLevelContext, GameOverWinContext } from './types';
-import { GameMode, LevelConfig, UserStats } from '../types';
+import { BotLevelContext, GameOverWinContext, CampaignStartMatchParams } from './types';
+import { GameMode, LevelConfig, UserStats, GameResult } from '../types';
 import { getLevelConfigByWins } from '../constants';
 
-export class CampaignStrategy extends BaseStrategy {
+export class CampaignStrategy extends BaseStrategy<void, CampaignStartMatchParams> {
   public readonly mode: GameMode = 'campaign';
 
-  public getBotLevel(ctx: BotLevelContext | UserStats): LevelConfig {
-    const stats = 'stats' in ctx ? ctx.stats : ctx;
-    const campaignWins = stats.campaign?.wins ?? stats.wins;
-    return getLevelConfigByWins(campaignWins, stats.manualLevel);
+  public getBotLevel(ctx: BotLevelContext): LevelConfig {
+    const campaignWins = ctx.stats.campaign?.wins ?? ctx.stats.wins;
+    return getLevelConfigByWins(campaignWins, ctx.stats.manualLevel);
   }
 
   public canUndo(): boolean {
@@ -31,7 +30,7 @@ export class CampaignStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw'
+    result: GameResult
   ): UserStats {
     if (!stats.campaign) {
       stats.campaign = {

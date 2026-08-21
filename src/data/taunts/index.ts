@@ -16,9 +16,4 @@ export const TAUNT_REGISTRY: Record<TauntEvent, TauntDefinition> = {
   ...IDLE_TAUNTS,
   ...INTERACTION_TAUNTS,
   ...SYSTEM_TAUNTS,
-} as Record<TauntEvent, TauntDefinition>;
-
-// Cung cấp backward-compatibility cho các nơi cần lấy trực tiếp mảng câu thoại
-export const TAUNT_DATABASE: Record<TauntEvent, string[]> = Object.fromEntries(
-  Object.entries(TAUNT_REGISTRY).map(([k, v]) => [k, v.texts])
-) as Record<TauntEvent, string[]>;
+};

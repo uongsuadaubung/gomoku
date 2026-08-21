@@ -1,14 +1,50 @@
 import { BaseStrategy } from './BaseStrategy';
-import { BotLevelContext, SeriesPlayerSideContext, GameOverPresentationContext } from './types';
-import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
+import {
+  ModeInitContext,
+  BotLevelContext,
+  SeriesPlayerSideContext,
+  GameOverPresentationContext,
+  CustomEnterParams,
+  CustomStartMatchParams,
+} from './types';
+import { GameMode, LevelConfig, UserStats, BLACK, WHITE, GameResult } from '../types';
 import { AI_LEVELS } from '../constants';
 
-export class CustomStrategy extends BaseStrategy {
+export class CustomStrategy extends BaseStrategy<CustomEnterParams, CustomStartMatchParams> {
   public readonly mode: GameMode = 'custom';
 
-  public getBotLevel(ctx: BotLevelContext | UserStats, customConfig?: { botLevel?: number }): LevelConfig {
-    const config = 'customConfig' in ctx ? ctx.customConfig : customConfig;
-    const lvl = config?.botLevel || 3;
+  public override enterMode(ctx: ModeInitContext, params?: CustomEnterParams): void {
+    const highestUnlocked = Math.max(1, ctx.campaignLevelConfig().id);
+    const selectedLevel = params?.botLevel || ctx.series.customConfig()?.botLevel || Math.min(3, highestUnlocked);
+
+    ctx.series.setCustomConfig({
+      botLevel: selectedLevel,
+      playerColor: BLACK,
+    });
+    super.enterMode(ctx);
+    ctx.setCurrentTurn(BLACK);
+    ctx.setPlayerColor(BLACK);
+  }
+
+  public override startMatch(
+    ctx: ModeInitContext,
+    params?: CustomStartMatchParams
+  ): void {
+    const lvl = params?.botLevel || ctx.series.customConfig()?.botLevel || 1;
+    const playAsBlack = params?.playAsBlack ?? true;
+    ctx.setGameMode('custom');
+    ctx.series.setCustomConfig({
+      botLevel: lvl,
+      playerColor: playAsBlack ? BLACK : WHITE,
+    });
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.startNewGame(playAsBlack);
+  }
+
+  public getBotLevel(ctx: BotLevelContext): LevelConfig {
+    const lvl = ctx.customConfig?.botLevel || 3;
     const clampedIndex = Math.max(0, Math.min(AI_LEVELS.length - 1, lvl - 1));
     return AI_LEVELS[clampedIndex];
   }
@@ -32,7 +68,7 @@ export class CustomStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { botLevel?: number }
   ): UserStats {
     if (!stats.custom) {

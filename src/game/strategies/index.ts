@@ -24,7 +24,15 @@ const blitzStrategy = new BlitzStrategy();
 const tutorStrategy = new TutorStrategy();
 const guideStrategy = new GuideStrategy();
 
-const strategyMap: Record<GameMode, GameModeStrategy> = {
+export type AnyGameModeStrategy =
+  | CampaignStrategy
+  | PuzzleStrategy
+  | CustomStrategy
+  | BlitzStrategy
+  | TutorStrategy
+  | GuideStrategy;
+
+const strategyMap: Record<GameMode, AnyGameModeStrategy> = {
   campaign: campaignStrategy,
   puzzle: puzzleStrategy,
   custom: customStrategy,
@@ -37,7 +45,15 @@ const strategyMap: Record<GameMode, GameModeStrategy> = {
 /**
  * Lấy Strategy tương ứng với GameMode được truyền vào (Strategy Pattern Factory)
  */
-export function getGameStrategy(mode: GameMode): GameModeStrategy {
+export function getGameStrategy(mode: 'campaign'): CampaignStrategy;
+export function getGameStrategy(mode: 'puzzle'): PuzzleStrategy;
+export function getGameStrategy(mode: 'custom'): CustomStrategy;
+export function getGameStrategy(mode: 'blitz'): BlitzStrategy;
+export function getGameStrategy(mode: 'tutor'): TutorStrategy;
+export function getGameStrategy(mode: 'guide'): GuideStrategy;
+export function getGameStrategy(mode: 'menu'): CampaignStrategy;
+export function getGameStrategy(mode: GameMode): AnyGameModeStrategy;
+export function getGameStrategy(mode: GameMode): AnyGameModeStrategy {
   return strategyMap[mode] || campaignStrategy;
 }
 

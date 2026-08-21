@@ -244,21 +244,11 @@ function buildNaturalMoveHistory(
  * Sinh thế cờ chiến thuật trung cuộc ngẫu nhiên (hỗ trợ VCF, VCT và DEFENSE)
  */
 export function generateTacticalScenario(
-  optionsOrStars?: number | PuzzleGeneratorOptions,
-  preferredType?: PuzzleType,
-  densityOption?: PuzzleDensity
+  options: PuzzleGeneratorOptions = {}
 ): PuzzleScenario {
-  let requestedStars = 1;
-  let explicitType: PuzzleType | undefined = preferredType;
-  let density: PuzzleDensity = densityOption || 'normal';
-
-  if (typeof optionsOrStars === 'object' && optionsOrStars !== null) {
-    requestedStars = optionsOrStars.stars ?? 1;
-    explicitType = optionsOrStars.type ?? preferredType;
-    density = optionsOrStars.density ?? density;
-  } else if (typeof optionsOrStars === 'number') {
-    requestedStars = optionsOrStars;
-  }
+  const requestedStars = options.stars ?? 1;
+  const explicitType = options.type;
+  const density: PuzzleDensity = options.density ?? 'normal';
 
   const targetStars = Math.max(1, Math.min(requestedStars, 7));
 

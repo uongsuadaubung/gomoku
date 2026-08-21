@@ -11,7 +11,6 @@ import { LUNCH_BREAK_RUSH } from './lunchBreakRush';
 import { MIDNIGHT_BATTERY_LOW } from './midnightBatteryLow';
 import { MONDAY_BLUES } from './mondayBlues';
 import { OPEN_BOT_MODAL } from './openBotModal';
-import { OPEN_RULES } from './openRules';
 import { OPEN_STATS } from './openStats';
 import { PERFECT_CENTURY_GAMES } from './perfectCenturyGames';
 import { RAGE_QUIT_F5_RELOAD } from './rageQuitF5Reload';
@@ -41,7 +40,6 @@ export * from './lunchBreakRush';
 export * from './midnightBatteryLow';
 export * from './mondayBlues';
 export * from './openBotModal';
-export * from './openRules';
 export * from './openStats';
 export * from './perfectCenturyGames';
 export * from './rageQuitF5Reload';
@@ -59,7 +57,7 @@ export * from './toggleStepNumbers';
 export * from './weekendChill';
 export * from './winRateDropBelow50';
 
-export const SYSTEM_TAUNTS: Record<string, TauntDefinition> = {
+export const SYSTEM_TAUNTS = {
   AFTERNOON_FOOD_COMA,
   BOARD_STYLE_CHANGE,
   CHANGE_BOT_LEVEL_DOWN,
@@ -72,7 +70,6 @@ export const SYSTEM_TAUNTS: Record<string, TauntDefinition> = {
   MIDNIGHT_BATTERY_LOW,
   MONDAY_BLUES,
   OPEN_BOT_MODAL,
-  OPEN_RULES,
   OPEN_STATS,
   PERFECT_CENTURY_GAMES,
   RAGE_QUIT_F5_RELOAD,

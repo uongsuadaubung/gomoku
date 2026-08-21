@@ -42,8 +42,13 @@ export const LessonCurriculum: Component = () => {
         return <Sparkles size={18} class="text-purple-400" />;
       case 'Zap':
         return <Zap size={18} class="text-yellow-400" />;
+      case 'Clock':
+        return <Clock size={18} class="text-indigo-400" />;
       case 'Award':
         return <Award size={18} class="text-rose-400" />;
+      case 'GraduationCap':
+      case 'BookOpen':
+        return <GraduationCap size={18} class="text-amber-400" />;
       case 'Shield':
       default:
         return <Shield size={18} class="text-emerald-400" />;
@@ -183,7 +188,7 @@ export const LessonCurriculum: Component = () => {
                             onClick={() => {
                               if (!isUnlocked()) return;
                               store.selectLesson(lesson.id);
-                              store.setLessonViewMode('player');
+                              store.setShowQuickLessonDrawer(false);
                             }}
                             class={`w-full p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 ${
                               isCurrent()

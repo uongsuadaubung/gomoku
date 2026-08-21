@@ -8,6 +8,9 @@ import {
   TutorPostMoveFeedback,
   TutorBotEvaluation,
   TutorMatchReview,
+  MatchEndingResult,
+  TutorMood,
+  MatchReviewGrade,
 } from '../../game/types';
 import { TutorEngine, formatCoord } from '../../game/tutorEngine';
 import { getCandidateMoves } from '../../game/board';
@@ -29,7 +32,7 @@ export function createTutorSlice(props: TutorSliceProps) {
   const [tutorFeedback, setTutorFeedback] = createSignal<TutorPostMoveFeedback | null>(null);
   const [tutorBotEvaluation, setTutorBotEvaluation] = createSignal<TutorBotEvaluation | null>(null);
   const [tutorSpeech, setTutorSpeech] = createSignal<string>('Gia sư Gomo sẵn sàng đồng hành cùng bạn!');
-  const [tutorMood, setTutorMood] = createSignal<'calm' | 'excited' | 'danger' | 'proud' | 'thinking'>('calm');
+  const [tutorMood, setTutorMood] = createSignal<TutorMood>('calm');
   const [selectedOpponentLevel, setSelectedOpponentLevel] = createSignal<number>(
     props.stats().tutor?.currentLevel || 1
   );
@@ -193,7 +196,7 @@ export function createTutorSlice(props: TutorSliceProps) {
    * Tổng kết báo cáo ván đấu sau khi trận đấu kết thúc (Debriefing Report)
    */
   function finalizeMatchReview(
-    result: 'win' | 'loss' | 'draw' | 'resign',
+    result: MatchEndingResult,
     opponentName: string,
     opponentLevel: number
   ): TutorMatchReview {
@@ -232,7 +235,7 @@ export function createTutorSlice(props: TutorSliceProps) {
           )
         : 100;
 
-    let grade: 'S' | 'A' | 'B' | 'C' | 'D' = 'B';
+    let grade: MatchReviewGrade = 'B';
     let gradeTitle = 'Kỳ Thủ Vững Vàng';
     let gradeBadgeClass = 'text-sky-300 bg-sky-500/20 border-sky-500/40 shadow-sky-500/20';
 

@@ -6,9 +6,84 @@ import {
   BoardMatrix,
   Move,
   CustomGameConfig,
+  GameStatus,
+  MatchStage,
+  MoveHistoryItem,
+  WinInfo,
+  AIStats,
+  GameResult,
+  MatchEndingResult,
 } from '../types';
+import { PuzzleScenario } from '../puzzles/types';
 import { TauntEvent } from '../../data/taunts/types';
 import { TutorGeneralEvent, TutorDialogueContext } from '../../data/tutor/types';
+import { soundService } from '../../services/soundService';
+
+export interface ModeInitContext {
+  setGameMode: (mode: GameMode) => void;
+  setGameStatus: (status: GameStatus) => void;
+  setMatchStage: (stage: MatchStage) => void;
+  setBoard: (board: BoardMatrix) => void;
+  setMoveHistory: (history: MoveHistoryItem[]) => void;
+  setLastMove: (move: Move | null) => void;
+  setWinInfo: (winInfo: WinInfo | null) => void;
+  setAiStats: (stats: AIStats | null) => void;
+  setIsAiThinking: (thinking: boolean) => void;
+  setAiThinkingProgress: (progress: { depth: number; nodes: number }) => void;
+  setCurrentTurn: (turn: ActivePlayer) => void;
+  setPlayerColor: (color: ActivePlayer) => void;
+
+  series: {
+    setIsSeriesActive: (active: boolean) => void;
+    setSeriesGameNumber: (num: number | ((prev: number) => number)) => void;
+    setLastResigned: (resigned: boolean) => void;
+    setCustomConfig: (config: CustomGameConfig | ((prev: CustomGameConfig | undefined) => CustomGameConfig)) => void;
+    customConfig: () => CustomGameConfig | undefined;
+  };
+
+  puzzle: {
+    getOrGeneratePuzzle: (stars?: number, forceNew?: boolean) => PuzzleScenario;
+    currentPuzzle: () => PuzzleScenario | null;
+  };
+
+  blitz: {
+    setupBlitzLevel: (timeSeconds?: 5 | 10 | 15, startLevel?: number) => void;
+    stopBlitzTimer: () => void;
+    setIsBlitzTimeout: (timeout: boolean) => void;
+    blitzTimeLimit: () => 5 | 10 | 15;
+  };
+
+  tutor: {
+    setOpponentLevel: (lvl: number) => void;
+    resetTutorMatchSession: () => void;
+    selectedOpponentLevel: () => number;
+    triggerTutorSpeech: (event: TutorGeneralEvent, context?: TutorDialogueContext) => void;
+    analyzePreMove: (board: BoardMatrix, playerColor: ActivePlayer) => void;
+  };
+
+  guide: {
+    setGuideTab: (tab: 'lessons' | 'sandbox') => void;
+    resumeLatestLesson: () => void;
+    startSandboxMode: () => void;
+    clearWhatIf: () => void;
+  };
+
+  soundService: typeof soundService;
+  taunt: {
+    clearTauntQueue: () => void;
+    resetIdleTimer: () => void;
+    triggerTaunt: (event: TauntEvent, priority?: number) => void;
+  };
+
+  campaignLevelConfig: () => LevelConfig;
+  currentLevelConfig: () => LevelConfig;
+  cancelAiWorker: () => void;
+  startNewGame: (playAsBlack?: boolean) => void;
+  lastGameResult: () => GameResult | null;
+  board: () => BoardMatrix;
+  gameStatus: () => GameStatus;
+  resignGame: () => void;
+}
 
 export interface BotLevelContext {
   stats: UserStats;
@@ -32,7 +107,7 @@ export interface GameOverPresentationContext {
 }
 
 export interface GameStartContext {
-  lastGameResult: 'win' | 'loss' | 'draw' | null;
+  lastGameResult: GameResult | null;
   botConfig: LevelConfig;
   board: BoardMatrix;
   playerColor: ActivePlayer;
@@ -117,7 +192,7 @@ export interface ResignContext {
   isLongThinking: boolean;
   services: {
     triggerTutorSpeech?: (event: TutorGeneralEvent, context?: TutorDialogueContext) => void;
-    finalizeMatchReview?: (result: 'win' | 'loss' | 'draw' | 'resign', opponentName: string, opponentLevel: number) => void;
+    finalizeMatchReview?: (result: MatchEndingResult, opponentName: string, opponentLevel: number) => void;
     triggerTaunt?: (event: TauntEvent, priority?: number) => void;
   };
 }
@@ -134,7 +209,7 @@ export interface GameOverWinContext {
   botEverHadOpenThreat: boolean;
   services: {
     triggerTutorSpeech?: (event: TutorGeneralEvent, context?: TutorDialogueContext) => void;
-    finalizeMatchReview?: (result: 'win' | 'loss' | 'draw' | 'resign', opponentName: string, opponentLevel: number) => void;
+    finalizeMatchReview?: (result: MatchEndingResult, opponentName: string, opponentLevel: number) => void;
     triggerTaunt?: (event: TauntEvent, priority?: number) => void;
     playLevelUpSound?: () => void;
     setShowLevelUpAlert?: (level: LevelConfig) => void;
@@ -153,7 +228,7 @@ export interface GameOverLossContext {
   isImmediateRevenge: boolean;
   services: {
     triggerTutorSpeech?: (event: TutorGeneralEvent, context?: TutorDialogueContext) => void;
-    finalizeMatchReview?: (result: 'win' | 'loss' | 'draw' | 'resign', opponentName: string, opponentLevel: number) => void;
+    finalizeMatchReview?: (result: MatchEndingResult, opponentName: string, opponentLevel: number) => void;
     triggerTaunt?: (event: TauntEvent, priority?: number) => void;
     clearActivePuzzle?: () => void;
   };
@@ -164,19 +239,74 @@ export interface GameOverDrawContext {
   consecutiveDrawsCount: number;
   services: {
     triggerTutorSpeech?: (event: TutorGeneralEvent, context?: TutorDialogueContext) => void;
-    finalizeMatchReview?: (result: 'win' | 'loss' | 'draw' | 'resign', opponentName: string, opponentLevel: number) => void;
+    finalizeMatchReview?: (result: MatchEndingResult, opponentName: string, opponentLevel: number) => void;
     triggerTaunt?: (event: TauntEvent, priority?: number) => void;
     clearActivePuzzle?: () => void;
   };
 }
 
-export interface GameModeStrategy {
+export interface CampaignStartMatchParams {
+  playAsBlack?: boolean;
+}
+
+export interface PuzzleEnterParams {
+  stars?: number;
+  forceNew?: boolean;
+}
+
+export interface PuzzleNextParams {
+  stars?: number;
+}
+
+export interface CustomEnterParams {
+  botLevel?: number;
+}
+
+export interface CustomStartMatchParams {
+  botLevel?: number;
+  playAsBlack?: boolean;
+}
+
+export interface BlitzEnterParams {
+  startLevel?: number;
+}
+
+export interface BlitzStartMatchParams {
+  timeSeconds?: 5 | 10 | 15;
+  playAsBlack?: boolean;
+  startLevel?: number;
+}
+
+export interface TutorEnterParams {
+  startLevel?: number;
+}
+
+export interface TutorStartMatchParams {
+  startLevel?: number;
+  playAsBlack?: boolean;
+}
+
+export interface GuideEnterParams {
+  tab?: 'lessons' | 'sandbox';
+}
+
+export interface GameModeStrategy<TEnterParams = void, TStartParams = void> {
   readonly mode: GameMode;
+
+  /**
+   * Khởi tạo và điều phối khi người dùng chọn vào Chế độ chơi này
+   */
+  enterMode(ctx: ModeInitContext, params?: TEnterParams): void;
+
+  /**
+   * Khởi động trực tiếp một trận đấu của chế độ chơi này
+   */
+  startMatch?(ctx: ModeInitContext, params?: TStartParams): void;
 
   /**
    * Xác định cấu hình AI tương ứng với chế độ chơi này
    */
-  getBotLevel(ctx: BotLevelContext | UserStats, customConfig?: { botLevel?: number }): LevelConfig;
+  getBotLevel(ctx: BotLevelContext): LevelConfig;
 
   /**
    * Xác định phe quân cho ván tiếp theo trong chuỗi ván
@@ -249,7 +379,7 @@ export interface GameModeStrategy {
    */
   recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats;
 

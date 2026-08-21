@@ -1,12 +1,40 @@
 import { BaseStrategy } from './BaseStrategy';
-import { GameMode, LevelConfig, UserStats, EMPTY } from '../types';
+import { GameMode, LevelConfig, UserStats, EMPTY, GameResult } from '../types';
 import { AI_LEVELS } from '../constants';
-import { BotLevelContext, CanPlayerMoveContext, CustomMoveContext, CellHoverContext } from './types';
+import {
+  ModeInitContext,
+  BotLevelContext,
+  CanPlayerMoveContext,
+  CustomMoveContext,
+  CellHoverContext,
+  GameStartContext,
+  GuideEnterParams,
+} from './types';
 
-export class GuideStrategy extends BaseStrategy {
+export class GuideStrategy extends BaseStrategy<GuideEnterParams, void> {
   readonly mode: GameMode = 'guide';
 
-  public getBotLevel(_ctx: BotLevelContext | UserStats, _customConfig?: { botLevel?: number }): LevelConfig {
+  public override enterMode(ctx: ModeInitContext, params?: GuideEnterParams): void {
+    const tab = params?.tab || 'lessons';
+    ctx.blitz.stopBlitzTimer();
+    ctx.setGameMode('guide');
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.setAiStats(null);
+    ctx.setIsAiThinking(false);
+    ctx.setGameStatus('playing');
+    ctx.setMatchStage('playing');
+    ctx.guide.setGuideTab(tab);
+    if (tab === 'lessons') {
+      ctx.guide.resumeLatestLesson();
+    } else {
+      ctx.guide.startSandboxMode();
+    }
+    ctx.soundService.playClickSound();
+  }
+
+  public getBotLevel(_ctx: BotLevelContext): LevelConfig {
     return AI_LEVELS[11] || AI_LEVELS[0]; // Thần Cờ Trí Tuệ Tối Thượng
   }
 
@@ -51,13 +79,13 @@ export class GuideStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    _result: 'win' | 'loss' | 'draw',
+    _result: GameResult,
     _extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats {
     return stats;
   }
 
-  public onGameStart(_ctx: any): void {
+  public onGameStart(_ctx: GameStartContext): void {
     // Không cần taunt tự động trong chế độ Guide
   }
 }

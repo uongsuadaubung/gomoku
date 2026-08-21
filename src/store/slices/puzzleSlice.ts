@@ -23,7 +23,7 @@ export function createPuzzleSlice(deps: PuzzleSliceDeps) {
       if (targetStars === undefined) {
         targetStars = Math.floor(Math.random() * maxUnlocked) + 1;
       }
-      scenario = generateTacticalScenario(targetStars);
+      scenario = generateTacticalScenario({ stars: targetStars });
       StorageService.saveActivePuzzle(scenario);
     }
 

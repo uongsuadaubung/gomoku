@@ -10,7 +10,6 @@ import { MoveHistory } from './components/MoveHistory';
 import { StatsModal } from './components/StatsModal';
 import { BotModal } from './components/BotModal';
 import { SettingsModal } from './components/SettingsModal';
-import { RulesModal } from './components/RulesModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { TutorCompanion } from './components/TutorCompanion';
 import { GuideMasterView } from './components/guide/GuideMasterView';
@@ -128,7 +127,6 @@ const AppContent: Component = () => {
       <StatsModal />
       <BotModal />
       <SettingsModal />
-      <RulesModal />
       <LevelUpModal />
     </div>
   );

@@ -1,4 +1,4 @@
-import { BOARD_SIZE, EMPTY, ActivePlayer, BoardMatrix, WinInfo, Move } from './types';
+import { BOARD_SIZE, EMPTY, ActivePlayer, BoardMatrix, WinInfo, Move, BLACK, WHITE } from './types';
 
 /**
  * Khởi tạo ma trận bàn cờ 15x15 rỗng
@@ -57,7 +57,7 @@ export function checkWin(board: BoardMatrix): WinInfo | null {
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
       const player = board[r][c];
-      if (player === EMPTY) continue;
+      if (player !== BLACK && player !== WHITE) continue;
 
       for (const dir of directions) {
         const line: [number, number][] = [[r, c]];
@@ -83,7 +83,7 @@ export function checkWin(board: BoardMatrix): WinInfo | null {
         // Đủ 5 quân liên tiếp trở lên là thắng
         if (count >= 5) {
           return {
-            winner: player as ActivePlayer,
+            winner: player,
             line: line.slice(0, 5),
             direction: dir.name,
           };

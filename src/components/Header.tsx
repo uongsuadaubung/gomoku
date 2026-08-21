@@ -3,7 +3,6 @@ import {
   Volume2,
   VolumeX,
   Settings,
-  CircleQuestionMark,
   ChartColumn,
   Bot,
   House,
@@ -104,19 +103,6 @@ export const Header: Component = () => {
                 <Volume2 size={16} class="text-emerald-400 sm:w-[18px] sm:h-[18px]" />
               </Show>
             }
-          />
-
-          {/* Rules / Help */}
-          <HeaderIconButton
-            title="Hướng dẫn luật chơi"
-            label="Luật"
-            onClick={() => {
-              store.setShowRulesModal(true);
-              if (store.gameMode() !== 'menu') {
-                store.triggerTaunt('OPEN_RULES', 200);
-              }
-            }}
-            icon={<CircleQuestionMark size={16} class="text-sky-400 sm:w-[18px] sm:h-[18px]" />}
           />
 
           {/* Stats Modal */}

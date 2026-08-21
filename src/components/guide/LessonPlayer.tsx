@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ListOrdered,
+  Map,
   X,
   Lock,
   CheckCircle2,
@@ -19,6 +20,7 @@ import {
 import { useGame } from '../../store/GameContext';
 import { formatCoord } from '../../game/constants';
 import { GUIDE_CHAPTERS } from '../../data/guide/lessons';
+import { LessonCurriculum } from './LessonCurriculum';
 
 export const LessonPlayer: Component = () => {
   const store = useGame();
@@ -31,34 +33,31 @@ export const LessonPlayer: Component = () => {
 
   return (
     <div class="w-full flex flex-col gap-3 sm:gap-3.5 select-none">
-      {/* 1. THANH ĐIỀU HƯỚNG NHANH CẤP TỐC (QUICK NAVIGATOR - ZERO SCROLLING) */}
-      <div class="w-full flex items-center justify-between gap-2 p-2 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md backdrop-blur-md">
+      {/* 1. THANH ĐIỀU HƯỚNG BÀI HỌC (GỌN GÀNG, KHÔNG BỊ LẸM CHỮ) */}
+      <div class="w-full flex items-center justify-between gap-1.5 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md backdrop-blur-md">
         {/* Nút Bài Trước */}
         <button
           type="button"
           disabled={!nav().hasPrev}
           onClick={() => store.goToPrevLesson()}
-          class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none text-slate-200 text-xs font-bold flex items-center gap-1 transition-all border border-slate-700/80 shadow-sm"
+          class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none text-slate-200 text-xs font-bold flex items-center gap-1 transition-all border border-slate-700/80 shadow-sm shrink-0"
           title="Chuyển sang bài trước"
         >
           <ChevronLeft size={15} />
-          <span class="hidden sm:inline">Bài Trước</span>
+          <span>Trước</span>
         </button>
 
-        {/* Nút Mở Khay Chọn Bài Nhanh (Teleport Drawer) */}
+        {/* Nút Mở Toàn Bộ Lộ Trình 9 Chương & Chọn Bài Học */}
         <button
           type="button"
           onClick={() => store.setShowQuickLessonDrawer(true)}
-          class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-950/80 via-slate-800/90 to-indigo-950/80 hover:border-indigo-400 text-indigo-200 border border-indigo-500/40 text-xs font-extrabold flex items-center gap-2 transition-all shadow-sm group"
-          title={`Bấm để mở danh sách ${nav().total} bài học`}
+          class="flex-1 min-w-0 py-1.5 px-2 rounded-xl bg-gradient-to-r from-indigo-950/80 via-slate-800/90 to-indigo-950/80 hover:border-indigo-400 text-indigo-200 border border-indigo-500/40 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-sm group"
+          title={`Mở Lộ Trình ${GUIDE_CHAPTERS.length} Chương (${nav().total} Bài)`}
         >
-          <ListOrdered size={14} class="text-indigo-400 group-hover:scale-110 transition-transform" />
-          <span class="text-white">Bài {nav().index} / {nav().total}</span>
-          <span class="text-indigo-300/80 text-[10px] hidden md:inline font-normal max-w-[150px] truncate">
-            ({lesson().title})
-          </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-mono">
-            Đổi bài ▼
+          <Map size={14} class="text-indigo-400 group-hover:scale-110 transition-transform shrink-0" />
+          <span class="text-white font-bold whitespace-nowrap">Bài {nav().index}/{nav().total}</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-mono shrink-0 whitespace-nowrap">
+            Lộ trình ▼
           </span>
         </button>
 
@@ -67,7 +66,7 @@ export const LessonPlayer: Component = () => {
           type="button"
           disabled={!nav().hasNext}
           onClick={() => store.goToNextLesson()}
-          class={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border shadow-sm ${
+          class={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all border shadow-sm shrink-0 ${
             nav().hasNext
               ? 'bg-slate-800/90 hover:bg-slate-700 text-slate-200 border-slate-700/80'
               : 'bg-slate-900/50 text-slate-500 border-slate-800/50 cursor-not-allowed opacity-50'
@@ -80,7 +79,7 @@ export const LessonPlayer: Component = () => {
               : 'Đã là bài cuối cùng'
           }
         >
-          <span class="hidden sm:inline">Bài Sau</span>
+          <span>Sau</span>
           <Show when={!nav().isCurrentCompleted && nav().index < nav().total}>
             <Lock size={12} class="text-amber-400/80" />
           </Show>
@@ -282,119 +281,35 @@ export const LessonPlayer: Component = () => {
         </div>
       </div>
 
-      {/* 4. KHAY CHỌN BÀI HỌC NHANH (TELEPORT DRAWER MODAL) */}
+      {/* 4. MODAL LỘ TRÌNH 9 CHƯƠNG & CHỌN BÀI HỌC (TELEPORT DRAWER MODAL) */}
       <Show when={store.showQuickLessonDrawer()}>
-        <div class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fade-in">
-          <div class="w-full max-w-2xl bg-slate-900 border border-indigo-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-            {/* Drawer Header */}
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div class="flex items-center gap-2">
+        <div class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div class="w-full max-w-2xl bg-slate-900 border border-indigo-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
+            {/* Modal Header */}
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0 mb-1">
+              <div class="flex items-center gap-2.5">
                 <div class="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                  <ListOrdered size={20} />
+                  <Map size={20} />
                 </div>
                 <div>
-                  <h3 class="text-sm sm:text-base font-black text-white">Chọn Bài Học Nhanh ({nav().total} Bài)</h3>
-                  <p class="text-xs text-indigo-300 font-medium">Bấm vào bất kỳ bài nào để tải bài học ngay lập tức</p>
+                  <h3 class="text-sm sm:text-base font-black text-white">Lộ Trình Giáo Trình {GUIDE_CHAPTERS.length} Chương</h3>
+                  <p class="text-xs text-indigo-300 font-medium">Bấm vào bất kỳ bài nào để vào học ngay lập tức</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => store.setShowQuickLessonDrawer(false)}
-                class="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                class="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                title="Đóng modal"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Drawer Content: Danh Sách 8 Chương & 28 Bài */}
-            <div class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 custom-scrollbar">
-              <For each={GUIDE_CHAPTERS}>
-                {chapter => {
-                  const completedInChapter = () =>
-                    chapter.lessons.filter(l => store.completedLessonsSet().has(l.id)).length;
-
-                  return (
-                    <div class="rounded-2xl bg-slate-950/60 border border-slate-800 p-3 space-y-2">
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <span class="text-xs font-black text-indigo-300">
-                            Chương {chapter.id}: {chapter.vietnameseTitle}
-                          </span>
-                          <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                            {chapter.badge}
-                          </span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 font-medium">
-                          {completedInChapter()} / {chapter.lessons.length} bài
-                        </span>
-                      </div>
-
-                      {/* Danh sách bài trong chương */}
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        <For each={chapter.lessons}>
-                          {item => {
-                            const isCurrent = () => store.currentLessonId() === item.id;
-                            const isDone = () => store.completedLessonsSet().has(item.id);
-                            const isUnlocked = () => store.isLessonUnlocked(item.id);
-
-                            return (
-                              <button
-                                type="button"
-                                disabled={!isUnlocked()}
-                                onClick={() => {
-                                  if (!isUnlocked()) return;
-                                  store.selectLesson(item.id);
-                                  store.setShowQuickLessonDrawer(false);
-                                }}
-                                class={`p-2 rounded-xl text-left border flex items-center justify-between gap-2 transition-all ${
-                                  isCurrent()
-                                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
-                                    : isDone()
-                                    ? 'bg-slate-900 hover:bg-slate-800 text-emerald-300 border-emerald-500/20'
-                                    : isUnlocked()
-                                    ? 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 border-slate-800'
-                                    : 'bg-slate-950/40 text-slate-500 border-slate-900/80 cursor-not-allowed opacity-50'
-                                }`}
-                                title={isUnlocked() ? item.title : 'Hoàn thành bài học trước để mở khóa bài này'}
-                              >
-                                <div class="flex items-center gap-2 min-w-0">
-                                  <div
-                                    class={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] shrink-0 ${
-                                      isCurrent()
-                                        ? 'bg-white text-indigo-950'
-                                        : isDone()
-                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                        : isUnlocked()
-                                        ? 'bg-slate-800 text-slate-400'
-                                        : 'bg-slate-900 text-slate-600'
-                                    }`}
-                                  >
-                                    <Show
-                                      when={isDone()}
-                                      fallback={
-                                        <Show when={isUnlocked()} fallback={<Lock size={11} class="text-slate-500" />}>
-                                          <span>{item.order}</span>
-                                        </Show>
-                                      }
-                                    >
-                                      <CheckCircle2 size={12} />
-                                    </Show>
-                                  </div>
-                                  <span class="text-xs font-bold truncate">{item.title}</span>
-                                </div>
-                                <Show when={!isUnlocked()}>
-                                  <Lock size={12} class="text-slate-600 shrink-0" />
-                                </Show>
-                              </button>
-                            );
-                          }}
-                        </For>
-                      </div>
-                    </div>
-                  );
-                }}
-              </For>
+            {/* Modal Body: Hiển thị trọn vẹn LessonCurriculum với đầy đủ icon từng chương, badge độ khó, thời lượng, và tiến độ */}
+            <div class="flex-1 overflow-y-auto py-1 pr-1 custom-scrollbar">
+              <LessonCurriculum />
             </div>
           </div>
         </div>

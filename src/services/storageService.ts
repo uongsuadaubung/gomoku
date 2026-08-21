@@ -1,4 +1,4 @@
-import { UserStats, ThemeType, BoardStyle, GameMode } from '../game/types';
+import { UserStats, ThemeType, BoardStyle, GameMode, GameResult } from '../game/types';
 import { PuzzleScenario } from '../game/puzzles/types';
 import { getGameStrategy } from '../game/strategies';
 
@@ -160,7 +160,7 @@ export class StorageService {
 
   public static recordGame(
     mode: GameMode = 'campaign',
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats {
     const stats = this.getStats();
@@ -183,9 +183,11 @@ export class StorageService {
   }
 
   public static getTheme(): ThemeType {
-    const theme = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeType;
-    const validThemes: ThemeType[] = ['wood', 'paper', 'jade', 'slate', 'cyber'];
-    return validThemes.includes(theme) ? theme : 'paper';
+    const raw = localStorage.getItem(STORAGE_KEYS.THEME);
+    if (raw === 'wood' || raw === 'paper' || raw === 'jade' || raw === 'slate' || raw === 'cyber') {
+      return raw;
+    }
+    return 'paper';
   }
 
   public static setTheme(theme: ThemeType): void {
@@ -201,8 +203,8 @@ export class StorageService {
   }
 
   public static getBoardStyle(): BoardStyle {
-    const style = localStorage.getItem(STORAGE_KEYS.BOARD_STYLE) as BoardStyle;
-    return style === 'intersections' ? 'intersections' : 'cells';
+    const raw = localStorage.getItem(STORAGE_KEYS.BOARD_STYLE);
+    return raw === 'intersections' ? 'intersections' : 'cells';
   }
 
   public static setBoardStyle(style: BoardStyle): void {
@@ -230,7 +232,7 @@ export class StorageService {
   public static getActivePuzzle(): PuzzleScenario | null {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_PUZZLE);
-      return data ? (JSON.parse(data) as PuzzleScenario) : null;
+      return data ? JSON.parse(data) : null;
     } catch {
       return null;
     }

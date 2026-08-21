@@ -22,6 +22,14 @@ export type GameStatus = 'idle' | 'playing' | 'black_win' | 'white_win' | 'draw'
 
 export type GameMode = 'menu' | 'campaign' | 'puzzle' | 'custom' | 'blitz' | 'tutor' | 'guide';
 
+export type GameResult = 'win' | 'loss' | 'draw';
+export type MatchEndingResult = GameResult | 'resign';
+
+export type ThreatLevel = 'winning' | 'danger' | 'warning' | 'neutral';
+export type MoveQuality = 'brilliant' | 'good' | 'missed_win' | 'missed_fork' | 'blunder' | 'passive';
+export type TutorMood = 'calm' | 'excited' | 'danger' | 'proud' | 'thinking';
+export type MatchReviewGrade = 'S' | 'A' | 'B' | 'C' | 'D';
+
 export interface WinInfo {
   winner: ActivePlayer;
   line: [number, number][];
@@ -42,7 +50,7 @@ export interface TutorPreMoveAnalysis {
   event: TutorPreMoveEvent;
   speech: string;
   isDirectCoord: boolean;
-  threatLevel: 'winning' | 'danger' | 'warning' | 'neutral';
+  threatLevel: ThreatLevel;
 }
 
 export interface TutorPostMoveFeedback {
@@ -52,7 +60,7 @@ export interface TutorPostMoveFeedback {
   bestCoordLabel: string;
   event: TutorPostMoveEvent;
   speech: string;
-  quality: 'brilliant' | 'good' | 'missed_win' | 'missed_fork' | 'blunder' | 'passive';
+  quality: MoveQuality;
   tacticName?: string;
 }
 
@@ -71,7 +79,7 @@ export interface TutorMatchReview {
   missedWins: number;
   passiveMoves: number;
   accuracy: number; // 0 - 100%
-  grade: 'S' | 'A' | 'B' | 'C' | 'D';
+  grade: MatchReviewGrade;
   gradeTitle: string;
   gradeBadgeClass: string;
   summaryAdvice: string;

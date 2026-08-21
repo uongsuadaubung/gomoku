@@ -6,11 +6,10 @@ import {
   type TauntItem,
   type TauntDefinition,
   TAUNT_REGISTRY,
-  TAUNT_DATABASE,
 } from '../data/taunts';
 
 export type { TauntEvent, BotMood, TauntItem, TauntDefinition };
-export { TAUNT_REGISTRY, TAUNT_DATABASE };
+export { TAUNT_REGISTRY };
 
 const MOOD_EMOJI_MAP: Record<BotMood, string> = {
   disdain: '😒',

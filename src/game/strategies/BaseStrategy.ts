@@ -1,5 +1,6 @@
 import {
   GameModeStrategy,
+  ModeInitContext,
   BotLevelContext,
   SeriesPlayerSideContext,
   GameOverPresentationContext,
@@ -15,20 +16,48 @@ import {
   CustomMoveContext,
   CellHoverContext,
 } from './types';
-import { GameMode, LevelConfig, UserStats, BLACK } from '../types';
+import { GameMode, LevelConfig, UserStats, BLACK, GameResult } from '../types';
+import { createEmptyBoard } from '../board';
 import { TauntEvent } from '../../data/taunts/types';
 import { TauntEvaluator } from '../../services/tauntEvaluator';
 import { TauntService } from '../../services/tauntService';
 
-export abstract class BaseStrategy implements GameModeStrategy {
+export abstract class BaseStrategy<
+  TEnterParams = void,
+  TStartParams extends { playAsBlack?: boolean } | void = { playAsBlack?: boolean }
+> implements GameModeStrategy<TEnterParams, TStartParams> {
   abstract readonly mode: GameMode;
-  abstract getBotLevel(ctx: BotLevelContext | UserStats, customConfig?: { botLevel?: number }): LevelConfig;
+  abstract getBotLevel(ctx: BotLevelContext): LevelConfig;
   abstract canUndo(): boolean;
   abstract recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { stars?: number; botLevel?: number; isTimeout?: boolean; timeSeconds?: 5 | 10 | 15 }
   ): UserStats;
+
+  public enterMode(ctx: ModeInitContext, _params?: TEnterParams): void {
+    ctx.setGameMode(this.mode);
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.setBoard(createEmptyBoard());
+    ctx.setMoveHistory([]);
+    ctx.setLastMove(null);
+    ctx.setWinInfo(null);
+    ctx.setAiStats(null);
+    ctx.setIsAiThinking(false);
+    ctx.setAiThinkingProgress({ depth: 0, nodes: 0 });
+    ctx.setGameStatus('idle');
+    ctx.setMatchStage('ready');
+    ctx.taunt.clearTauntQueue();
+    ctx.taunt.resetIdleTimer();
+    ctx.soundService.playClickSound();
+  }
+
+  public startMatch(ctx: ModeInitContext, params?: TStartParams): void {
+    this.enterMode(ctx);
+    ctx.startNewGame(params ? params.playAsBlack ?? true : true);
+  }
 
   public getNextSeriesPlayerSide(ctx: SeriesPlayerSideContext): boolean {
     // Mặc định: Luân phiên đổi phe đen/trắng sau mỗi ván

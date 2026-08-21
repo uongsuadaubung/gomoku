@@ -1,15 +1,77 @@
 import { BaseStrategy } from './BaseStrategy';
 import {
+  ModeInitContext,
   GameOverPresentationContext,
   GameOverWinContext,
   GameOverLossContext,
   GameOverDrawContext,
+  PuzzleEnterParams,
+  PuzzleNextParams,
 } from './types';
-import { GameMode, LevelConfig, UserStats } from '../types';
+import { GameMode, LevelConfig, UserStats, GameResult } from '../types';
 import { AI_LEVELS } from '../constants';
+import { cloneBoard } from '../board';
+import { StorageService } from '../../services/storageService';
+import { TauntEvaluator } from '../../services/tauntEvaluator';
 
-export class PuzzleStrategy extends BaseStrategy {
+export class PuzzleStrategy extends BaseStrategy<PuzzleEnterParams, void> {
   public readonly mode: GameMode = 'puzzle';
+
+  public override enterMode(ctx: ModeInitContext, params?: PuzzleEnterParams): void {
+    const scenario = ctx.puzzle.getOrGeneratePuzzle(params?.stars, params?.forceNew ?? false);
+
+    ctx.setGameMode('puzzle');
+    ctx.series.setIsSeriesActive(false);
+    ctx.series.setSeriesGameNumber(0);
+    ctx.series.setLastResigned(false);
+    ctx.setPlayerColor(scenario.playerColor);
+    ctx.setBoard(cloneBoard(scenario.initialBoard));
+    ctx.setMoveHistory([...scenario.initialMoveHistory]);
+    const lastHist = scenario.initialMoveHistory[scenario.initialMoveHistory.length - 1];
+    ctx.setLastMove(lastHist ? { row: lastHist.row, col: lastHist.col } : null);
+    ctx.setWinInfo(null);
+    ctx.setAiStats(null);
+    ctx.setIsAiThinking(false);
+    ctx.setAiThinkingProgress({ depth: 0, nodes: 0 });
+    ctx.setGameStatus('playing');
+    ctx.setMatchStage('playing');
+    ctx.setCurrentTurn(scenario.playerColor);
+
+    ctx.soundService.playStoneSound();
+    const startTaunt = TauntEvaluator.evaluateGameStart(ctx.lastGameResult());
+    ctx.taunt.triggerTaunt(startTaunt, 200);
+    ctx.taunt.resetIdleTimer();
+  }
+
+  public restartPuzzle(ctx: ModeInitContext): void {
+    const scenario = ctx.puzzle.currentPuzzle() || StorageService.getActivePuzzle();
+    if (!scenario) {
+      this.enterMode(ctx, { forceNew: true });
+      return;
+    }
+    StorageService.saveActivePuzzle(scenario);
+    ctx.cancelAiWorker();
+    ctx.setBoard(cloneBoard(scenario.initialBoard));
+    ctx.setMoveHistory([...scenario.initialMoveHistory]);
+    const lastHist = scenario.initialMoveHistory[scenario.initialMoveHistory.length - 1];
+    ctx.setLastMove(lastHist ? { row: lastHist.row, col: lastHist.col } : null);
+    ctx.setWinInfo(null);
+    ctx.setAiStats(null);
+    ctx.setIsAiThinking(false);
+    ctx.setAiThinkingProgress({ depth: 0, nodes: 0 });
+    ctx.setGameStatus('playing');
+    ctx.setMatchStage('playing');
+    ctx.setCurrentTurn(scenario.playerColor);
+    ctx.soundService.playClickSound();
+    ctx.taunt.resetIdleTimer();
+  }
+
+  public nextPuzzle(ctx: ModeInitContext, params?: PuzzleNextParams): void {
+    if (ctx.gameStatus() === 'playing') {
+      ctx.resignGame();
+    }
+    this.enterMode(ctx, { stars: params?.stars, forceNew: true });
+  }
 
   public getBotLevel(): LevelConfig {
     // Chế độ thế cờ luôn đấu với Bot Level 8 (Thần Cờ Bất Khả Chiến Bại)
@@ -61,7 +123,7 @@ export class PuzzleStrategy extends BaseStrategy {
 
   public recordGame(
     stats: UserStats,
-    result: 'win' | 'loss' | 'draw',
+    result: GameResult,
     extra?: { stars?: number }
   ): UserStats {
     if (!stats.puzzle) {

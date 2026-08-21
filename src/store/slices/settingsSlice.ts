@@ -15,7 +15,6 @@ export function createSettingsSlice() {
   const [showStatsModal, setShowStatsModal] = createSignal<boolean>(false);
   const [showBotModal, setShowBotModal] = createSignal<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = createSignal<boolean>(false);
-  const [showRulesModal, setShowRulesModal] = createSignal<boolean>(false);
   const [showLevelUpAlert, setShowLevelUpAlert] = createSignal<LevelConfig | null>(null);
 
   function setTheme(newTheme: ThemeType) {
@@ -76,7 +75,6 @@ export function createSettingsSlice() {
     showStatsModal,
     showBotModal,
     showSettingsModal,
-    showRulesModal,
     showLevelUpAlert,
 
     // Setters
@@ -84,7 +82,6 @@ export function createSettingsSlice() {
     setShowStatsModal,
     setShowBotModal,
     setShowSettingsModal,
-    setShowRulesModal,
     setShowLevelUpAlert,
 
     // Actions
