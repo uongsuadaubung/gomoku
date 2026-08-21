@@ -68,7 +68,7 @@ Thay vì tải về danh sách vài chục bài tập tĩnh khiến người ch�
 Toàn bộ hạt giống được lưu trữ dưới dạng tọa độ tương đối `{ r, c, player }` xoay quanh gốc trung tâm `(0, 0)`.
 
 ### 2.1. Thể loại VCF (Victory by Continuous Fours - 1⭐ đến 7⭐)
-*File: [`src/game/puzzles/skeletons/vcfSkeletons.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/skeletons/vcfSkeletons.ts)*
+*File: [`src/game/puzzles/skeletons/vcfSkeletons.ts`](../src/game/puzzles/skeletons/vcfSkeletons.ts)*
 
 VCF là chuỗi nước cờ trong đó người tấn công (Đen) liên tục tạo ra các **nước 4 (Four)**, buộc đối thủ (Trắng) phải đỡ vào đúng ô chặn duy nhất ở mọi lượt cho đến khi đạt 5 quân liên tiếp.
 
@@ -94,7 +94,7 @@ VCF là chuỗi nước cờ trong đó người tấn công (Đen) liên tục 
 ---
 
 ### 2.2. Thể loại VCT (Victory by Continuous Threats - 1⭐ đến 3⭐)
-*File: [`src/game/puzzles/skeletons/vctSkeletons.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/skeletons/vctSkeletons.ts)*
+*File: [`src/game/puzzles/skeletons/vctSkeletons.ts`](../src/game/puzzles/skeletons/vctSkeletons.ts)*
 
 VCT là chuỗi tấn công phối hợp sử dụng cả **nước 3 mở (Open Three)** và **nước 4 (Four)** để ép đối thủ chống đỡ cho đến khi sập bẫy sát cục không thể hóa giải.
 
@@ -113,7 +113,7 @@ VCT là chuỗi tấn công phối hợp sử dụng cả **nước 3 mở (Open
 ---
 
 ### 2.3. Thể loại DEFENSE (Phòng Thủ & Phản Kích - 1⭐ đến 3⭐)
-*File: [`src/game/puzzles/skeletons/defenseSkeletons.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/skeletons/defenseSkeletons.ts)*
+*File: [`src/game/puzzles/skeletons/defenseSkeletons.ts`](../src/game/puzzles/skeletons/defenseSkeletons.ts)*
 
 Bối cảnh: **Đối thủ (Trắng) đang nắm sẵn cơ hội thắng ngay ở nước kế tiếp** (Trắng có nước 3 mở hoặc nước 4 nhảy cóc). Bạn phải tìm **điểm giao cắt vàng (Interception Point)**:
 1. 🛑 **Bịt kín 100% hướng thắng của đối thủ**.
@@ -133,7 +133,7 @@ Bối cảnh: **Đối thủ (Trắng) đang nắm sẵn cơ hội thắng ngay 
 
 ## 3. QUY TRÌNH & THUẬT TOÁN SINH THẾ CỜ (PROCEDURAL GENERATION PIPELINE)
 
-*File thực thi chính: [`src/game/puzzles/generators/tacticalGenerator.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/generators/tacticalGenerator.ts)*
+*File thực thi chính: [`src/game/puzzles/generators/tacticalGenerator.ts`](../src/game/puzzles/generators/tacticalGenerator.ts)*
 
 ### 3.1. Pipeline 5 Bước Sinh Bản Đồ
 
@@ -164,7 +164,7 @@ Input: { stars: 1..7, type?: 'VCF'|'VCT'|'DEFENSE', density?: 'sparse'|'normal'|
 ---
 
 ### 3.2. Nhóm Đối Xứng D4 (Dihedral Group Transformations)
-*File: [`src/game/puzzles/utils/symmetry.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/utils/symmetry.ts)*
+*File: [`src/game/puzzles/utils/symmetry.ts`](../src/game/puzzles/utils/symmetry.ts)*
 
 Mỗi hạt giống $(r, c)$ được chuyển đổi qua 8 trạng thái đẳng cấu hình học:
 1. **Nguyên bản (Identity)**: $(r, c)$
@@ -179,7 +179,7 @@ Mỗi hạt giống $(r, c)$ được chuyển đổi qua 8 trạng thái đẳn
 ---
 
 ### 3.3. Hệ Thống 42 Mẫu Giao Tranh Thực Chiến (Skirmish Noise)
-*File: [`src/game/puzzles/templates/skirmishes.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/templates/skirmishes.ts)*
+*File: [`src/game/puzzles/templates/skirmishes.ts`](../src/game/puzzles/templates/skirmishes.ts)*
 
 Bao gồm 42 cụm thế cờ trung cuộc và khai cuộc thực tế đã trung hòa (Settled skirmishes):
 - Nhóm 1: Cụm giao tranh góc bàn cờ (Corner Skirmishes).
@@ -199,7 +199,7 @@ Tham số `density` kiểm soát số lượng quân cờ trang trí xung quanh 
 
 ## 4. CƠ CHẾ KIỂM ĐỊNH AI SOLVER & VÙNG GỢI Ý
 
-*File: [`src/game/puzzles/utils/validator.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/src/game/puzzles/utils/validator.ts)*
+*File: [`src/game/puzzles/utils/validator.ts`](../src/game/puzzles/utils/validator.ts)*
 
 - **Kiểm định nước giải (`getVCFSolutionTrace` / `getVCTSolutionTrace`)**:
   - AI Solver chạy thuật toán Minimax đệ quy tìm kiếm đường thắng tối ưu.
@@ -272,7 +272,7 @@ Người chơi bắt đầu từ bàn cờ trống, đối đầu với AI qua 8
 
 ## 7. HƯỚNG DẪN CHẠY TEST TỰ ĐỘNG (AUTOMATED TESTING GUIDE)
 
-Bộ kiểm thử được viết bằng `bun:test` tại file [`test/seeds.test.ts`](file:///c:/Users/uongsuadaubung/Desktop/gomoku/test/seeds.test.ts).
+Bộ kiểm thử được viết bằng `bun:test` tại file [`test/seeds.test.ts`](../test/seeds.test.ts).
 
 ### Lệnh Chạy Test:
 
