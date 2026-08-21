@@ -16,13 +16,12 @@ export * from './BlitzStrategy';
 export * from './TutorStrategy';
 export * from './GuideStrategy';
 
-// Singleton instances để tái sử dụng hiệu quả
-const campaignStrategy = new CampaignStrategy();
-const puzzleStrategy = new PuzzleStrategy();
-const customStrategy = new CustomStrategy();
-const blitzStrategy = new BlitzStrategy();
-const tutorStrategy = new TutorStrategy();
-const guideStrategy = new GuideStrategy();
+let _campaign: CampaignStrategy | null = null;
+let _puzzle: PuzzleStrategy | null = null;
+let _custom: CustomStrategy | null = null;
+let _blitz: BlitzStrategy | null = null;
+let _tutor: TutorStrategy | null = null;
+let _guide: GuideStrategy | null = null;
 
 export type AnyGameModeStrategy =
   | CampaignStrategy
@@ -31,16 +30,6 @@ export type AnyGameModeStrategy =
   | BlitzStrategy
   | TutorStrategy
   | GuideStrategy;
-
-const strategyMap: Record<GameMode, AnyGameModeStrategy> = {
-  campaign: campaignStrategy,
-  puzzle: puzzleStrategy,
-  custom: customStrategy,
-  blitz: blitzStrategy,
-  tutor: tutorStrategy,
-  guide: guideStrategy,
-  menu: campaignStrategy, // Mặc định khi ở Menu
-};
 
 /**
  * Lấy Strategy tương ứng với GameMode được truyền vào (Strategy Pattern Factory)
@@ -54,6 +43,21 @@ export function getGameStrategy(mode: 'guide'): GuideStrategy;
 export function getGameStrategy(mode: 'menu'): CampaignStrategy;
 export function getGameStrategy(mode: GameMode): AnyGameModeStrategy;
 export function getGameStrategy(mode: GameMode): AnyGameModeStrategy {
-  return strategyMap[mode] || campaignStrategy;
+  switch (mode) {
+    case 'puzzle':
+      return (_puzzle ??= new PuzzleStrategy());
+    case 'custom':
+      return (_custom ??= new CustomStrategy());
+    case 'blitz':
+      return (_blitz ??= new BlitzStrategy());
+    case 'tutor':
+      return (_tutor ??= new TutorStrategy());
+    case 'guide':
+      return (_guide ??= new GuideStrategy());
+    case 'campaign':
+    case 'menu':
+    default:
+      return (_campaign ??= new CampaignStrategy());
+  }
 }
 

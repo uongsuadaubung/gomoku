@@ -225,7 +225,6 @@ const EVENT_CONTEXT_KEYWORDS: Partial<Record<TauntEvent, string[]>> = {
   TOGGLE_STEP_NUMBERS: ['số thứ tự', 'bật số', 'tắt số', 'đếm', 'bước đi', 'nước đi', 'đánh số', 'dãy số', 'con số', 'số bước', 'bảng cửu chương', 'số 0', 'hiển thị số'],
   OPEN_STATS: ['thống kê', 'tỷ lệ thắng', 'bảng vàng', 'thành tích', 'soi', 'xem lại'],
   RESET_STATS: ['reset', 'xóa', 'về 0', 'tẩy trắng', 'làm lại từ đầu', 'quên đi'],
-  OPEN_RULES: ['luật', 'đọc luật', 'sách', '5 quân', 'phạm quy', 'học luật', 'cấp tốc'],
   OPEN_BOT_MODAL: ['cấp độ', 'level', 'độ khó', 'bot', 'thông tin', 'nghiên cứu', 'soi'],
   CHANGE_BOT_LEVEL_UP: ['tăng cấp', 'tăng độ khó', 'thử thách', 'mạnh hơn', 'tự tin', 'liều'],
   CHANGE_BOT_LEVEL_DOWN: ['hạ cấp', 'giảm độ khó', 'sợ', 'dễ hơn', 'bắt nạt', 'yếu'],
