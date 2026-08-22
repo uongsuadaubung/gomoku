@@ -236,6 +236,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
         initialBoard: buildBoard([
           { r: 7, c: 6, p: BLACK }, // G8
           { r: 7, c: 7, p: BLACK }, // H8
+          { r: 5, c: 5, p: WHITE }, // F10
           { r: 6, c: 8, p: WHITE }, // I9
         ]),
         playerColor: BLACK,
@@ -250,6 +251,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 6, p: BLACK }, // G8
               { r: 7, c: 7, p: BLACK }, // H8
               { r: 5, c: 5, p: WHITE }, // F10
+              { r: 6, c: 8, p: WHITE }, // I9
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 8 }, // I8
@@ -289,6 +291,10 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 7, c: 6, p: BLACK }, // G8
           { r: 7, c: 7, p: BLACK }, // H8
           { r: 7, c: 8, p: BLACK }, // I8
+          { r: 8, c: 7, p: BLACK }, // H7
+          { r: 6, c: 5, p: WHITE }, // F9
+          { r: 9, c: 9, p: WHITE }, // J6
+          { r: 8, c: 4, p: WHITE }, // E7
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -304,6 +310,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 7, p: BLACK }, // H8
               { r: 7, c: 8, p: BLACK }, // I8
               { r: 8, c: 7, p: BLACK }, // H7
+              { r: 6, c: 5, p: WHITE }, // F9
+              { r: 9, c: 9, p: WHITE }, // J6
+              { r: 8, c: 4, p: WHITE }, // E7
             ]),
             playerColor: BLACK,
             targetMove: { row: 6, col: 7 }, // H9
@@ -342,7 +351,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 7, c: 6, p: BLACK }, // G8
           { r: 7, c: 7, p: BLACK }, // H8
           { r: 7, c: 8, p: BLACK }, // I8
+          { r: 4, c: 4, p: WHITE }, // E11
           { r: 5, c: 5, p: WHITE }, // F10
+          { r: 9, c: 7, p: WHITE }, // H6
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -357,6 +368,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 7, p: BLACK }, // H8
               { r: 7, c: 8, p: BLACK }, // I8
               { r: 4, c: 4, p: WHITE }, // E11
+              { r: 5, c: 5, p: WHITE }, // F10
+              { r: 9, c: 7, p: WHITE }, // H6
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 9 }, // J8
@@ -388,6 +401,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 7, c: 7, p: BLACK }, // H8
           { r: 7, c: 8, p: BLACK }, // I8
           { r: 9, c: 9, p: WHITE }, // J6
+          { r: 8, c: 4, p: WHITE }, // E7
+          { r: 5, c: 5, p: WHITE }, // F10
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -402,6 +417,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 7, p: BLACK }, // H8
               { r: 7, c: 8, p: BLACK }, // I8
               { r: 9, c: 9, p: WHITE }, // J6
+              { r: 8, c: 4, p: WHITE }, // E7
+              { r: 5, c: 5, p: WHITE }, // F10
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 6 }, // G8
@@ -687,6 +704,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 7, c: 6, p: BLACK }, // G8
           { r: 5, c: 9, p: WHITE }, // J10
           { r: 8, c: 9, p: WHITE }, // J7
+          { r: 6, c: 4, p: WHITE }, // E9
+          { r: 8, c: 5, p: WHITE }, // F7
+          { r: 9, c: 8, p: WHITE }, // I6
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -704,6 +724,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 6, p: BLACK }, // G8
               { r: 5, c: 9, p: WHITE }, // J10
               { r: 8, c: 9, p: WHITE }, // J7
+              { r: 6, c: 4, p: WHITE }, // E9
+              { r: 8, c: 5, p: WHITE }, // F7
+              { r: 9, c: 8, p: WHITE }, // I6
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -737,6 +760,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 6, c: 7, p: BLACK }, // H9
           { r: 4, c: 9, p: WHITE }, // J11
           { r: 9, c: 4, p: WHITE }, // E6
+          { r: 8, c: 8, p: WHITE }, // I7
+          { r: 6, c: 5, p: WHITE }, // F9
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -753,6 +778,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 6, c: 7, p: BLACK }, // H9
               { r: 4, c: 9, p: WHITE }, // J11
               { r: 9, c: 4, p: WHITE }, // E6
+              { r: 8, c: 8, p: WHITE }, // I7
+              { r: 6, c: 5, p: WHITE }, // F9
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -788,6 +815,10 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 6, c: 7, p: BLACK }, // H9
           { r: 7, c: 3, p: WHITE }, // D8
           { r: 3, c: 7, p: WHITE }, // H12
+          { r: 5, c: 9, p: WHITE }, // J10
+          { r: 8, c: 9, p: WHITE }, // J7
+          { r: 5, c: 5, p: WHITE }, // F10
+          { r: 5, c: 3, p: WHITE }, // D10
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -806,6 +837,10 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 6, c: 7, p: BLACK }, // H9
               { r: 7, c: 3, p: WHITE }, // D8
               { r: 3, c: 7, p: WHITE }, // H12
+              { r: 5, c: 9, p: WHITE }, // J10
+              { r: 8, c: 9, p: WHITE }, // J7
+              { r: 5, c: 5, p: WHITE }, // F10
+              { r: 5, c: 3, p: WHITE }, // D10
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -839,6 +874,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 7, c: 6, p: BLACK }, // G8
           { r: 3, c: 3, p: WHITE }, // D12
           { r: 8, c: 4, p: WHITE }, // E7
+          { r: 8, c: 8, p: WHITE }, // I7
+          { r: 6, c: 9, p: WHITE }, // J9
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -855,6 +892,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 7, c: 6, p: BLACK }, // G8
               { r: 3, c: 3, p: WHITE }, // D12
               { r: 8, c: 4, p: WHITE }, // E7
+              { r: 8, c: 8, p: WHITE }, // I7
+              { r: 6, c: 9, p: WHITE }, // J9
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -946,6 +985,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 5, c: 8, p: BLACK }, // I10
           { r: 6, c: 8, p: WHITE }, // I9
           { r: 8, c: 8, p: WHITE }, // I7
+          { r: 6, c: 5, p: WHITE }, // F9
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -961,6 +1001,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 5, c: 8, p: BLACK }, // I10
               { r: 6, c: 8, p: WHITE }, // I9
               { r: 8, c: 8, p: WHITE }, // I7
+              { r: 6, c: 5, p: WHITE }, // F9
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 8 }, // I8
@@ -988,10 +1029,11 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
         description: 'Chiếm giữ những giao điểm huyết mạch để khóa chặt toàn bộ các hướng tiến công tiềm năng của đối thủ, ép họ rơi vào thế cạn kiệt nước đi.',
         coreConcepts: ['Đóng băng không gian', 'Hạn chế tầm với', 'Bóp nghẹt thế trận'],
         initialBoard: buildBoard([
-          { r: 6, c: 7, p: WHITE }, // H9
-          { r: 6, c: 8, p: WHITE }, // I9
+          { r: 7, c: 7, p: BLACK }, // H8
           { r: 8, c: 7, p: BLACK }, // H7
           { r: 8, c: 8, p: BLACK }, // I7
+          { r: 6, c: 7, p: WHITE }, // H9
+          { r: 6, c: 8, p: WHITE }, // I9
           { r: 5, c: 6, p: WHITE }, // G10
         ]),
         playerColor: BLACK,
@@ -1003,10 +1045,11 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
             stepIndex: 1,
             instruction: 'Đánh G9 để đóng băng hoàn toàn hướng bành trướng phía Tây Bắc của quân Trắng!',
             initialBoard: buildBoard([
-              { r: 6, c: 7, p: WHITE }, // H9
-              { r: 6, c: 8, p: WHITE }, // I9
+              { r: 7, c: 7, p: BLACK }, // H8
               { r: 8, c: 7, p: BLACK }, // H7
               { r: 8, c: 8, p: BLACK }, // I7
+              { r: 6, c: 7, p: WHITE }, // H9
+              { r: 6, c: 8, p: WHITE }, // I9
               { r: 5, c: 6, p: WHITE }, // G10
             ]),
             playerColor: BLACK,
@@ -1058,6 +1101,11 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 9, c: 8, p: BLACK }, // I6
           { r: 4, c: 4, p: WHITE }, // E11
           { r: 7, c: 3, p: WHITE }, // D8
+          { r: 5, c: 3, p: WHITE }, // D10
+          { r: 6, c: 3, p: WHITE }, // D9
+          { r: 8, c: 4, p: WHITE }, // E7
+          { r: 4, c: 5, p: WHITE }, // F11
+          { r: 9, c: 10, p: WHITE }, // K6
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -1077,6 +1125,11 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 9, c: 8, p: BLACK }, // I6
               { r: 4, c: 4, p: WHITE }, // E11
               { r: 7, c: 3, p: WHITE }, // D8
+              { r: 5, c: 3, p: WHITE }, // D10
+              { r: 6, c: 3, p: WHITE }, // D9
+              { r: 8, c: 4, p: WHITE }, // E7
+              { r: 4, c: 5, p: WHITE }, // F11
+              { r: 9, c: 10, p: WHITE }, // K6
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -1110,6 +1163,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 9, c: 6, p: BLACK }, // G6
           { r: 5, c: 9, p: WHITE }, // J10
           { r: 9, c: 9, p: WHITE }, // J6
+          { r: 8, c: 4, p: WHITE }, // E7
+          { r: 7, c: 5, p: WHITE }, // F8
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -1126,6 +1181,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 9, c: 6, p: BLACK }, // G6
               { r: 5, c: 9, p: WHITE }, // J10
               { r: 9, c: 9, p: WHITE }, // J6
+              { r: 8, c: 4, p: WHITE }, // E7
+              { r: 7, c: 5, p: WHITE }, // F8
             ]),
             playerColor: BLACK,
             targetMove: { row: 6, col: 8 }, // I9
@@ -1160,6 +1217,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 8, c: 8, p: BLACK }, // I7
           { r: 4, c: 4, p: WHITE }, // E11
           { r: 9, c: 9, p: WHITE }, // J6
+          { r: 7, c: 3, p: WHITE }, // D8
+          { r: 5, c: 5, p: WHITE }, // F10
+          { r: 9, c: 6, p: WHITE }, // G6
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -1177,6 +1237,9 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 8, c: 8, p: BLACK }, // I7
               { r: 4, c: 4, p: WHITE }, // E11
               { r: 9, c: 9, p: WHITE }, // J6
+              { r: 7, c: 3, p: WHITE }, // D8
+              { r: 5, c: 5, p: WHITE }, // F10
+              { r: 9, c: 6, p: WHITE }, // G6
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 7 }, // H8
@@ -1223,6 +1286,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 5, c: 7, p: BLACK }, // H10
           { r: 6, c: 7, p: BLACK }, // H9
           { r: 3, c: 3, p: WHITE }, // D12
+          { r: 9, c: 4, p: WHITE }, // E6
+          { r: 9, c: 9, p: WHITE }, // J6
         ]),
         playerColor: WHITE,
         turnPlayer: WHITE,
@@ -1238,6 +1303,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 5, c: 7, p: BLACK }, // H10
               { r: 6, c: 7, p: BLACK }, // H9
               { r: 3, c: 3, p: WHITE }, // D12
+              { r: 9, c: 4, p: WHITE }, // E6
+              { r: 9, c: 9, p: WHITE }, // J6
             ]),
             playerColor: WHITE,
             targetMove: { row: 7, col: 7 }, // H8
@@ -1279,6 +1346,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 5, c: 8, p: WHITE }, // I10
           { r: 6, c: 8, p: WHITE }, // I9
           { r: 9, c: 9, p: BLACK }, // J6
+          { r: 4, c: 3, p: WHITE }, // D11
         ]),
         playerColor: WHITE,
         turnPlayer: WHITE,
@@ -1295,6 +1363,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 5, c: 8, p: WHITE }, // I10
               { r: 6, c: 8, p: WHITE }, // I9
               { r: 9, c: 9, p: BLACK }, // J6
+              { r: 4, c: 3, p: WHITE }, // D11
             ]),
             playerColor: WHITE,
             targetMove: { row: 7, col: 8 }, // I8
@@ -1334,6 +1403,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 8, c: 8, p: BLACK }, // I7
           { r: 4, c: 4, p: WHITE }, // E11
           { r: 4, c: 5, p: WHITE }, // F11
+          { r: 5, c: 3, p: WHITE }, // D10
         ]),
         playerColor: WHITE,
         turnPlayer: WHITE,
@@ -1350,6 +1420,7 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 8, c: 8, p: BLACK }, // I7
               { r: 4, c: 4, p: WHITE }, // E11
               { r: 4, c: 5, p: WHITE }, // F11
+              { r: 5, c: 3, p: WHITE }, // D10
             ]),
             playerColor: WHITE,
             targetMove: { row: 7, col: 8 }, // I8
@@ -1397,6 +1468,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
           { r: 6, c: 7, p: BLACK }, // H9
           { r: 3, c: 3, p: WHITE }, // D12
           { r: 9, c: 9, p: WHITE }, // J6
+          { r: 9, c: 4, p: WHITE }, // E6
+          { r: 4, c: 8, p: WHITE }, // I11
         ]),
         playerColor: BLACK,
         turnPlayer: BLACK,
@@ -1413,6 +1486,8 @@ export const GUIDE_CHAPTERS: GuideChapter[] = [
               { r: 6, c: 7, p: BLACK }, // H9
               { r: 3, c: 3, p: WHITE }, // D12
               { r: 9, c: 9, p: WHITE }, // J6
+              { r: 9, c: 4, p: WHITE }, // E6
+              { r: 4, c: 8, p: WHITE }, // I11
             ]),
             playerColor: BLACK,
             targetMove: { row: 7, col: 8 }, // I8
