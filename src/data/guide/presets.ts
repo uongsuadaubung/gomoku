@@ -330,9 +330,9 @@ export const PRESET_BOARDS: PresetBoard[] = [
     id: 'renju_foul_trap',
     category: 'defense_master',
     categoryName: 'Bậc Thầy Phòng Thủ',
-    name: 'Bẫy Cấm Renju Foul Trap',
-    vietnameseName: 'Tuyệt Kỹ Bẫy Cấm Ép Đen Tự Sát',
-    description: 'Trắng tạo nước 4 ép Đen phải nhảy vào ô cấm 3-3 tại H8 khiến Đen bị xử thua ngay.',
+    name: 'Bẫy Cấm Renju Foul Trap (Mở Rộng)',
+    vietnameseName: 'Tuyệt Kỹ Bẫy Cấm Ép Đen Tự Sát (Luật Renju Quốc Tế)',
+    description: 'Trắng tạo nước 4 ép Đen phải nhảy vào ô cấm 3-3 tại H8 khiến Đen bị xử thua ngay theo luật Renju quốc tế (Chuyên đề tham khảo mở rộng).',
     board: buildBoard([
       { r: 7, c: 5, p: BLACK }, // F8
       { r: 7, c: 6, p: BLACK }, // G8
@@ -344,7 +344,7 @@ export const PRESET_BOARDS: PresetBoard[] = [
     ]),
     turnPlayer: WHITE,
     recommendedMove: { row: 7, col: 8 }, // I8
-    tacticalNote: 'Đánh I8 tạo nước 4 ép Đen nhảy vào ô cấm H8 tự sát theo luật Renju.',
+    tacticalNote: 'Đánh I8 tạo nước 4 ép Đen nhảy vào ô cấm H8 tự sát theo luật Renju quốc tế (chuyên đề tham khảo).',
   }
 ];
 
